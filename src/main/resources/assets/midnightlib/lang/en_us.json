@@ -1,0 +1,7 @@
+{
+	"midnightlib.midnightconfig.title":"MidnightLib Config",
+	"midnightlib.midnightconfig.event_hats":"Enable Event Hats",
+	"midnightlib.midnightconfig.event_hats.tooltip":"Enable or disable event hats",
+	"midnightlib.midnightconfig.special_hats":"Enable Special Hats",
+	"midnightlib.midnightconfig.special_hats.tooltip":"Enable or disable hats for contributors, friends and donors."
+}

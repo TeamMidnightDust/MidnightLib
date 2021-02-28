@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "midnightlib",
+  "version": "${version}",
+
+  "name": "MidnightLib",
+  "description": "Common Library for Team MidnightDust's mods.\nProvides a config api, common utils, and cosmetics.",
+  "authors": [
+    "Motschen",
+    "TeamMidnightDust"
+  ],
+  "contact": {
+    "homepage": "https://www.midnightdust.eu/",
+    "sources": "https://github.com/TeamMidnightDust/MidnightLib",
+    "issues": "https://github.com/TeamMidnightDust/MidnightLib/issues"
+  },
+
+  "license": "MIT",
+  "icon": "assets/midnightlib/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "eu.midnightdust.hats.HatsClient"
+    ],
+    "modmenu": [
+      "eu.midnightdust.hats.config.ModMenuIntegration"
+    ]
+  },
+
+  "mixins": [
+    "midnight-hats.mixins.json"
+  ],
+
+  "depends": {
+    "fabric": "*"
+  },
+
+  "custom": {
+    "modmenu:api": true
+  }
+}
