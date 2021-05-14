@@ -1,11 +1,10 @@
 package eu.midnightdust.hats.tater;
 
-import eu.midnightdust.hats.HatsClient;
-import eu.midnightdust.hats.config.AreEventHatsEnabled;
+import eu.midnightdust.core.MidnightLibClient;
+import eu.midnightdust.core.config.MidnightLibConfig;
 import eu.midnightdust.hats.web.HatLoader;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.model.TexturedModelData;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.OverlayTexture;
@@ -28,7 +27,7 @@ import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public class TinyPotatoFeatureRenderer<T extends LivingEntity, M extends EntityModel<T>> extends FeatureRenderer<T, M> {
-    private static final String MOD_ID = HatsClient.MOD_ID;
+    private static final String MOD_ID = MidnightLibClient.MOD_ID;
     public static final EntityModelLayer TINY_POTATO_MODEL_LAYER = new EntityModelLayer(new Identifier("midnight-hats","tiny_potato"), "main");
     private static final UUID MOTSCHEN = UUID.fromString("a44c2660-630f-478f-946a-e518669fcf0c");
 
@@ -38,7 +37,7 @@ public class TinyPotatoFeatureRenderer<T extends LivingEntity, M extends EntityM
 
     public TinyPotatoFeatureRenderer(FeatureRendererContext<T, M> featureRendererContext, EntityModelLoader entityModelLoader) {
         super(featureRendererContext);
-        this.tinyPotato = new TinyPotatoModel(entityModelLoader.getModelPart(TINY_POTATO_MODEL_LAYER));
+        this.tinyPotato = new TinyPotatoModel<>(entityModelLoader.getModelPart(TINY_POTATO_MODEL_LAYER));
     }
 
     public static TexturedModelData getTexturedModelData() {
@@ -50,15 +49,11 @@ public class TinyPotatoFeatureRenderer<T extends LivingEntity, M extends EntityM
             AbstractClientPlayerEntity abstractClientPlayerEntity = (AbstractClientPlayerEntity)livingEntity;
             Identifier hat_type;
             if (livingEntity != null) {
-
                 if (Calendar.getInstance().get(Calendar.MONTH) == Calendar.DECEMBER && Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == 10) {
-                    if (FabricLoader.getInstance().isModLoaded("cloth-config2")) {
-                        if (AreEventHatsEnabled.areEventHatsEnabled()) {
-                            hat_type = TATER;
-                        }
-                        else hat_type = DEACTIVATED;
+                    if (MidnightLibConfig.event_hats) {
+                        hat_type = TATER;
                     }
-                    else hat_type = TATER;
+                    else hat_type = DEACTIVATED;
                 }else {
                     hat_type = DEACTIVATED;
                 }

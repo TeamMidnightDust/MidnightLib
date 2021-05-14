@@ -26,8 +26,7 @@ public class HatLoader {
     public static void init() {
         CompletableFuture.supplyAsync(() -> {
             try (Reader reader = new InputStreamReader(new URL(HATS_URL).openStream())) {
-                Map<UUID, PlayerHatData> playerData = GSON.fromJson(reader, HAT_TYPE);
-                return playerData;
+                return GSON.<Map<UUID, PlayerHatData>>fromJson(reader, HAT_TYPE);
             } catch (MalformedURLException error) {
                 logger.log(Level.ERROR, "Unable to load player hats because of connection problems: " + error.getMessage());
             } catch (IOException error) {

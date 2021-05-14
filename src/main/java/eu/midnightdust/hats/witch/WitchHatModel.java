@@ -35,7 +35,7 @@ public class WitchHatModel<T extends LivingEntity> extends SinglePartEntityModel
         modelPartData.addChild("headwear", ModelPartBuilder.create().uv(0, 64).cuboid(-10.0F, -0.1F, 0.0F, 10.0F, 2.0F, 10.0F), ModelTransform.NONE);
         ModelPartData modelPartData2 = modelPartData.addChild("bone", ModelPartBuilder.create().uv(0, 76).cuboid(0.0F, -4.0F, 0.0F, 7.0F, 4.0F, 7.0F), ModelTransform.rotation(-0.0524F, 0.0F, 0.0349F));
         ModelPartData modelPartData3 = modelPartData2.addChild("bone2", ModelPartBuilder.create().uv(0, 87).cuboid(0.0F, -4.0F, 0.0F, 4.0F, 4.0F, 4.0F), ModelTransform.rotation(-0.1222F, 0.0F, 0.0698F));
-        ModelPartData modelPartData4 = modelPartData3.addChild("bone3", ModelPartBuilder.create().uv(0, 95).cuboid(0.0F, -2.0F, 0.0F, 1.0F, 2.0F, 1.0F), ModelTransform.rotation(-0.2618F, 0.0F, 0.1047F));
+        modelPartData3.addChild("bone3", ModelPartBuilder.create().uv(0, 95).cuboid(0.0F, -2.0F, 0.0F, 1.0F, 2.0F, 1.0F), ModelTransform.rotation(-0.2618F, 0.0F, 0.1047F));
 
         return modelData;
     }

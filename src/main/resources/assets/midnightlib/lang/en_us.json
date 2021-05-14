@@ -1,7 +1,13 @@
 {
+	"midnightlib.overview.title":"MidnightConfig Overview",
 	"midnightlib.midnightconfig.title":"MidnightLib Config",
+	"midnightlib.midnightconfig.midnightlib_description":"MidnightLib",
+	"midnightlib.midnightconfig.config_screen_list":"Enable Config Screen List",
+	"midnightlib.midnightconfig.midnighthats_description":"MidnightHats",
 	"midnightlib.midnightconfig.event_hats":"Enable Event Hats",
-	"midnightlib.midnightconfig.event_hats.tooltip":"Enable or disable event hats",
 	"midnightlib.midnightconfig.special_hats":"Enable Special Hats",
-	"midnightlib.midnightconfig.special_hats.tooltip":"Enable or disable hats for contributors, friends and donors."
+	"midnightlib.modrinth":"Modrinth",
+	"midnightlib.curseforge":"CurseForge",
+	"modmenu.descriptionTranslation.midnightlib": "Common Library for Team MidnightDust's mods.\nProvides a config api, common utils, and cosmetics.",
+	"modmenu.summaryTranslation.midnightlib": "Common Library for Team MidnightDust's mods."
 }

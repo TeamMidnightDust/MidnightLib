@@ -1,7 +1,7 @@
 package eu.midnightdust.hats.bunny;
 
-import eu.midnightdust.hats.HatsClient;
-import eu.midnightdust.hats.config.AreEventHatsEnabled;
+import eu.midnightdust.core.MidnightLibClient;
+import eu.midnightdust.core.config.MidnightLibConfig;
 import eu.midnightdust.hats.web.HatLoader;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public class BunnyEarsFeatureRenderer<T extends LivingEntity, M extends EntityModel<T>> extends FeatureRenderer<T, M> {
-    private static final String MOD_ID = HatsClient.MOD_ID;
+    private static final String MOD_ID = MidnightLibClient.MOD_ID;
     public static final EntityModelLayer RABBIT_EARS_MODEL_LAYER = new EntityModelLayer(new Identifier("midnight-hats","bunny_ears"), "main");
     private static final UUID MOTSCHEN = UUID.fromString("a44c2660-630f-478f-946a-e518669fcf0c");
 
@@ -49,13 +49,10 @@ public class BunnyEarsFeatureRenderer<T extends LivingEntity, M extends EntityMo
             if (livingEntity != null) {
 
                 if (Calendar.getInstance().get(Calendar.MONTH) == Calendar.APRIL && Calendar.getInstance().get(Calendar.DAY_OF_MONTH) <= 4) {
-                    if (FabricLoader.getInstance().isModLoaded("cloth-config2")) {
-                        if (AreEventHatsEnabled.areEventHatsEnabled()) {
-                            hat_type = RABBIT;
-                        }
-                        else hat_type = DEACTIVATED;
+                    if (MidnightLibConfig.event_hats) {
+                        hat_type = RABBIT;
                     }
-                    else hat_type = RABBIT;
+                    else hat_type = DEACTIVATED;
                 }else {
                     hat_type = DEACTIVATED;
                 }

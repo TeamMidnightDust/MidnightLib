@@ -1,11 +1,10 @@
 package eu.midnightdust.hats.witch;
 
-import eu.midnightdust.hats.HatsClient;
-import eu.midnightdust.hats.config.AreEventHatsEnabled;
+import eu.midnightdust.core.MidnightLibClient;
+import eu.midnightdust.core.config.MidnightLibConfig;
 import eu.midnightdust.hats.web.HatLoader;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.model.TexturedModelData;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.OverlayTexture;
@@ -28,7 +27,7 @@ import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public class WitchHatFeatureRenderer<T extends LivingEntity, M extends EntityModel<T>> extends FeatureRenderer<T, M> {
-    private static final String MOD_ID = HatsClient.MOD_ID;
+    private static final String MOD_ID = MidnightLibClient.MOD_ID;
     public static final EntityModelLayer WITCH_HAT_MODEL_LAYER = new EntityModelLayer(new Identifier("midnight-hats","witch_hat"), "main");
     private static final UUID MOTSCHEN = UUID.fromString("a44c2660-630f-478f-946a-e518669fcf0c");
 
@@ -44,7 +43,7 @@ public class WitchHatFeatureRenderer<T extends LivingEntity, M extends EntityMod
 
     public WitchHatFeatureRenderer(FeatureRendererContext<T, M> featureRendererContext, EntityModelLoader entityModelLoader) {
         super(featureRendererContext);
-        this.witchHat = new WitchHatModel(entityModelLoader.getModelPart(WITCH_HAT_MODEL_LAYER));
+        this.witchHat = new WitchHatModel<>(entityModelLoader.getModelPart(WITCH_HAT_MODEL_LAYER));
     }
 
     public static TexturedModelData getTexturedModelData() {
@@ -54,40 +53,35 @@ public class WitchHatFeatureRenderer<T extends LivingEntity, M extends EntityMod
     public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, T livingEntity, float f, float g, float h, float j, float k, float l) {
         {
             Identifier hat_type = DEACTIVATED;
-            if (livingEntity instanceof AbstractClientPlayerEntity) {
-                AbstractClientPlayerEntity abstractClientPlayerEntity = (AbstractClientPlayerEntity)livingEntity;
+            if (livingEntity instanceof AbstractClientPlayerEntity abstractClientPlayerEntity) {
 
                 if (abstractClientPlayerEntity.getUuid().equals(MOTSCHEN)) {
                     hat_type = MOTSCHEN_SKIN;
-                }else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("contributer")) {
+                } else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("contributer")) {
                     hat_type = CONTRIBUTER_SKIN;
-                }else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("friend")) {
+                } else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("friend")) {
                     hat_type = FRIEND_SKIN;
-                }else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("donator")) {
+                } else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("donator")) {
                     hat_type = DONATOR_SKIN;
-                }else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("social")) {
+                } else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("social")) {
                     hat_type = SOCIAL_SKIN;
-                }else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("pride")) {
+                } else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("pride")) {
                     hat_type = PRIDE_SKIN;
-                }else if (Calendar.getInstance().get(Calendar.MONTH) == Calendar.OCTOBER && Calendar.getInstance().get(Calendar.DAY_OF_MONTH) >= 30) {
-                    if (FabricLoader.getInstance().isModLoaded("cloth-config2")) {
-                        if (AreEventHatsEnabled.areEventHatsEnabled()) {
-                            hat_type = WITCH;
-                        }
-                        else hat_type = DEACTIVATED;
+                } else if (Calendar.getInstance().get(Calendar.MONTH) == Calendar.OCTOBER && Calendar.getInstance().get(Calendar.DAY_OF_MONTH) >= 30) {
+                    if (MidnightLibConfig.event_hats) {
+                        hat_type = WITCH;
                     }
-                    else hat_type = WITCH;
-                }else hat_type = DEACTIVATED;
-            } else { hat_type = DEACTIVATED; }
+                }
 
-            if (!(hat_type == DEACTIVATED)) {
-                matrixStack.push();
+                if (!(hat_type == DEACTIVATED)) {
+                    matrixStack.push();
 
-                ((ModelWithHead) this.getContextModel()).getHead().rotate(matrixStack);
-                VertexConsumer vertexConsumer = ItemRenderer.getArmorGlintConsumer(vertexConsumerProvider, RenderLayer.getEntityCutoutNoCull(hat_type), false, false);
-                this.witchHat.render(matrixStack, vertexConsumer, i, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F, 1.0F, 1.0F);
+                    ((ModelWithHead) this.getContextModel()).getHead().rotate(matrixStack);
+                    VertexConsumer vertexConsumer = ItemRenderer.getArmorGlintConsumer(vertexConsumerProvider, RenderLayer.getEntityCutoutNoCull(hat_type), false, false);
+                    this.witchHat.render(matrixStack, vertexConsumer, i, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F, 1.0F, 1.0F);
 
-                matrixStack.pop();
+                    matrixStack.pop();
+                }
             }
         }
     }

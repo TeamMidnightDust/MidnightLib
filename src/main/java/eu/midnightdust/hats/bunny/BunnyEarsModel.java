@@ -11,10 +11,8 @@ public class BunnyEarsModel<T extends LivingEntity> extends SinglePartEntityMode
 
 	public BunnyEarsModel(ModelPart root) {
 		this.right_ear = root;
-
 		right_ear.setPivot(0.0F, -3.0F, -1.0F);
-
-}
+	}
 	public static ModelData getModelData(){
 		ModelData modelData = new ModelData();
 		ModelPartData modelPartData = modelData.getRoot();
@@ -34,11 +32,5 @@ public class BunnyEarsModel<T extends LivingEntity> extends SinglePartEntityMode
 	@Override
 	public void render(MatrixStack matrixStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha){
 		right_ear.render(matrixStack, buffer, packedLight, packedOverlay);
-	}
-
-	public void setRotationAngle(ModelPart bone, float x, float y, float z) {
-		bone.pitch = x;
-		bone.yaw = y;
-		bone.roll = z;
 	}
 }

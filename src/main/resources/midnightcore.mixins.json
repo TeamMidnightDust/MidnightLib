@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "eu.midnightdust.core.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "MixinOptionsScreen"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

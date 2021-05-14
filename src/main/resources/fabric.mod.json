@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "MidnightLib",
-  "description": "Common Library for Team MidnightDust's mods.\nProvides a config api, common utils, and cosmetics.",
+  "description": "Common Library for Team MidnightDust's mods.",
   "authors": [
     "Motschen",
     "TeamMidnightDust"
@@ -21,7 +21,7 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "eu.midnightdust.hats.HatsClient"
+      "eu.midnightdust.core.MidnightLibClient"
     ],
     "modmenu": [
       "eu.midnightdust.hats.config.ModMenuIntegration"
@@ -29,7 +29,8 @@
   },
 
   "mixins": [
-    "midnight-hats.mixins.json"
+    "midnighthats.mixins.json",
+    "midnightcore.mixins.json"
   ],
 
   "depends": {
@@ -37,6 +38,12 @@
   },
 
   "custom": {
-    "modmenu:api": true
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/jAGnWYHm3r",
+        "modmenu.website": "https://www.midnightdust.eu/"
+      },
+      "badges": [ "library" ]
+    }
   }
 }

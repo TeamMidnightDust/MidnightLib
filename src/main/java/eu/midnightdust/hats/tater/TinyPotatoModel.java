@@ -33,10 +33,4 @@ public class TinyPotatoModel <T extends LivingEntity> extends SinglePartEntityMo
 
 		tater.render(matrixStack, buffer, packedLight, packedOverlay);
 	}
-
-	public void setRotationAngle(ModelPart bone, float x, float y, float z) {
-		bone.pitch = x;
-		bone.yaw = y;
-		bone.roll = z;
-	}
 }
