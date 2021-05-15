@@ -30,9 +30,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-// MidnightConfig v1.0.0
+// MidnightConfig v1.0.1
 // Single class config library - feel free to copy!
 // Changelog:
+// - 1.0.1:
+// - Fixed buttons not working in fullscreen
+// - 1.0.0:
 // - The config screen no longer shows the entries of all instances of MidnightConfig
 // - Compatible with servers!
 // - Scrollable!
@@ -302,7 +305,7 @@ public class MidnightConfig {
             this.addEntry(ButtonEntry.create(button, text, resetButton));
         }
         @Override
-        public int getRowWidth() { return 400; }
+        public int getRowWidth() { return 10000; }
         public Optional<AbstractButtonWidget> getHoveredButton(double mouseX, double mouseY) {
             for (ButtonEntry buttonEntry : this.children()) {
                 for (AbstractButtonWidget abstractButtonWidget : buttonEntry.buttons) {

@@ -18,6 +18,7 @@ public class MidnightLibClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         MidnightConfig.init("midnightlib", MidnightLibConfig.class);
+        MidnightConfig.useTooltipForTitle = MidnightLibConfig.titleStyle.equals(MidnightLibConfig.TitleStyle.TOOLTIP);
 
         EntityModelLayerRegistry.registerModelLayer(BunnyEarsFeatureRenderer.RABBIT_EARS_MODEL_LAYER, BunnyEarsFeatureRenderer::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(ChristmasHatFeatureRenderer.CHRISTMAS_HAT_MODEL_LAYER, ChristmasHatFeatureRenderer::getTexturedModelData);

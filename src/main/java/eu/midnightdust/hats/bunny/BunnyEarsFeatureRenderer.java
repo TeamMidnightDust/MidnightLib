@@ -5,7 +5,6 @@ import eu.midnightdust.core.config.MidnightLibConfig;
 import eu.midnightdust.hats.web.HatLoader;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.model.TexturedModelData;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.OverlayTexture;
@@ -35,7 +34,7 @@ public class BunnyEarsFeatureRenderer<T extends LivingEntity, M extends EntityMo
 
     public BunnyEarsFeatureRenderer(FeatureRendererContext<T, M> featureRendererContext, EntityModelLoader entityModelLoader) {
         super(featureRendererContext);
-        this.bunnyEars = new BunnyEarsModel(entityModelLoader.getModelPart(RABBIT_EARS_MODEL_LAYER));
+        this.bunnyEars = new BunnyEarsModel<>(entityModelLoader.getModelPart(RABBIT_EARS_MODEL_LAYER));
     }
 
     public static TexturedModelData getTexturedModelData() {
