@@ -6,6 +6,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.*;
@@ -25,19 +26,16 @@ public class MidnightConfigOverviewScreen extends Screen {
 
     @Override
     protected void init() {
-        super.init();
-
-        this.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 28, 200, 20, ScreenTexts.DONE, (button) -> {
-            Objects.requireNonNull(client).openScreen(parent);
-        }));
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height - 28, 200, 20, ScreenTexts.DONE, (button) -> Objects.requireNonNull(client).openScreen(parent)));
 
         this.list = new MidnightOverviewListWidget(this.client, this.width, this.height, 32, this.height - 32, 25);
-        this.children.add(this.list);
+        this.addSelectableChild(this.list);
         MidnightConfig.configClass.forEach((modid, configClass) -> {
             list.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 28, 200, 20, new TranslatableText(modid +".midnightconfig.title"), (button) -> {
                 Objects.requireNonNull(client).openScreen(MidnightConfig.getScreen(this,modid));
             }));
         });
+        super.init();
     }
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
@@ -45,9 +43,9 @@ public class MidnightConfigOverviewScreen extends Screen {
         this.list.render(matrices, mouseX, mouseY, delta);
 
         int stringWidth = title.getString().length() + 47;
-        super.render(matrices, mouseX, mouseY, delta);
         if (MidnightConfig.useTooltipForTitle) renderTooltip(matrices, title, width/2 - stringWidth, 27);
         else drawCenteredText(matrices, textRenderer, title, width / 2, 15, 0xFFFFFF);
+        super.render(matrices, mouseX, mouseY, delta);
     }
     @Environment(EnvType.CLIENT)
     public static class MidnightOverviewListWidget extends ElementListWidget<OverviewButtonEntry> {
@@ -61,19 +59,19 @@ public class MidnightConfigOverviewScreen extends Screen {
         @Override
         public int getScrollbarPositionX() { return this.width -7; }
 
-        public void addButton(AbstractButtonWidget button) {
+        public void addButton(ClickableWidget button) {
             this.addEntry(OverviewButtonEntry.create(button));
         }
         @Override
         public int getRowWidth() { return 400; }
     }
     public static class OverviewButtonEntry extends ElementListWidget.Entry<OverviewButtonEntry> {
-        private final List<AbstractButtonWidget> buttons = new ArrayList<>();
+        private final List<ClickableWidget> buttons = new ArrayList<>();
 
-        private OverviewButtonEntry(AbstractButtonWidget button) {
+        private OverviewButtonEntry(ClickableWidget button) {
             this.buttons.add(button);
         }
-        public static OverviewButtonEntry create(AbstractButtonWidget button) {
+        public static OverviewButtonEntry create(ClickableWidget button) {
             return new OverviewButtonEntry(button);
         }
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
@@ -83,6 +81,10 @@ public class MidnightConfigOverviewScreen extends Screen {
             });
         }
         public List<? extends Element> children() {
+            return buttons;
+        }
+
+        public List<? extends Selectable> method_37025() {
             return buttons;
         }
     }

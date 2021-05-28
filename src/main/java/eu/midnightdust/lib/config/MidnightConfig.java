@@ -11,6 +11,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.*;
@@ -30,9 +31,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-// MidnightConfig v1.0.1
+// MidnightConfig v1.0.2
 // Single class config library - feel free to copy!
 // Changelog:
+// - 1.0.2:
+// - Update to 21w20a
 // - 1.0.1:
 // - Fixed buttons not working in fullscreen
 // - 1.0.0:
@@ -43,7 +46,7 @@ import java.util.regex.Pattern;
 // - Fresh New Design
 
 /** Based on https://github.com/Minenash/TinyConfig
- * Credits to Minenash */
+ *  Credits to Minenash */
 
 @SuppressWarnings("unchecked")
 public class MidnightConfig {
@@ -200,7 +203,7 @@ public class MidnightConfig {
         protected void init() {
             super.init();
 
-            this.addButton(new ButtonWidget(this.width / 2 - 154, this.height - 28, 150, 20, ScreenTexts.CANCEL, button -> {
+            this.addDrawableChild(new ButtonWidget(this.width / 2 - 154, this.height - 28, 150, 20, ScreenTexts.CANCEL, button -> {
                 try { gson.fromJson(Files.newBufferedReader(path), configClass.get(modid)); }
                 catch (Exception e) { write(modid); }
 
@@ -216,7 +219,7 @@ public class MidnightConfig {
                 Objects.requireNonNull(client).openScreen(parent);
             }));
 
-            ButtonWidget done = this.addButton(new ButtonWidget(this.width / 2 + 4, this.height - 28, 150, 20, ScreenTexts.DONE, (button) -> {
+            ButtonWidget done = this.addDrawableChild(new ButtonWidget(this.width / 2 + 4, this.height - 28, 150, 20, ScreenTexts.DONE, (button) -> {
                 for (EntryInfo info : entries)
                     if (info.id.equals(modid)) {
                         try {
@@ -228,7 +231,7 @@ public class MidnightConfig {
             }));
 
             this.list = new MidnightConfigListWidget(this.client, this.width, this.height, 32, this.height - 32, 25);
-            this.children.add(this.list);
+            this.addSelectableChild(this.list);
             for (EntryInfo info : entries) {
                 if (info.id.equals(modid)) {
                     TranslatableText name = new TranslatableText(translationPrefix + info.field.getName());
@@ -265,14 +268,13 @@ public class MidnightConfig {
             this.list.render(matrices, mouseX, mouseY, delta);
 
             int stringWidth = (int) (title.getString().length() * 2.75f);
-            super.render(matrices, mouseX, mouseY, delta);
             if (useTooltipForTitle) renderTooltip(matrices, title, width/2 - stringWidth, 27);
             else drawCenteredText(matrices, textRenderer, title, width / 2, 15, 0xFFFFFF);
 
             for (EntryInfo info : entries) {
                 if (info.id.equals(modid)) {
                     if (list.getHoveredButton(mouseX,mouseY).isPresent()) {
-                        AbstractButtonWidget buttonWidget = list.getHoveredButton(mouseX,mouseY).get();
+                        ClickableWidget buttonWidget = list.getHoveredButton(mouseX,mouseY).get();
                         Text text = ButtonEntry.buttonsWithText.get(buttonWidget);
                         TranslatableText name = new TranslatableText(this.translationPrefix + info.field.getName());
                         String key = translationPrefix + info.field.getName() + ".tooltip";
@@ -287,6 +289,7 @@ public class MidnightConfig {
                     }
                 }
             }
+            super.render(matrices,mouseX,mouseY,delta);
         }
     }
     @Environment(EnvType.CLIENT)
@@ -301,16 +304,16 @@ public class MidnightConfig {
         @Override
         public int getScrollbarPositionX() { return this.width -7; }
 
-        public void addButton(AbstractButtonWidget button, AbstractButtonWidget resetButton, Text text) {
+        public void addButton(ClickableWidget button, ClickableWidget resetButton, Text text) {
             this.addEntry(ButtonEntry.create(button, text, resetButton));
         }
         @Override
         public int getRowWidth() { return 10000; }
-        public Optional<AbstractButtonWidget> getHoveredButton(double mouseX, double mouseY) {
+        public Optional<ClickableWidget> getHoveredButton(double mouseX, double mouseY) {
             for (ButtonEntry buttonEntry : this.children()) {
-                for (AbstractButtonWidget abstractButtonWidget : buttonEntry.buttons) {
-                    if (abstractButtonWidget.isMouseOver(mouseX, mouseY)) {
-                        return Optional.of(abstractButtonWidget);
+                for (ClickableWidget ClickableWidget : buttonEntry.buttons) {
+                    if (ClickableWidget.isMouseOver(mouseX, mouseY)) {
+                        return Optional.of(ClickableWidget);
                     }
                 }
             }
@@ -319,13 +322,13 @@ public class MidnightConfig {
     }
     public static class ButtonEntry extends ElementListWidget.Entry<ButtonEntry> {
         private static final TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        private final List<AbstractButtonWidget> buttons = new ArrayList<>();
-        private final List<AbstractButtonWidget> resetButtons = new ArrayList<>();
+        private final List<ClickableWidget> buttons = new ArrayList<>();
+        private final List<ClickableWidget> resetButtons = new ArrayList<>();
         private final List<Text> texts = new ArrayList<>();
-        private final List<AbstractButtonWidget> buttonsWithResetButtons = new ArrayList<>();
-        public static final Map<AbstractButtonWidget, Text> buttonsWithText = new HashMap<>();
+        private final List<ClickableWidget> buttonsWithResetButtons = new ArrayList<>();
+        public static final Map<ClickableWidget, Text> buttonsWithText = new HashMap<>();
 
-        private ButtonEntry(AbstractButtonWidget button, Text text, AbstractButtonWidget resetButton) {
+        private ButtonEntry(ClickableWidget button, Text text, ClickableWidget resetButton) {
             buttonsWithText.put(button,text);
             this.buttons.add(button);
             this.resetButtons.add(resetButton);
@@ -333,21 +336,25 @@ public class MidnightConfig {
             this.buttonsWithResetButtons.add(button);
             this.buttonsWithResetButtons.add(resetButton);
         }
-        public static ButtonEntry create(AbstractButtonWidget button, Text text, AbstractButtonWidget resetButton) {
+        public static ButtonEntry create(ClickableWidget button, Text text, ClickableWidget resetButton) {
             return new ButtonEntry(button, text, resetButton);
         }
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            this.buttons.forEach((button) -> {
+            this.buttons.forEach(button -> {
                 button.y = y;
                 button.render(matrices, mouseX, mouseY, tickDelta);
             });
-            this.texts.forEach((text) -> DrawableHelper.drawTextWithShadow(matrices,textRenderer, text,12,y+5,0xFFFFFF));
+            this.texts.forEach(text -> DrawableHelper.drawTextWithShadow(matrices,textRenderer, text,12,y+5,0xFFFFFF));
             this.resetButtons.forEach((button) -> {
                 button.y = y;
                 button.render(matrices, mouseX, mouseY, tickDelta);
             });
         }
         public List<? extends Element> children() {
+            return buttonsWithResetButtons;
+        }
+
+        public List<? extends Selectable> method_37025() {
             return buttonsWithResetButtons;
         }
     }

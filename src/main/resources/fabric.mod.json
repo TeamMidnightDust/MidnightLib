@@ -34,7 +34,7 @@
   ],
 
   "depends": {
-    "fabric": "*"
+    "fabric-renderer-registries-v1": "*"
   },
 
   "custom": {
