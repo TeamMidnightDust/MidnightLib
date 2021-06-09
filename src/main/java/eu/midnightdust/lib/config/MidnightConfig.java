@@ -31,9 +31,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-// MidnightConfig v1.0.2
+// MidnightConfig v1.0.3
 // Single class config library - feel free to copy!
 // Changelog:
+// - 1.0.3:
+// - Text field length is now configurable
+// - Better separation of client and server
 // - 1.0.2:
 // - Update to 21w20a
 // - 1.0.1:
@@ -61,6 +64,7 @@ public class MidnightConfig {
         Field field;
         Object widget;
         int width;
+        int max;
         Map.Entry<TextFieldWidget,Text> error;
         Object defaultValue;
         Object value;
@@ -81,9 +85,7 @@ public class MidnightConfig {
         for (Field field : config.getFields()) {
             EntryInfo info = new EntryInfo();
             if (field.isAnnotationPresent(Entry.class) || field.isAnnotationPresent(Comment.class))
-                try {
-                    initClient(modid, field, info);
-                } catch (Exception e) {continue;}
+                if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) initClient(modid, field, info);
             if (field.isAnnotationPresent(Entry.class))
                 try {
                     info.defaultValue = field.get(null);
@@ -102,7 +104,7 @@ public class MidnightConfig {
         }
     }
     @Environment(EnvType.CLIENT)
-    public static void initClient(String modid, Field field, EntryInfo info) {
+    private static void initClient(String modid, Field field, EntryInfo info) {
         Class<?> type = field.getType();
         Entry e = field.getAnnotation(Entry.class);
         info.width = e != null ? e.width() : 0;
@@ -110,21 +112,24 @@ public class MidnightConfig {
         info.id = modid;
 
         if (e != null)
-            if (type == int.class)         textField(info, Integer::parseInt, INTEGER_ONLY, e.min(), e.max(), true);
-            else if (type == double.class) textField(info, Double::parseDouble, DECIMAL_ONLY, e.min(), e.max(),false);
-            else if (type == String.class) textField(info, String::length, null, Math.min(e.min(),0), Math.max(e.max(),1),true);
+            if (type == int.class) textField(info, Integer::parseInt, INTEGER_ONLY, e.min(), e.max(), true);
+            else if (type == double.class) textField(info, Double::parseDouble, DECIMAL_ONLY, e.min(), e.max(), false);
+            else if (type == String.class) {
+                info.max = e.max() == Double.MAX_VALUE ? Integer.MAX_VALUE : (int) e.max();
+                textField(info, String::length, null, Math.min(e.min(), 0), Math.max(e.max(), 1), true);
+            }
             else if (type == boolean.class) {
-                Function<Object,Text> func = value -> new LiteralText((Boolean) value ? "True" : "False").formatted((Boolean) value ? Formatting.GREEN : Formatting.RED);
+                Function<Object, Text> func = value -> new LiteralText((Boolean) value ? "True" : "False").formatted((Boolean) value ? Formatting.GREEN : Formatting.RED);
                 info.widget = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
                     info.value = !(Boolean) info.value;
                     button.setMessage(func.apply(info.value));
                 }, func);
             } else if (type.isEnum()) {
                 List<?> values = Arrays.asList(field.getType().getEnumConstants());
-                Function<Object,Text> func = value -> new TranslatableText(modid + ".midnightconfig." + "enum." + type.getSimpleName() + "." + info.value.toString());
-                info.widget = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object,Text>>( button -> {
+                Function<Object, Text> func = value -> new TranslatableText(modid + ".midnightconfig." + "enum." + type.getSimpleName() + "." + info.value.toString());
+                info.widget = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
                     int index = values.indexOf(info.value) + 1;
-                    info.value = values.get(index >= values.size()? 0 : index);
+                    info.value = values.get(index >= values.size() ? 0 : index);
                     button.setMessage(func.apply(info.value));
                 }, func);
             }
@@ -171,16 +176,14 @@ public class MidnightConfig {
             e.printStackTrace();
         }
     }
-
     @Environment(EnvType.CLIENT)
     public static Screen getScreen(Screen parent, String modid) {
-        return new TinyConfigScreen(parent, modid);
+        return new MidnightConfigScreen(parent, modid);
     }
-
     @Environment(EnvType.CLIENT)
-    private static class TinyConfigScreen extends Screen {
+    private static class MidnightConfigScreen extends Screen {
 
-        protected TinyConfigScreen(Screen parent, String modid) {
+        protected MidnightConfigScreen(Screen parent, String modid) {
             super(new TranslatableText(modid + ".midnightconfig." + "title"));
             this.parent = parent;
             this.modid = modid;
@@ -250,6 +253,7 @@ public class MidnightConfig {
                     } else if (info.widget != null) {
                         TextFieldWidget widget = new TextFieldWidget(textRenderer, width - 110, 0, info.width, 20, null);
 
+                        widget.setMaxLength(info.max);
                         widget.setText(info.tempValue);
                         Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.widget).apply(widget, done);
                         widget.setTextPredicate(processor);

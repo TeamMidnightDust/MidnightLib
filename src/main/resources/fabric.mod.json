@@ -24,7 +24,7 @@
       "eu.midnightdust.core.MidnightLibClient"
     ],
     "modmenu": [
-      "eu.midnightdust.hats.config.ModMenuIntegration"
+      "eu.midnightdust.lib.config.AutoModMenu"
     ]
   },
 
