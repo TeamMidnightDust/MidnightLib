@@ -14,13 +14,21 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
-import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.ElementListWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.*;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
@@ -31,9 +39,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-// MidnightConfig v1.0.3
+// MidnightConfig v1.0.4
 // Single class config library - feel free to copy!
 // Changelog:
+// - 1.0.4:
+// - Number field length is now configurable
+// - Fixed number fields being empty
 // - 1.0.3:
 // - Text field length is now configurable
 // - Better separation of client and server
@@ -111,14 +122,13 @@ public class MidnightConfig {
         info.field = field;
         info.id = modid;
 
-        if (e != null)
+        if (e != null) {
             if (type == int.class) textField(info, Integer::parseInt, INTEGER_ONLY, e.min(), e.max(), true);
             else if (type == double.class) textField(info, Double::parseDouble, DECIMAL_ONLY, e.min(), e.max(), false);
             else if (type == String.class) {
                 info.max = e.max() == Double.MAX_VALUE ? Integer.MAX_VALUE : (int) e.max();
                 textField(info, String::length, null, Math.min(e.min(), 0), Math.max(e.max(), 1), true);
-            }
-            else if (type == boolean.class) {
+            } else if (type == boolean.class) {
                 Function<Object, Text> func = value -> new LiteralText((Boolean) value ? "True" : "False").formatted((Boolean) value ? Formatting.GREEN : Formatting.RED);
                 info.widget = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
                     info.value = !(Boolean) info.value;
@@ -133,6 +143,7 @@ public class MidnightConfig {
                     button.setMessage(func.apply(info.value));
                 }, func);
             }
+        }
         entries.add(info);
     }
 
@@ -249,11 +260,10 @@ public class MidnightConfig {
                     if (info.widget instanceof Map.Entry) {
                         Map.Entry<ButtonWidget.PressAction, Function<Object, Text>> widget = (Map.Entry<ButtonWidget.PressAction, Function<Object, Text>>) info.widget;
                         if (info.field.getType().isEnum()) widget.setValue(value -> new TranslatableText(translationPrefix + "enum." + info.field.getType().getSimpleName() + "." + info.value.toString()));
-                        this.list.addButton(new ButtonWidget(width - 110, 0, info.width, 20, widget.getValue().apply(info.value), widget.getKey()),resetButton,name);
+                        this.list.addButton(new ButtonWidget(width - 110, 0,100, 20, widget.getValue().apply(info.value), widget.getKey()),resetButton,name);
                     } else if (info.widget != null) {
-                        TextFieldWidget widget = new TextFieldWidget(textRenderer, width - 110, 0, info.width, 20, null);
-
-                        widget.setMaxLength(info.max);
+                        TextFieldWidget widget = new TextFieldWidget(textRenderer, width - 110, 0, 100, 20, null);
+                        widget.setMaxLength(info.width);
                         widget.setText(info.tempValue);
                         Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.widget).apply(widget, done);
                         widget.setTextPredicate(processor);
@@ -297,7 +307,7 @@ public class MidnightConfig {
         }
     }
     @Environment(EnvType.CLIENT)
-    public static class MidnightConfigListWidget extends ElementListWidget<MidnightConfig.ButtonEntry> {
+    public static class MidnightConfigListWidget extends ElementListWidget<ButtonEntry> {
         TextRenderer textRenderer;
 
         public MidnightConfigListWidget(MinecraftClient minecraftClient, int i, int j, int k, int l, int m) {
