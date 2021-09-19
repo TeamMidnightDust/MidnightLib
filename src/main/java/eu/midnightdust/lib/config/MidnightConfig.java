@@ -39,25 +39,28 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-// MidnightConfig v1.0.4
-// Single class config library - feel free to copy!
-// Changelog:
-// - 1.0.4:
-// - Number field length is now configurable
-// - Fixed number fields being empty
-// - 1.0.3:
-// - Text field length is now configurable
-// - Better separation of client and server
-// - 1.0.2:
-// - Update to 21w20a
-// - 1.0.1:
-// - Fixed buttons not working in fullscreen
-// - 1.0.0:
-// - The config screen no longer shows the entries of all instances of MidnightConfig
-// - Compatible with servers!
-// - Scrollable!
-// - Comment support!
-// - Fresh New Design
+/* MidnightConfig v1.0.5
+  Single class config library - feel free to copy!
+ Changelog:
+ - 1.0.5:
+ - Custom lang keys
+ - Transparent list background when in game
+ - 1.0.4:
+ - Number field length is now configurable
+ - Fixed number fields being empty
+ - 1.0.3:
+ - Text field length is now configurable
+ - Better separation of client and server
+ - 1.0.2:
+ - Update to 21w20a
+ - 1.0.1:
+ - Fixed buttons not working in fullscreen
+ - 1.0.0:
+ - The config screen no longer shows the entries of all instances of MidnightConfig
+ - Compatible with servers!
+ - Scrollable!
+ - Comment support!
+ - Fresh New Design */
 
 /** Based on https://github.com/Minenash/TinyConfig
  *  Credits to Minenash */
@@ -82,6 +85,7 @@ public class MidnightConfig {
         String tempValue;
         boolean inLimits = true;
         String id;
+        TranslatableText name;
     }
 
     public static final Map<String,Class<?>> configClass = new HashMap<>();
@@ -123,6 +127,7 @@ public class MidnightConfig {
         info.id = modid;
 
         if (e != null) {
+            if (!e.name().equals("")) info.name = new TranslatableText(e.name());
             if (type == int.class) textField(info, Integer::parseInt, INTEGER_ONLY, e.min(), e.max(), true);
             else if (type == double.class) textField(info, Double::parseDouble, DECIMAL_ONLY, e.min(), e.max(), false);
             else if (type == String.class) {
@@ -245,10 +250,11 @@ public class MidnightConfig {
             }));
 
             this.list = new MidnightConfigListWidget(this.client, this.width, this.height, 32, this.height - 32, 25);
+            if (this.client != null && this.client.world != null) this.list.setRenderBackground(false);
             this.addSelectableChild(this.list);
             for (EntryInfo info : entries) {
                 if (info.id.equals(modid)) {
-                    TranslatableText name = new TranslatableText(translationPrefix + info.field.getName());
+                    TranslatableText name = Objects.requireNonNullElseGet(info.name, () -> new TranslatableText(translationPrefix + info.field.getName()));
                     ButtonWidget resetButton = new ButtonWidget(width - 155, 0, 40, 20, new LiteralText("Reset").formatted(Formatting.RED), (button -> {
                         info.value = info.defaultValue;
                         info.tempValue = info.value.toString();
@@ -378,6 +384,7 @@ public class MidnightConfig {
         int width() default 100;
         double min() default Double.MIN_NORMAL;
         double max() default Double.MAX_VALUE;
+        String name() default "";
     }
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Comment {}
 

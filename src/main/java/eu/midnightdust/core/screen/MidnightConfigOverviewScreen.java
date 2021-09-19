@@ -29,6 +29,7 @@ public class MidnightConfigOverviewScreen extends Screen {
         this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height - 28, 200, 20, ScreenTexts.DONE, (button) -> Objects.requireNonNull(client).openScreen(parent)));
 
         this.list = new MidnightOverviewListWidget(this.client, this.width, this.height, 32, this.height - 32, 25);
+        if (this.client != null && this.client.world != null) this.list.setRenderBackground(false);
         this.addSelectableChild(this.list);
         MidnightConfig.configClass.forEach((modid, configClass) -> {
             list.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 28, 200, 20, new TranslatableText(modid +".midnightconfig.title"), (button) -> {

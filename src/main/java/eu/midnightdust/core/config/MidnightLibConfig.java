@@ -9,6 +9,8 @@ public class MidnightLibConfig extends MidnightConfig {
     public static boolean config_screen_list = !FabricLoader.getInstance().isModLoaded("modmenu");
     @Entry // Change the style of the title in MidnightConfig
     public static TitleStyle titleStyle = MidnightConfig.useTooltipForTitle ? TitleStyle.TOOLTIP : TitleStyle.TEXT;
+    @Entry // Change the texture of the background in MidnightConfig
+    public static String background_texture = "minecraft:textures/block/deepslate.png";
     @Comment public static Comment midnighthats_description;
     @Entry // Enable or disable event hats
     public static boolean event_hats = true;

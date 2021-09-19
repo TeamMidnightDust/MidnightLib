@@ -3,7 +3,8 @@
   "package": "eu.midnightdust.core.mixin",
   "compatibilityLevel": "JAVA_16",
   "client": [
-    "MixinOptionsScreen"
+    "MixinOptionsScreen",
+    "MixinEntryListWidget"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -12,7 +12,7 @@ public class MidnightConfigExample extends MidnightConfig {
     @Entry public static int fabric = 16777215;                 // Example for a int option
     @Entry public static double world = 1.4D;                   // Example for a double option
     @Entry public static boolean showInfo = true;               // Example for a boolean option
-    @Entry public static String name = "Hi";                           // Example for a string option
+    @Entry public static String name = "Hi";                    // Example for a string option
     @Entry public static TestEnum testEnum = TestEnum.FABRIC;   // Example for a enum option
     public static enum TestEnum {                               // Enums allow the user to cycle through predefined options
         QUILT, FABRIC
