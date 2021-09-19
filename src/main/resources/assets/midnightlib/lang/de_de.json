@@ -4,6 +4,7 @@
 	"midnightlib.midnightconfig.midnightlib_description":"§nMidnightLib",
 	"midnightlib.midnightconfig.config_screen_list":"Konfigurationsliste aktivieren",
 	"midnightlib.midnightconfig.titleStyle":"Aussehen der Konfigurationsbildschirmtitel",
+	"midnightlib.midnightconfig.background_texture":"Textur der Konfigurationsbildschirmhintergründe",
 	"midnightlib.midnightconfig.titleStyle.tooltip":"§cBenötigt Neustart!",
 	"midnightlib.midnightconfig.enum.TitleStyle.TEXT":"Text",
 	"midnightlib.midnightconfig.enum.TitleStyle.TOOLTIP":"Tooltip",

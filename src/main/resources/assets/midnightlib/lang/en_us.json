@@ -7,6 +7,7 @@
 	"midnightlib.midnightconfig.titleStyle.tooltip":"§cRequires restart!",
 	"midnightlib.midnightconfig.enum.TitleStyle.TEXT":"Text",
 	"midnightlib.midnightconfig.enum.TitleStyle.TOOLTIP":"Tooltip",
+	"midnightlib.midnightconfig.background_texture":"Texture of config screen backgrounds",
 	"midnightlib.midnightconfig.midnighthats_description":"§nMidnightHats",
 	"midnightlib.midnightconfig.event_hats":"Enable Event Hats",
 	"midnightlib.midnightconfig.special_hats":"Enable Special Hats",
