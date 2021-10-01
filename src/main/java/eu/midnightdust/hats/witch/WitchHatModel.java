@@ -8,23 +8,20 @@ import net.minecraft.entity.LivingEntity;
 
 public class WitchHatModel<T extends LivingEntity> extends SinglePartEntityModel<T> {
 	private final ModelPart headwear;
-	private final ModelPart bone;
-	private final ModelPart bone2;
-	private final ModelPart bone3;
 
     public WitchHatModel(ModelPart root) {
         headwear = root;
         root.setPivot(5.0F, -9.0F, -5.0F);
 
-        bone = headwear.getChild("bone");
+        ModelPart bone = headwear.getChild("bone");
         bone.setPivot(-8.5F, -0.1F, 1.5F);
         setRotationAngle(bone, -0.0524F, 0.0F, 0.0349F);
 
-        bone2 = bone.getChild("bone2");
+        ModelPart bone2 = bone.getChild("bone2");
         bone2.setPivot(1.5F, -4.0F, 1.5F);
         setRotationAngle(bone2, -0.1222F, 0.0F, 0.0698F);
 
-        bone3 = bone2.getChild("bone3");
+        ModelPart bone3 = bone2.getChild("bone3");
         bone3.setPivot(1.5F, -4.0F, 1.5F);
         setRotationAngle(bone3, -0.2618F, 0.0F, 0.1047F);
     }

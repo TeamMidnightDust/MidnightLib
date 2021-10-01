@@ -6,7 +6,6 @@ import eu.midnightdust.hats.web.HatLoader;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.TexturedModelData;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -22,7 +21,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 
-import java.util.Calendar;
 import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
@@ -51,38 +49,32 @@ public class WitchHatFeatureRenderer<T extends LivingEntity, M extends EntityMod
     }
 
     public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, T livingEntity, float f, float g, float h, float j, float k, float l) {
-        {
-            Identifier hat_type = DEACTIVATED;
-            if (livingEntity instanceof AbstractClientPlayerEntity abstractClientPlayerEntity) {
+        Identifier hat_type = getHat(livingEntity.getUuid());
 
-                if (abstractClientPlayerEntity.getUuid().equals(MOTSCHEN)) {
-                    hat_type = MOTSCHEN_SKIN;
-                } else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("contributer")) {
-                    hat_type = CONTRIBUTER_SKIN;
-                } else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("friend")) {
-                    hat_type = FRIEND_SKIN;
-                } else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("donator")) {
-                    hat_type = DONATOR_SKIN;
-                } else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("social")) {
-                    hat_type = SOCIAL_SKIN;
-                } else if (HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && HatLoader.PLAYER_HATS.get(abstractClientPlayerEntity.getUuid()).getHatType().contains("pride")) {
-                    hat_type = PRIDE_SKIN;
-                } else if (Calendar.getInstance().get(Calendar.MONTH) == Calendar.OCTOBER && Calendar.getInstance().get(Calendar.DAY_OF_MONTH) >= 30) {
-                    if (MidnightLibConfig.event_hats) {
-                        hat_type = WITCH;
-                    }
-                }
+        if (!(hat_type == DEACTIVATED)) {
+            matrixStack.push();
 
-                if (!(hat_type == DEACTIVATED)) {
-                    matrixStack.push();
+            ((ModelWithHead) this.getContextModel()).getHead().rotate(matrixStack);
+            VertexConsumer vertexConsumer = ItemRenderer.getArmorGlintConsumer(vertexConsumerProvider, RenderLayer.getEntityCutoutNoCull(hat_type), false, false);
+            this.witchHat.render(matrixStack, vertexConsumer, i, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F, 1.0F, 1.0F);
 
-                    ((ModelWithHead) this.getContextModel()).getHead().rotate(matrixStack);
-                    VertexConsumer vertexConsumer = ItemRenderer.getArmorGlintConsumer(vertexConsumerProvider, RenderLayer.getEntityCutoutNoCull(hat_type), false, false);
-                    this.witchHat.render(matrixStack, vertexConsumer, i, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F, 1.0F, 1.0F);
-
-                    matrixStack.pop();
-                }
+            matrixStack.pop();
+        }
+    }
+    private Identifier getHat(UUID uuid) {
+        if (uuid.equals(MOTSCHEN)) {
+            return MOTSCHEN_SKIN;
+        } else if (HatLoader.PLAYER_HATS.containsKey(uuid)) {
+            if (HatLoader.PLAYER_HATS.get(uuid).getHatType().contains("contributer")) return CONTRIBUTER_SKIN;
+            else if (HatLoader.PLAYER_HATS.get(uuid).getHatType().contains("friend")) return FRIEND_SKIN;
+            else if (HatLoader.PLAYER_HATS.get(uuid).getHatType().contains("donator")) return DONATOR_SKIN;
+            else if (HatLoader.PLAYER_HATS.get(uuid).getHatType().contains("social")) return SOCIAL_SKIN;
+            else if (HatLoader.PLAYER_HATS.get(uuid).getHatType().contains("pride")) return PRIDE_SKIN;
+        } else if (MidnightLibClient.EVENT.equals(MidnightLibClient.Event.HALLOWEEN)) {
+            if (MidnightLibConfig.event_hats) {
+                return WITCH;
             }
         }
+        return DEACTIVATED;
     }
 }

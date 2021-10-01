@@ -1,6 +1,5 @@
 package eu.midnightdust.lib.config;
 
-import com.google.common.collect.ImmutableMap;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import eu.midnightdust.core.config.MidnightLibConfig;

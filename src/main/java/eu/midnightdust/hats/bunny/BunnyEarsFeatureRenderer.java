@@ -6,7 +6,6 @@ import eu.midnightdust.hats.web.HatLoader;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.TexturedModelData;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -19,7 +18,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 
-import java.util.Calendar;
 import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
@@ -42,32 +40,24 @@ public class BunnyEarsFeatureRenderer<T extends LivingEntity, M extends EntityMo
     }
 
     public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, T livingEntity, float f, float g, float h, float j, float k, float l) {
-        {
-            AbstractClientPlayerEntity abstractClientPlayerEntity = (AbstractClientPlayerEntity)livingEntity;
-            Identifier hat_type;
-            if (livingEntity != null) {
+        UUID uuid = livingEntity.getUuid();
+        Identifier hat_type = getHat(uuid);
 
-                if (Calendar.getInstance().get(Calendar.MONTH) == Calendar.APRIL && Calendar.getInstance().get(Calendar.DAY_OF_MONTH) <= 4) {
-                    if (MidnightLibConfig.event_hats) {
-                        hat_type = RABBIT;
-                    }
-                    else hat_type = DEACTIVATED;
-                }else {
-                    hat_type = DEACTIVATED;
-                }
-            } else {
-                hat_type = DEACTIVATED;
-            }
-
-            if (!(hat_type == DEACTIVATED) && !HatLoader.PLAYER_HATS.containsKey(abstractClientPlayerEntity.getUuid()) && !abstractClientPlayerEntity.getUuid().equals(MOTSCHEN)) {
-                matrixStack.push();
-
-                ((ModelWithHead) this.getContextModel()).getHead().rotate(matrixStack);
-                VertexConsumer vertexConsumer = ItemRenderer.getArmorGlintConsumer(vertexConsumerProvider, RenderLayer.getEntityCutoutNoCull(hat_type), false, false);
-                this.bunnyEars.render(matrixStack, vertexConsumer, i, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F, 1.0F, 1.0F);
-
-                matrixStack.pop();
-            }
+        if (!(hat_type == DEACTIVATED) && !HatLoader.PLAYER_HATS.containsKey(uuid) && !uuid.equals(MOTSCHEN)) {
+            matrixStack.push();
+            ((ModelWithHead) this.getContextModel()).getHead().rotate(matrixStack);
+            VertexConsumer vertexConsumer = ItemRenderer.getArmorGlintConsumer(vertexConsumerProvider, RenderLayer.getEntityCutoutNoCull(hat_type), false, false);
+            this.bunnyEars.render(matrixStack, vertexConsumer, i, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F, 1.0F, 1.0F);
+            matrixStack.pop();
         }
     }
+    private Identifier getHat(UUID uuid) {
+        if (MidnightLibConfig.event_hats && MidnightLibClient.EVENT.equals(MidnightLibClient.Event.EASTER))
+            return RABBIT;
+        else if (HatLoader.PLAYER_HATS.containsKey(uuid) && HatLoader.PLAYER_HATS.get(uuid).getHatType().contains("bunny"))
+            return RABBIT;
+
+        return DEACTIVATED;
+    }
+
 }

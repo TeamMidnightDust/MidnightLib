@@ -39,9 +39,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-/* MidnightConfig v1.0.5
+/* MidnightConfig v1.0.6
   Single class config library - feel free to copy!
  Changelog:
+ - 1.0.6:
+ - Abstract & Allow super ticks
  - 1.0.5:
  - Custom lang keys
  - Transparent list background when in game
@@ -66,7 +68,7 @@ import java.util.regex.Pattern;
  *  Credits to Minenash */
 
 @SuppressWarnings("unchecked")
-public class MidnightConfig {
+public abstract class MidnightConfig {
     public static boolean useTooltipForTitle = true; // Render title as tooltip or as simple text
 
     private static final Pattern INTEGER_ONLY = Pattern.compile("(-?[0-9]*)");
@@ -213,6 +215,7 @@ public class MidnightConfig {
         // Real Time config update //
         @Override
         public void tick() {
+            super.tick();
             for (EntryInfo info : entries)
                 try { info.field.set(null, info.value); }
                 catch (IllegalAccessException ignored) {}
