@@ -64,7 +64,7 @@ public class WitchHatFeatureRenderer<T extends LivingEntity, M extends EntityMod
     private Identifier getHat(UUID uuid) {
         if (uuid.equals(MOTSCHEN)) {
             return MOTSCHEN_SKIN;
-        } else if (HatLoader.PLAYER_HATS.containsKey(uuid)) {
+        } else if (HatLoader.PLAYER_HATS != null && HatLoader.PLAYER_HATS.containsKey(uuid)) {
             if (HatLoader.PLAYER_HATS.get(uuid).getHatType().contains("contributer")) return CONTRIBUTER_SKIN;
             else if (HatLoader.PLAYER_HATS.get(uuid).getHatType().contains("friend")) return FRIEND_SKIN;
             else if (HatLoader.PLAYER_HATS.get(uuid).getHatType().contains("donator")) return DONATOR_SKIN;

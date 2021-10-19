@@ -54,7 +54,7 @@ public class BunnyEarsFeatureRenderer<T extends LivingEntity, M extends EntityMo
     private Identifier getHat(UUID uuid) {
         if (MidnightLibConfig.event_hats && MidnightLibClient.EVENT.equals(MidnightLibClient.Event.EASTER))
             return RABBIT;
-        else if (HatLoader.PLAYER_HATS.containsKey(uuid) && HatLoader.PLAYER_HATS.get(uuid).getHatType().contains("bunny"))
+        else if (HatLoader.PLAYER_HATS != null && HatLoader.PLAYER_HATS.containsKey(uuid) && HatLoader.PLAYER_HATS.get(uuid).getHatType().contains("bunny"))
             return RABBIT;
 
         return DEACTIVATED;

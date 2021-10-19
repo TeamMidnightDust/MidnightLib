@@ -59,7 +59,7 @@ public class TinyPotatoFeatureRenderer<T extends LivingEntity, M extends EntityM
     private Identifier getHat(UUID uuid) {
         if (MidnightLibConfig.event_hats && MidnightLibClient.EVENT.equals(MidnightLibClient.Event.FABRIC))
             return TATER;
-        else if (HatLoader.PLAYER_HATS.containsKey(uuid) && HatLoader.PLAYER_HATS.get(uuid).getHatType().contains("tater"))
+        else if (HatLoader.PLAYER_HATS != null && HatLoader.PLAYER_HATS.containsKey(uuid) && HatLoader.PLAYER_HATS.get(uuid).getHatType().contains("tater"))
             return TATER;
         return DEACTIVATED;
     }
