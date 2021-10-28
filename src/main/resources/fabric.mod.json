@@ -23,13 +23,15 @@
     "client": [
       "eu.midnightdust.core.MidnightLibClient"
     ],
+    "server": [
+      "eu.midnightdust.core.MidnightLibServer"
+    ],
     "modmenu": [
       "eu.midnightdust.lib.config.AutoModMenu"
     ]
   },
 
   "mixins": [
-    "midnighthats.mixins.json",
     "midnightcore.mixins.json"
   ],
 
@@ -41,7 +43,10 @@
     "modmenu": {
       "links": {
         "modmenu.discord": "https://discord.midnightdust.eu/",
-        "modmenu.website": "https://www.midnightdust.eu/"
+        "modmenu.website": "https://www.midnightdust.eu/",
+        "midnightlib.curseforge": "https://www.curseforge.com/minecraft/mc-mods/midnightlib",
+        "midnightlib.modrinth": "https://modrinth.com/mod/midnightlib",
+        "midnightlib.wiki": "https://github.com/TeamMidnightDust/MidnightLib/wiki"
       },
       "badges": [ "library" ]
     }

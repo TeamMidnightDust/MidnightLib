@@ -26,16 +26,14 @@ public class MidnightConfigOverviewScreen extends Screen {
 
     @Override
     protected void init() {
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height - 28, 200, 20, ScreenTexts.DONE, (button) -> Objects.requireNonNull(client).openScreen(parent)));
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height - 28, 200, 20, ScreenTexts.DONE, (button) -> Objects.requireNonNull(client).setScreen(parent)));
 
         this.list = new MidnightOverviewListWidget(this.client, this.width, this.height, 32, this.height - 32, 25);
         if (this.client != null && this.client.world != null) this.list.setRenderBackground(false);
         this.addSelectableChild(this.list);
-        MidnightConfig.configClass.forEach((modid, configClass) -> {
-            list.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 28, 200, 20, new TranslatableText(modid +".midnightconfig.title"), (button) -> {
-                Objects.requireNonNull(client).openScreen(MidnightConfig.getScreen(this,modid));
-            }));
-        });
+        MidnightConfig.configClass.forEach((modid, configClass) ->
+                list.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 28, 200, 20, new TranslatableText(modid +".midnightconfig.title"), (button) ->
+                        Objects.requireNonNull(client).setScreen(MidnightConfig.getScreen(this,modid)))));
         super.init();
     }
     @Override
@@ -44,8 +42,8 @@ public class MidnightConfigOverviewScreen extends Screen {
         this.list.render(matrices, mouseX, mouseY, delta);
 
         int stringWidth = title.getString().length() + 47;
-        if (MidnightConfig.useTooltipForTitle) renderTooltip(matrices, title, width/2 - stringWidth, 27);
-        else drawCenteredText(matrices, textRenderer, title, width / 2, 15, 0xFFFFFF);
+        renderTooltip(matrices, title, width/2 - stringWidth, 27);
+        //drawCenteredText(matrices, textRenderer, title, width / 2, 15, 0xFFFFFF);
         super.render(matrices, mouseX, mouseY, delta);
     }
     @Environment(EnvType.CLIENT)
@@ -85,7 +83,7 @@ public class MidnightConfigOverviewScreen extends Screen {
             return buttons;
         }
 
-        public List<? extends Selectable> method_37025() {
+        public List<? extends Selectable> selectableChildren() {
             return buttons;
         }
     }

@@ -1,8 +1,5 @@
-package eu.midnightdust.hats.mixin;
+package eu.midnightdust.core.mixin;
 
-import eu.midnightdust.hats.bunny.BunnyEarsFeatureRenderer;
-import eu.midnightdust.hats.christmas.ChristmasHatFeatureRenderer;
-import eu.midnightdust.hats.tater.TinyPotatoFeatureRenderer;
 import eu.midnightdust.hats.witch.WitchHatFeatureRenderer;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.entity.EntityRendererFactory;
@@ -15,16 +12,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerEntityRenderer.class)
-public abstract class PlayerEntityRendererMixin extends LivingEntityRenderer<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> {
-    public PlayerEntityRendererMixin(EntityRendererFactory.Context ctx, PlayerEntityModel<AbstractClientPlayerEntity> model, float shadowSize) {
+public abstract class MixinPlayerEntityRenderer extends LivingEntityRenderer<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> {
+    public MixinPlayerEntityRenderer(EntityRendererFactory.Context ctx, PlayerEntityModel<AbstractClientPlayerEntity> model, float shadowSize) {
         super(ctx, model, shadowSize);
     }
 
     @Inject(at = @At("TAIL"), method = "<init>")
     public void addFeatures(EntityRendererFactory.Context ctx, boolean slim, CallbackInfo ci) {
         this.addFeature(new WitchHatFeatureRenderer<>(this, ctx.getModelLoader()));
-        this.addFeature(new ChristmasHatFeatureRenderer<>(this, ctx.getModelLoader()));
-        this.addFeature(new BunnyEarsFeatureRenderer<>(this, ctx.getModelLoader()));
-        this.addFeature(new TinyPotatoFeatureRenderer<>(this, ctx.getModelLoader()));
     }
 }

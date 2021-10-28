@@ -39,14 +39,12 @@ public class WitchHatModel<T extends LivingEntity> extends SinglePartEntityModel
 
 	@Override
 	public void setAngles(T entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
-
 	}
 
 	@Override
 	public void render(MatrixStack matrixStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha){
-
-		headwear.render(matrixStack, buffer, packedLight, packedOverlay);
-}
+		headwear.render(matrixStack, buffer, packedLight, packedOverlay, red, green, blue, alpha);
+    }
 
     @Override
     public ModelPart getPart() {
@@ -57,6 +55,5 @@ public class WitchHatModel<T extends LivingEntity> extends SinglePartEntityModel
 		bone.pitch = x;
 		bone.yaw = y;
 		bone.roll = z;
+    }
 }
-
-	}

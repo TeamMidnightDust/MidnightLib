@@ -42,7 +42,7 @@ public class HatLoader {
                 logger.log(Level.INFO, "Player hats successfully loaded!");
             } else {
                 PLAYER_HATS = Collections.emptyMap();
-                logger.log(Level.WARN, "A problem with the database occured, the hats could not be initialized.");
+                logger.log(Level.WARN, "A problem with the database occurred, the hats could not be initialized.");
             }
         }, MinecraftClient.getInstance());
     }

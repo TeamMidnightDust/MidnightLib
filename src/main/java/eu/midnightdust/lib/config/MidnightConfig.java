@@ -39,38 +39,14 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-/* MidnightConfig v1.0.6
-  Single class config library - feel free to copy!
- Changelog:
- - 1.0.6:
- - Abstract & Allow super ticks
- - 1.0.5:
- - Custom lang keys
- - Transparent list background when in game
- - 1.0.4:
- - Number field length is now configurable
- - Fixed number fields being empty
- - 1.0.3:
- - Text field length is now configurable
- - Better separation of client and server
- - 1.0.2:
- - Update to 21w20a
- - 1.0.1:
- - Fixed buttons not working in fullscreen
- - 1.0.0:
- - The config screen no longer shows the entries of all instances of MidnightConfig
- - Compatible with servers!
- - Scrollable!
- - Comment support!
- - Fresh New Design */
-
-/** Based on https://github.com/Minenash/TinyConfig
+/** MidnightConfig v1.0.8 by TeamMidnightDust & Motschen
+ *  Single class config library - feel free to copy!
+ *
+ *  Based on https://github.com/Minenash/TinyConfig
  *  Credits to Minenash */
 
 @SuppressWarnings("unchecked")
 public abstract class MidnightConfig {
-    public static boolean useTooltipForTitle = true; // Render title as tooltip or as simple text
-
     private static final Pattern INTEGER_ONLY = Pattern.compile("(-?[0-9]*)");
     private static final Pattern DECIMAL_ONLY = Pattern.compile("-?([\\d]+\\.?[\\d]*|[\\d]*\\.?[\\d]+|\\.)");
 
@@ -211,6 +187,7 @@ public abstract class MidnightConfig {
         private final Screen parent;
         private final String modid;
         private MidnightConfigListWidget list;
+        private boolean reload = false;
 
         // Real Time config update //
         @Override
@@ -220,25 +197,27 @@ public abstract class MidnightConfig {
                 try { info.field.set(null, info.value); }
                 catch (IllegalAccessException ignored) {}
         }
+        private void loadValues() {
+            try { gson.fromJson(Files.newBufferedReader(path), configClass.get(modid)); }
+            catch (Exception e) { write(modid); }
 
+            for (EntryInfo info : entries) {
+                if (info.field.isAnnotationPresent(Entry.class))
+                    try {
+                        info.value = info.field.get(null);
+                        info.tempValue = info.value.toString();
+                    } catch (IllegalAccessException ignored) {
+                    }
+            }
+        }
         @Override
         protected void init() {
             super.init();
+            if (!reload) loadValues();
 
             this.addDrawableChild(new ButtonWidget(this.width / 2 - 154, this.height - 28, 150, 20, ScreenTexts.CANCEL, button -> {
-                try { gson.fromJson(Files.newBufferedReader(path), configClass.get(modid)); }
-                catch (Exception e) { write(modid); }
-
-                for (EntryInfo info : entries) {
-                    if (info.field.isAnnotationPresent(Entry.class)) {
-                        try {
-                            info.value = info.field.get(null);
-                            info.tempValue = info.value.toString();
-                        } catch (IllegalAccessException ignored) {
-                        }
-                    }
-                }
-                Objects.requireNonNull(client).openScreen(parent);
+                loadValues();
+                Objects.requireNonNull(client).setScreen(parent);
             }));
 
             ButtonWidget done = this.addDrawableChild(new ButtonWidget(this.width / 2 + 4, this.height - 28, 150, 20, ScreenTexts.DONE, (button) -> {
@@ -249,7 +228,7 @@ public abstract class MidnightConfig {
                         } catch (IllegalAccessException ignored) {}
                     }
                 write(modid);
-                Objects.requireNonNull(client).openScreen(parent);
+                Objects.requireNonNull(client).setScreen(parent);
             }));
 
             this.list = new MidnightConfigListWidget(this.client, this.width, this.height, 32, this.height - 32, 25);
@@ -262,7 +241,8 @@ public abstract class MidnightConfig {
                         info.value = info.defaultValue;
                         info.tempValue = info.value.toString();
                         double scrollAmount = list.getScrollAmount();
-                        Objects.requireNonNull(client).openScreen(this);
+                        this.reload = true;
+                        Objects.requireNonNull(client).setScreen(this);
                         list.setScrollAmount(scrollAmount);
                     }));
 
@@ -291,8 +271,8 @@ public abstract class MidnightConfig {
             this.list.render(matrices, mouseX, mouseY, delta);
 
             int stringWidth = (int) (title.getString().length() * 2.75f);
-            if (useTooltipForTitle) renderTooltip(matrices, title, width/2 - stringWidth, 27);
-            else drawCenteredText(matrices, textRenderer, title, width / 2, 15, 0xFFFFFF);
+            renderTooltip(matrices, title, width/2 - stringWidth, 27);
+            //drawCenteredText(matrices, textRenderer, title, width / 2, 15, 0xFFFFFF);
 
             for (EntryInfo info : entries) {
                 if (info.id.equals(modid)) {
@@ -377,7 +357,7 @@ public abstract class MidnightConfig {
             return buttonsWithResetButtons;
         }
 
-        public List<? extends Selectable> method_37025() {
+        public List<? extends Selectable> selectableChildren() {
             return buttonsWithResetButtons;
         }
     }
