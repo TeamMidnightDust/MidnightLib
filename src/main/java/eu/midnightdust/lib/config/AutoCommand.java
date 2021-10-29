@@ -25,7 +25,7 @@ public class AutoCommand {
     public void register() {
         command = CommandManager.literal(modid);
         command();
-        LiteralArgumentBuilder<ServerCommandSource> finalized = CommandManager.literal("midnightconfig").then(command);
+        LiteralArgumentBuilder<ServerCommandSource> finalized = CommandManager.literal("midnightconfig").requires(source -> source.hasPermissionLevel(2)).then(command);
 
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> dispatcher.register(finalized));
     }
