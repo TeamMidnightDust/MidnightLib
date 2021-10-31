@@ -40,10 +40,7 @@ public class MidnightConfigOverviewScreen extends Screen {
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.renderBackground(matrices);
         this.list.render(matrices, mouseX, mouseY, delta);
-
-        int stringWidth = title.getString().length() + 47;
-        renderTooltip(matrices, title, width/2 - stringWidth, 27);
-        //drawCenteredText(matrices, textRenderer, title, width / 2, 15, 0xFFFFFF);
+        drawCenteredText(matrices, textRenderer, title, width / 2, 15, 0xFFFFFF);
         super.render(matrices, mouseX, mouseY, delta);
     }
     @Environment(EnvType.CLIENT)
@@ -56,7 +53,7 @@ public class MidnightConfigOverviewScreen extends Screen {
             textRenderer = minecraftClient.textRenderer;
         }
         @Override
-        public int getScrollbarPositionX() { return this.width -7; }
+        public int getScrollbarPositionX() {return this.width -7;}
 
         public void addButton(ClickableWidget button) {
             this.addEntry(OverviewButtonEntry.create(button));
@@ -65,26 +62,19 @@ public class MidnightConfigOverviewScreen extends Screen {
         public int getRowWidth() { return 400; }
     }
     public static class OverviewButtonEntry extends ElementListWidget.Entry<OverviewButtonEntry> {
-        private final List<ClickableWidget> buttons = new ArrayList<>();
+        private final ClickableWidget button;
+        private final List<ClickableWidget> buttonList = new ArrayList<>();
 
         private OverviewButtonEntry(ClickableWidget button) {
-            this.buttons.add(button);
+            this.button = button;
+            this.buttonList.add(button);
         }
-        public static OverviewButtonEntry create(ClickableWidget button) {
-            return new OverviewButtonEntry(button);
-        }
+        public static OverviewButtonEntry create(ClickableWidget button) {return new OverviewButtonEntry(button);}
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            this.buttons.forEach((button) -> {
-                button.y = y;
-                button.render(matrices, mouseX, mouseY, tickDelta);
-            });
+            button.y = y;
+            button.render(matrices, mouseX, mouseY, tickDelta);
         }
-        public List<? extends Element> children() {
-            return buttons;
-        }
-
-        public List<? extends Selectable> selectableChildren() {
-            return buttons;
-        }
+        public List<? extends Element> children() {return buttonList;}
+        public List<? extends Selectable> selectableChildren() {return buttonList;}
     }
 }

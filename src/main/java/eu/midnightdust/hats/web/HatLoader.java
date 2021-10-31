@@ -17,6 +17,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
+@SuppressWarnings("UnstableApiUsage")
 public class HatLoader {
     public static final Logger logger = LogManager.getLogger("MidnightLib");
     private final static String HATS_URL = "https://raw.githubusercontent.com/TeamMidnightDust/MidnightHats/master/hats.json";
