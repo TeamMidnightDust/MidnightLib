@@ -24,7 +24,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
-import org.apache.logging.log4j.LogManager;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -264,7 +263,6 @@ public abstract class MidnightConfig {
                         resetButton.setWidth(20);
                         resetButton.setMessage(new LiteralText("R").formatted(Formatting.RED));
                         ButtonWidget cycleButton = new ButtonWidget(width - 185, 0, 20, 20, new LiteralText(String.valueOf(info.index)).formatted(Formatting.GOLD), (button -> {
-                            LogManager.getLogger("1").info(info.value);
                             ((List<String>)info.value).remove("");
                             double scrollAmount = list.getScrollAmount();
                             this.reload = true;
