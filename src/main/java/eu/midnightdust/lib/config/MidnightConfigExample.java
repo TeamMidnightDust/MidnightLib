@@ -18,7 +18,8 @@ public class MidnightConfigExample extends MidnightConfig {
         QUILT, FABRIC
     }
     @Entry(min=10,max=30) public static int hello = 15675965;   // - The entered number has to be larger than 10 and smaller than 30
-
+    @Entry(width = 7, min = 7, isColor = true) public static String titleColor = "#ffffff"; // The isColor property adds a preview box for a hexadecimal color
+    @Entry public static List<String> blurExclusions = Mod.defaultExclusions; // Array String Lists are also supported
 
     public static int imposter = 16777215; // - Entries without an @Entry or @Comment annotation are ignored
 
