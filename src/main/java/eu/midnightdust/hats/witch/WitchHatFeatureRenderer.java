@@ -1,6 +1,7 @@
 package eu.midnightdust.hats.witch;
 
 import eu.midnightdust.hats.web.HatLoader;
+import eu.midnightdust.lib.config.MidnightConfig;
 import eu.midnightdust.lib.util.MidnightColorUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -68,15 +69,14 @@ public class WitchHatFeatureRenderer<T extends LivingEntity, M extends EntityMod
         if (uuid.equals(MOTSCHEN)) {
             return MOTSCHEN_COLOR;
         } else if (HatLoader.PLAYER_HATS != null && HatLoader.PLAYER_HATS.containsKey(uuid)) {
-            switch (HatLoader.PLAYER_HATS.get(uuid).getHatType()) {
-                case "adopter": return ADOPTER_COLOR;
-                case "contributer": // old name
-                case "modder": return MODDER_COLOR;
-                case "friend": return FRIEND_COLOR;
-                case "donator": // old name
-                case "donor": return DONOR_COLOR;
-                case "social": return SOCIAL_COLOR;
-            }
+            return switch (HatLoader.PLAYER_HATS.get(uuid).getHatType()) {
+                case "adopter" -> ADOPTER_COLOR;
+                case "contributer", "modder" -> MODDER_COLOR;
+                case "friend" -> FRIEND_COLOR;
+                case "donator", "donor" -> DONOR_COLOR;
+                case "social" -> SOCIAL_COLOR;
+                default -> MidnightColorUtil.hex2Rgb(HatLoader.PLAYER_HATS.get(uuid).getHatType());
+            };
         }
         return null;
     }

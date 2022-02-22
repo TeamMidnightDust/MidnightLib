@@ -12,7 +12,7 @@ public class MidnightLibServer implements DedicatedServerModInitializer {
     public void onInitializeServer() {
         MidnightConfig.configClass.forEach((modid, config) -> {
             for (Field field : config.getFields()) {
-                if (field.isAnnotationPresent(MidnightConfig.Entry.class))
+                if (field.isAnnotationPresent(MidnightConfig.Entry.class) && !field.isAnnotationPresent(MidnightConfig.Client.class))
                     new AutoCommand(field, modid).register();
             }
         });
