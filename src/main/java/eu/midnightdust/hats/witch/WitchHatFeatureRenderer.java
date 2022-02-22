@@ -1,7 +1,6 @@
 package eu.midnightdust.hats.witch;
 
 import eu.midnightdust.hats.web.HatLoader;
-import eu.midnightdust.lib.config.MidnightConfig;
 import eu.midnightdust.lib.util.MidnightColorUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
