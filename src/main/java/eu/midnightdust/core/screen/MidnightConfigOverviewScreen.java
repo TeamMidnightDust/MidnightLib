@@ -18,7 +18,7 @@ import java.util.*;
 public class MidnightConfigOverviewScreen extends Screen {
 
     public MidnightConfigOverviewScreen(Screen parent) {
-        super(new TranslatableText( "midnightlib.overview.title"));
+        super(Text.translatable( "midnightlib.overview.title"));
         this.parent = parent;
     }
     private final Screen parent;
@@ -32,7 +32,7 @@ public class MidnightConfigOverviewScreen extends Screen {
         if (this.client != null && this.client.world != null) this.list.setRenderBackground(false);
         this.addSelectableChild(this.list);
         MidnightConfig.configClass.forEach((modid, configClass) ->
-                list.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 28, 200, 20, new TranslatableText(modid +".midnightconfig.title"), (button) ->
+                list.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 28, 200, 20, Text.translatable(modid +".midnightconfig.title"), (button) ->
                         Objects.requireNonNull(client).setScreen(MidnightConfig.getScreen(this,modid)))));
         super.init();
     }

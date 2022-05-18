@@ -7,7 +7,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -73,16 +73,16 @@ public class AutoCommand {
             MidnightConfig.write(modid);
         }
         catch (Exception e) {
-            source.sendError(new LiteralText("Could not set "+entry.getName()+" to value "+value+": " + e));
+            source.sendError(Text.literal("Could not set "+entry.getName()+" to value "+value+": " + e));
             return 0;
         }
 
-        source.sendFeedback(new LiteralText("Successfully set " + entry.getName()+" to "+value), true);
+        source.sendFeedback(Text.literal("Successfully set " + entry.getName()+" to "+value), true);
         return 1;
     }
     private int getValue(ServerCommandSource source) {
         try {
-            source.sendFeedback(new LiteralText("The value of "+entry.getName()+" is "+entry.get(null)), false);
+            source.sendFeedback(Text.literal("The value of "+entry.getName()+" is "+entry.get(null)), false);
             return 1;
         }
         catch (IllegalAccessException ignored) {}

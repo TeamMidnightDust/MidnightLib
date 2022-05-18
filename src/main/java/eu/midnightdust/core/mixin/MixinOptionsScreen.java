@@ -7,7 +7,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.OptionsScreen;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,7 +24,7 @@ public class MixinOptionsScreen extends Screen {
 
     @Inject(at = @At("HEAD"),method = "init")
     private void midnightlib$init(CallbackInfo ci) {
-        if (MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.TRUE) || MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.MODMENU) && FabricLoader.getInstance().isModLoaded("modmenu"))
-        this.addDrawableChild(new TexturedOverlayButtonWidget(this.width / 2 + 158, this.height / 6 - 12, 20, 20, 0, 0, 20, MIDNIGHTLIB_ICON_TEXTURE, 32, 64, (buttonWidget) -> Objects.requireNonNull(client).setScreen(new MidnightConfigOverviewScreen(this)), new TranslatableText("midnightlib.overview.title")));
+        if (MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.TRUE) || (MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.MODMENU) && !FabricLoader.getInstance().isModLoaded("modmenu")))
+            this.addDrawableChild(new TexturedOverlayButtonWidget(this.width / 2 + 158, this.height / 6 - 12, 20, 20, 0, 0, 20, MIDNIGHTLIB_ICON_TEXTURE, 32, 64, (buttonWidget) -> Objects.requireNonNull(client).setScreen(new MidnightConfigOverviewScreen(this)), Text.translatable("midnightlib.overview.title")));
     }
 }
