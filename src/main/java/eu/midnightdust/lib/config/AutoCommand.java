@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -27,7 +27,7 @@ public class AutoCommand {
         command();
         LiteralArgumentBuilder<ServerCommandSource> finalized = CommandManager.literal("midnightconfig").requires(source -> source.hasPermissionLevel(2)).then(command);
 
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> dispatcher.register(finalized));
+        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated, registrationEnvironment) -> dispatcher.register(finalized));
     }
 
     private void command() {

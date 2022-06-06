@@ -32,12 +32,8 @@
   },
 
   "mixins": [
-    "midnightcore.mixins.json"
+    "midnightlib.mixins.json"
   ],
-
-  "depends": {
-    "fabric-renderer-registries-v1": "*"
-  },
 
   "custom": {
     "modmenu": {
