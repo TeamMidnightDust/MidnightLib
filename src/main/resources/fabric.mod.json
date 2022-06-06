@@ -32,7 +32,7 @@
   },
 
   "mixins": [
-    "midnightcore.mixins.json"
+    "midnightlib.mixins.json"
   ],
 
   "depends": {
