@@ -3,6 +3,7 @@ package eu.midnightdust.core;
 import eu.midnightdust.core.config.MidnightLibConfig;
 import eu.midnightdust.hats.web.HatLoader;
 import eu.midnightdust.hats.witch.WitchHatFeatureRenderer;
+import eu.midnightdust.lib.config.AutoModMenu;
 import eu.midnightdust.lib.config.MidnightConfig;
 import eu.midnightdust.lib.util.MidnightColorUtil;
 import net.fabricmc.api.ClientModInitializer;
@@ -16,6 +17,7 @@ public class MidnightLibClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         MidnightConfig.init("midnightlib", MidnightLibConfig.class);
+        AutoModMenu.hideFromModMenu("puzzle");
 
         EntityModelLayerRegistry.registerModelLayer(WitchHatFeatureRenderer.WITCH_HAT_MODEL_LAYER, WitchHatFeatureRenderer::getTexturedModelData);
         if (MidnightLibConfig.special_hats) HatLoader.init();

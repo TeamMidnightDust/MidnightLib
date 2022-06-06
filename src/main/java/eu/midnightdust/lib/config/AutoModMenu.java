@@ -4,12 +4,13 @@ import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import eu.midnightdust.core.config.MidnightLibConfig;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class AutoModMenu implements ModMenuApi {
-    protected static List<String> hiddenMods = List.of();
+    private static List<String> hiddenMods = new ArrayList<>();
 
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
