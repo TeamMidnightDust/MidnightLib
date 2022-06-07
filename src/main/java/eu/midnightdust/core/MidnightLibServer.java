@@ -12,11 +12,9 @@ public class MidnightLibServer implements DedicatedServerModInitializer {
     @Override
     public void onInitializeServer() {
         MidnightConfig.configClass.forEach((modid, config) -> {
-            if (!MidnightLibClient.hiddenMods.contains(modid)) {
-                for (Field field : config.getFields()) {
-                    if (field.isAnnotationPresent(MidnightConfig.Entry.class) && !field.isAnnotationPresent(MidnightConfig.Client.class))
-                        new AutoCommand(field, modid).register();
-                }
+            for (Field field : config.getFields()) {
+                if (field.isAnnotationPresent(MidnightConfig.Entry.class) && !field.isAnnotationPresent(MidnightConfig.Client.class))
+                    new AutoCommand(field, modid).register();
             }
         });
     }
