@@ -1,5 +1,7 @@
 package eu.midnightdust.core.screen;
 
+import eu.midnightdust.core.MidnightLibClient;
+import eu.midnightdust.core.config.MidnightLibConfig;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -31,9 +33,12 @@ public class MidnightConfigOverviewScreen extends Screen {
         this.list = new MidnightOverviewListWidget(this.client, this.width, this.height, 32, this.height - 32, 25);
         if (this.client != null && this.client.world != null) this.list.setRenderBackground(false);
         this.addSelectableChild(this.list);
-        MidnightConfig.configClass.forEach((modid, configClass) ->
+        MidnightConfig.configClass.forEach((modid, configClass) -> {
+            if (!MidnightLibClient.hiddenMods.contains(modid)) {
                 list.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 28, 200, 20, Text.translatable(modid +".midnightconfig.title"), (button) ->
-                        Objects.requireNonNull(client).setScreen(MidnightConfig.getScreen(this,modid)))));
+                        Objects.requireNonNull(client).setScreen(MidnightConfig.getScreen(this,modid))));
+            }
+        });
         super.init();
     }
     @Override
