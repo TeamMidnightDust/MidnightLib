@@ -306,7 +306,8 @@ public abstract class MidnightConfig {
                             ButtonWidget colorButton = new ButtonWidget(width - 185, 0, 20, 20, Text.literal("⬛"), (button -> {}));
                             try {colorButton.setMessage(Text.literal("⬛").setStyle(Style.EMPTY.withColor(Color.decode(info.tempValue).getRGB())));} catch (Exception ignored) {}
                             info.colorButton = colorButton;
-                            this.list.addButton(List.of(widget, colorButton, resetButton), name, info);
+                            colorButton.active = false;
+                            this.list.addButton(List.of(widget, resetButton, colorButton), name, info);
                         }
                         else this.list.addButton(List.of(widget, resetButton), name, info);
                     } else {
