@@ -32,8 +32,8 @@ public class TexturedOverlayButtonWidget extends TexturedButtonWidget {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableDepthTest();
-        this.drawTexture(matrices, this.x, this.y, 0, 46 + i * 20, this.width / 2, this.height);
-        this.drawTexture(matrices, this.x + this.width / 2, this.y, 200 - this.width / 2, 46 + i * 20, this.width / 2, this.height);
+        this.drawTexture(matrices, this.method_46426(), this.method_46427(), 0, 46 + i * 20, this.width / 2, this.height);
+        this.drawTexture(matrices, this.method_46426() + this.width / 2, this.method_46427(), 200 - this.width / 2, 46 + i * 20, this.width / 2, this.height);
 
         super.renderButton(matrices, mouseX, mouseY, delta);
     }
