@@ -13,10 +13,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.ElementListWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
@@ -40,9 +37,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-/** MidnightConfig v2.2.0 by TeamMidnightDust & Motschen
+/** MidnightConfig v2.3.0 by TeamMidnightDust & Motschen
  *  Single class config library - feel free to copy!
- *
+
  *  Based on https://github.com/Minenash/TinyConfig
  *  Credits to Minenash */
 
@@ -260,7 +257,7 @@ public abstract class MidnightConfig {
             for (EntryInfo info : entries) {
                 if (info.id.equals(modid)) {
                     Text name = Objects.requireNonNullElseGet(info.name, () -> Text.translatable(translationPrefix + info.field.getName()));
-                    ButtonWidget resetButton = new ButtonWidget(width - 205, 0, 40, 20, Text.translatable("Reset").formatted(Formatting.RED), (button -> {
+                    ButtonWidget resetButton = new ButtonWidget(width - 205, 0, 40, 20, Text.literal("Reset").formatted(Formatting.RED), (button -> {
                         info.value = info.defaultValue;
                         info.tempValue = info.defaultValue.toString();
                         info.index = 0;
@@ -276,10 +273,9 @@ public abstract class MidnightConfig {
                         this.list.addButton(List.of(new ButtonWidget(width - 160, 0,150, 20, widget.getValue().apply(info.value), widget.getKey()),resetButton), name, info);
                     } else if (info.field.getType() == List.class) {
                         if (!reload) info.index = 0;
-                        TextFieldWidget widget = new TextFieldWidget(textRenderer, width - 160, 0, 150, 20, null);
+                        TextFieldWidget widget = new TextFieldWidget(textRenderer, width - 160, 0, 150, 20, Text.empty());
                         widget.setMaxLength(info.width);
                         if (info.index < ((List<String>)info.value).size()) widget.setText((String.valueOf(((List<String>)info.value).get(info.index))));
-                        else widget.setText("");
                         Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.widget).apply(widget, done);
                         widget.setTextPredicate(processor);
                         resetButton.setWidth(20);
@@ -295,12 +291,17 @@ public abstract class MidnightConfig {
                         }));
                         this.list.addButton(List.of(widget, resetButton, cycleButton), name, info);
                     } else if (info.widget != null) {
-                        TextFieldWidget widget = new TextFieldWidget(textRenderer, width - 160, 0, 150, 20, null);
-                        widget.setMaxLength(info.width);
-                        widget.setText(info.tempValue);
-                        Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.widget).apply(widget, done);
-                        widget.setTextPredicate(processor);
-                        if (info.field.getAnnotation(Entry.class).isColor()) {
+                        ClickableWidget widget;
+                        Entry e = info.field.getAnnotation(Entry.class);
+                        if (e.isSlider()) widget = new MidnightSliderWidget(width - 160, 0, 150, 20, Text.of(info.tempValue), (Double.parseDouble(info.tempValue)-e.min()) / (e.max() - e.min()), info);
+                        else widget = new TextFieldWidget(textRenderer, width - 160, 0, 150, 20, null, Text.of(info.tempValue));
+                        if (widget instanceof TextFieldWidget textField) {
+                            textField.setMaxLength(info.width);
+                            textField.setText(info.tempValue);
+                            Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.widget).apply(textField, done);
+                            textField.setTextPredicate(processor);
+                        }
+                        if (e.isColor()) {
                             resetButton.setWidth(20);
                             resetButton.setMessage(Text.literal("R").formatted(Formatting.RED));
                             ButtonWidget colorButton = new ButtonWidget(width - 185, 0, 20, 20, Text.literal("⬛"), (button -> {}));
@@ -358,7 +359,7 @@ public abstract class MidnightConfig {
         public int getScrollbarPositionX() { return this.width -7; }
 
         public void addButton(List<ClickableWidget> buttons, Text text, EntryInfo info) {
-            this.addEntry(ButtonEntry.create(buttons, text, info));
+            this.addEntry(new ButtonEntry(buttons, text, info));
         }
         @Override
         public int getRowWidth() { return 10000; }
@@ -386,9 +387,6 @@ public abstract class MidnightConfig {
             this.info = info;
             children.addAll(buttons);
         }
-        public static ButtonEntry create(List<ClickableWidget> buttons, Text text, EntryInfo info) {
-            return new ButtonEntry(buttons, text, info);
-        }
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             buttons.forEach(b -> { b.y = y; b.render(matrices, mouseX, mouseY, tickDelta); });
             if (text != null && (!text.getString().contains("spacer") || !buttons.isEmpty())) {
@@ -399,12 +397,35 @@ public abstract class MidnightConfig {
         public List<? extends Element> children() {return children;}
         public List<? extends Selectable> selectableChildren() {return children;}
     }
+    private static class MidnightSliderWidget extends SliderWidget {
+        private final EntryInfo info; private final Entry e;
+        public MidnightSliderWidget(int x, int y, int width, int height, Text text, double value, EntryInfo info) {
+            super(x, y, width, height, text, value);
+            this.e = info.field.getAnnotation(Entry.class);
+            this.info = info;
+        }
+
+        @Override
+        protected void updateMessage() {
+            this.setMessage(Text.of(info.tempValue));
+        }
+
+        @Override
+        protected void applyValue() {
+            if (info.field.getType() == int.class) info.value = ((Number) (e.min() + value * (e.max() - e.min()))).intValue();
+            else if (info.field.getType() == double.class) info.value = Math.round((e.min() + value * (e.max() - e.min())) * (double) e.precision()) / (double) e.precision();
+            else if (info.field.getType() == float.class) info.value = Math.round((e.min() + value * (e.max() - e.min())) * (float) e.precision()) / (float) e.precision();
+            info.tempValue = String.valueOf(info.value);
+        }
+    }
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Entry {
         int width() default 100;
         double min() default Double.MIN_NORMAL;
         double max() default Double.MAX_VALUE;
         String name() default "";
         boolean isColor() default false;
+        boolean isSlider() default false;
+        int precision() default 100;
     }
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Client {}
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Server {}
