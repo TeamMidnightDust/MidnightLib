@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import eu.midnightdust.lib.util.PlatformVariables;
+import eu.midnightdust.lib.util.PlatformFunctions;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -30,7 +30,7 @@ public class AutoCommand {
         command();
         LiteralArgumentBuilder<ServerCommandSource> finalized = CommandManager.literal("midnightconfig").requires(source -> source.hasPermissionLevel(2)).then(command);
 
-        PlatformVariables.registerCommand(finalized); commands.add(finalized);
+        PlatformFunctions.registerCommand(finalized); commands.add(finalized);
     }
 
     private void command() {

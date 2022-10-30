@@ -17,17 +17,17 @@
     "intermediate_mappings": "net.fabricmc:intermediary",
     "environment": "*",
     "entrypoints": {
-      "client": [
+      "client_init": [
         "eu.midnightdust.quilt.core.MidnightLibClientQuilt"
       ],
-      "server": [
+      "server_init": [
         "eu.midnightdust.quilt.core.MidnightLibServerQuilt"
       ],
       "modmenu": [
         "eu.midnightdust.lib.config.AutoModMenu"
       ]
     },
-    "mixins": [
+    "mixin": [
       "midnightlib.mixins.json"
     ],
     "depends": [
@@ -39,6 +39,18 @@
         "id": "quilt_base",
         "version": "*"
       }
-    ]
+    ],
+    "custom": {
+      "modmenu": {
+        "links": {
+          "modmenu.discord": "https://discord.midnightdust.eu/",
+          "modmenu.website": "https://www.midnightdust.eu/",
+          "midnightlib.curseforge": "https://www.curseforge.com/minecraft/mc-mods/midnightlib",
+          "midnightlib.modrinth": "https://modrinth.com/mod/midnightlib",
+          "midnightlib.wiki": "https://github.com/TeamMidnightDust/MidnightLib/wiki"
+        },
+        "badges": [ "library" ]
+      }
+    }
   }
 }

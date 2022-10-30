@@ -4,7 +4,7 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import eu.midnightdust.lib.util.PlatformVariables;
+import eu.midnightdust.lib.util.PlatformFunctions;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -74,13 +74,13 @@ public abstract class MidnightConfig {
     private static final Gson gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.TRANSIENT).excludeFieldsWithModifiers(Modifier.PRIVATE).addSerializationExclusionStrategy(new HiddenAnnotationExclusionStrategy()).setPrettyPrinting().create();
 
     public static void init(String modid, Class<?> config) {
-        path = PlatformVariables.getConfigDirectory().resolve(modid + ".json");
+        path = PlatformFunctions.getConfigDirectory().resolve(modid + ".json");
         configClass.put(modid, config);
 
         for (Field field : config.getFields()) {
             EntryInfo info = new EntryInfo();
             if ((field.isAnnotationPresent(Entry.class) || field.isAnnotationPresent(Comment.class)) && !field.isAnnotationPresent(Server.class) && !field.isAnnotationPresent(Hidden.class))
-                if (PlatformVariables.isClientEnv()) initClient(modid, field, info);
+                if (PlatformFunctions.isClientEnv()) initClient(modid, field, info);
             if (field.isAnnotationPresent(Comment.class)) info.centered = field.getAnnotation(Comment.class).centered();
             if (field.isAnnotationPresent(Entry.class))
                 try {
@@ -174,7 +174,7 @@ public abstract class MidnightConfig {
     }
 
     public static void write(String modid) {
-        path = PlatformVariables.getConfigDirectory().resolve(modid + ".json");
+        path = PlatformFunctions.getConfigDirectory().resolve(modid + ".json");
         try {
             if (!Files.exists(path)) Files.createFile(path);
             Files.write(path, gson.toJson(configClass.get(modid).getDeclaredConstructor().newInstance()).getBytes());

@@ -1,6 +1,6 @@
 package eu.midnightdust.lib.util;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class MidnightColorUtil {
     public static float hue;
