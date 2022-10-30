@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "quilt_loader": {
+    "group": "${group}",
+    "id": "midnightlib",
+    "version": "${version}",
+    "name": "MidnightLib",
+    "description": "Common Library for Team MidnightDust's mods.",
+    "authors": ["TeamMidnightDust","Motschen"],
+    "contact": {
+      "homepage": "https://www.midnightdust.eu/",
+      "sources": "https://github.com/TeamMidnightDust/MidnightLib",
+      "issues": "https://github.com/TeamMidnightDust/MidnightLib/issues"
+    },
+    "license": "MIT License",
+    "icon": "assets/midnightlib/icon.png",
+    "intermediate_mappings": "net.fabricmc:intermediary",
+    "environment": "*",
+    "entrypoints": {
+      "client": [
+        "eu.midnightdust.quilt.core.MidnightLibClientQuilt"
+      ],
+      "server": [
+        "eu.midnightdust.quilt.core.MidnightLibServerQuilt"
+      ],
+      "modmenu": [
+        "eu.midnightdust.lib.config.AutoModMenu"
+      ]
+    },
+    "mixins": [
+      "midnightlib.mixins.json"
+    ],
+    "depends": [
+      {
+        "id": "quilt_loader",
+        "version": "*"
+      },
+      {
+        "id": "quilt_base",
+        "version": "*"
+      }
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "midnightlib",
+  "version": "${version}",
+
+  "name": "MidnightLib",
+  "description": "Common Library for Team MidnightDust's mods.",
+  "authors": [
+    "Motschen",
+    "TeamMidnightDust"
+  ],
+  "contact": {
+    "homepage": "https://www.midnightdust.eu/",
+    "sources": "https://github.com/TeamMidnightDust/MidnightLib",
+    "issues": "https://github.com/TeamMidnightDust/MidnightLib/issues"
+  },
+
+  "license": "MIT",
+  "icon": "assets/midnightlib/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "eu.midnightdust.fabric.core.MidnightLibClientFabric"
+    ],
+    "server": [
+      "eu.midnightdust.fabric.core.MidnightLibServerFabric"
+    ],
+    "modmenu": [
+      "eu.midnightdust.lib.config.AutoModMenu"
+    ]
+  },
+
+  "mixins": [
+    "midnightlib.mixins.json"
+  ],
+
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.midnightdust.eu/",
+        "modmenu.website": "https://www.midnightdust.eu/",
+        "midnightlib.curseforge": "https://www.curseforge.com/minecraft/mc-mods/midnightlib",
+        "midnightlib.modrinth": "https://modrinth.com/mod/midnightlib",
+        "midnightlib.wiki": "https://github.com/TeamMidnightDust/MidnightLib/wiki"
+      },
+      "badges": [ "library" ]
+    }
+  }
+}

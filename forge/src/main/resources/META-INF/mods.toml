@@ -1,0 +1,28 @@
+modLoader = "javafml"
+loaderVersion = "[43,)"
+#issueTrackerURL = ""
+license = "MIT License"
+
+[[mods]]
+modId = "midnightlib"
+version = "${version}"
+displayName = "MidnightLib"
+authors = "TeamMidnightDust, Motschen"
+description = '''
+Common Library for Team MidnightDust's mods.
+'''
+#logoFile = ""
+
+[[dependencies.midnightlib]]
+modId = "forge"
+mandatory = true
+versionRange = "[43,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.midnightlib]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.19.2,)"
+ordering = "NONE"
+side = "BOTH"
