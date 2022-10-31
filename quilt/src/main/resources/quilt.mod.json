@@ -6,13 +6,16 @@
     "version": "${version}",
     "name": "MidnightLib",
     "description": "Common Library for Team MidnightDust's mods.",
-    "authors": ["TeamMidnightDust","Motschen"],
+    "authors": [
+      "TeamMidnightDust",
+      "Motschen"
+    ],
     "contact": {
       "homepage": "https://www.midnightdust.eu/",
       "sources": "https://github.com/TeamMidnightDust/MidnightLib",
       "issues": "https://github.com/TeamMidnightDust/MidnightLib/issues"
     },
-    "license": "MIT License",
+    "license": "MIT",
     "icon": "assets/midnightlib/icon.png",
     "intermediate_mappings": "net.fabricmc:intermediary",
     "environment": "*",
@@ -27,9 +30,6 @@
         "eu.midnightdust.lib.config.AutoModMenu"
       ]
     },
-    "mixin": [
-      "midnightlib.mixins.json"
-    ],
     "depends": [
       {
         "id": "quilt_loader",
@@ -40,17 +40,33 @@
         "version": "*"
       }
     ],
-    "custom": {
-      "modmenu": {
-        "links": {
-          "modmenu.discord": "https://discord.midnightdust.eu/",
-          "modmenu.website": "https://www.midnightdust.eu/",
-          "midnightlib.curseforge": "https://www.curseforge.com/minecraft/mc-mods/midnightlib",
-          "midnightlib.modrinth": "https://modrinth.com/mod/midnightlib",
-          "midnightlib.wiki": "https://github.com/TeamMidnightDust/MidnightLib/wiki"
-        },
-        "badges": [ "library" ]
-      }
+    "metadata": {
+      "name": "MidnightLib (Quilt)",
+      "description": "Common Library for Team MidnightDust's mods.\nProvides a config api, automatic integration with other mods, common utils, and cosmetics.",
+      "contributors": {
+        "Motschen": "Author",
+        "TeamMidnightDust": "Mascot"
+      },
+      "contact": {
+        "email": "mail@midnightdust.eu",
+        "homepage": "https://modrinth.com/mod/midnightlib",
+        "issues":  "https://github.com/TeamMidnightDust/MidnightLib/issues",
+        "sources": "https://github.com/TeamMidnightDust/MidnightLib"
+      },
+      "icon": "assets/midnightlib/icon.png"
     }
+  },
+  "mixin": [
+    "midnightlib.mixins.json"
+  ],
+  "modmenu": {
+    "links": {
+      "modmenu.discord": "https://discord.midnightdust.eu/",
+      "modmenu.website": "https://www.midnightdust.eu/",
+      "midnightlib.curseforge": "https://www.curseforge.com/minecraft/mc-mods/midnightlib",
+      "midnightlib.modrinth": "https://modrinth.com/mod/midnightlib",
+      "midnightlib.wiki": "https://github.com/TeamMidnightDust/MidnightLib/wiki"
+    },
+    "badges": [ "library" ]
   }
 }
