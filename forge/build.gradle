@@ -19,6 +19,7 @@ configurations {
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
     developmentForge.extendsFrom common
+    archivesBaseName = rootProject.archives_base_name + "-forge"
 }
 
 dependencies {
