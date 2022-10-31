@@ -143,7 +143,7 @@ public abstract class MidnightConfig {
             boolean inLimits = false;
             info.error = null;
             if (!(isNumber && s.isEmpty()) && !s.equals("-") && !s.equals(".")) {
-                value = f.apply(s);
+                try { value = f.apply(s); } catch(NumberFormatException e){ return false; }
                 inLimits = value.doubleValue() >= min && value.doubleValue() <= max;
                 info.error = inLimits? null : new AbstractMap.SimpleEntry<>(t, Text.literal(value.doubleValue() < min ?
                         "§cMinimum " + (isNumber? "value" : "length") + (cast? " is " + (int)min : " is " + min) :
