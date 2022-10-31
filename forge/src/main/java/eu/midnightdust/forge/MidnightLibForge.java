@@ -33,6 +33,7 @@ public class MidnightLibForge {
         );
         ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () ->
                 new ConfigScreenHandler.ConfigScreenFactory((client, parent) -> MidnightConfig.getScreen(parent, "midnightlib")));
-        MinecraftForge.EVENT_BUS.register(new MidnightLibEvents());
+        MinecraftForge.EVENT_BUS.register(new MidnightLibClientEvents());
+        MinecraftForge.EVENT_BUS.register(new MidnightLibServerEvents());
     }
 }

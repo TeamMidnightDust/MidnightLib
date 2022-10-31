@@ -1,6 +1,5 @@
 package eu.midnightdust.core;
 
-import eu.midnightdust.core.config.MidnightLibConfig;
 import eu.midnightdust.lib.config.AutoCommand;
 import eu.midnightdust.lib.config.MidnightConfig;
 

@@ -7,6 +7,7 @@ license = "MIT License"
 modId = "midnightlib"
 version = "${version}"
 displayName = "MidnightLib"
+logoFile = "midnightlib.png"
 authors = "TeamMidnightDust, Motschen"
 description = '''
 Common Library for Team MidnightDust's mods.
