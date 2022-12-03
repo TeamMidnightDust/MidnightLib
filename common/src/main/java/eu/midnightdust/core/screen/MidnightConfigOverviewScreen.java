@@ -1,7 +1,6 @@
 package eu.midnightdust.core.screen;
 
 import eu.midnightdust.core.MidnightLibClient;
-import eu.midnightdust.core.config.MidnightLibConfig;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -28,7 +27,7 @@ public class MidnightConfigOverviewScreen extends Screen {
 
     @Override
     protected void init() {
-        this.addDrawableChild(new ButtonWidget(this.width / 2 - 100, this.height - 28, 200, 20, ScreenTexts.DONE, (button) -> Objects.requireNonNull(client).setScreen(parent)));
+        this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> Objects.requireNonNull(client).setScreen(parent)).dimensions(this.width / 2 - 100, this.height - 28, 200, 20).build());
 
         this.list = new MidnightOverviewListWidget(this.client, this.width, this.height, 32, this.height - 32, 25);
         if (this.client != null && this.client.world != null) this.list.setRenderBackground(false);
@@ -37,8 +36,8 @@ public class MidnightConfigOverviewScreen extends Screen {
         Collections.sort(sortedMods);
         sortedMods.forEach((modid) -> {
             if (!MidnightLibClient.hiddenMods.contains(modid)) {
-                list.addButton(new ButtonWidget(this.width / 2 - 100, this.height - 28, 200, 20, Text.translatable(modid +".midnightconfig.title"), (button) ->
-                        Objects.requireNonNull(client).setScreen(MidnightConfig.getScreen(this,modid))));
+                list.addButton(ButtonWidget.builder(Text.translatable(modid +".midnightconfig.title"), (button) ->
+                        Objects.requireNonNull(client).setScreen(MidnightConfig.getScreen(this,modid))).dimensions(this.width / 2 - 100, this.height - 28, 200, 20).build());
             }
         });
         super.init();
@@ -78,7 +77,7 @@ public class MidnightConfigOverviewScreen extends Screen {
         }
         public static OverviewButtonEntry create(ClickableWidget button) {return new OverviewButtonEntry(button);}
         public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            button.y = y;
+            button.setY(y);
             button.render(matrices, mouseX, mouseY, tickDelta);
         }
         public List<? extends Element> children() {return buttonList;}
