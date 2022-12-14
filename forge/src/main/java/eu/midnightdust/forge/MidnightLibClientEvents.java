@@ -25,9 +25,7 @@ public class MidnightLibClientEvents {
     @SubscribeEvent
     public void onPostInit(FMLLoadCompleteEvent event) {
         ModList.get().applyForEachModContainer(modContainer -> {
-            System.out.println(modContainer.getModId() + " yes");
             if (MidnightConfig.configClass.containsKey(modContainer.getModId())) {
-
                 modContainer.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () ->
                         new ConfigScreenHandler.ConfigScreenFactory((client, parent) -> MidnightConfig.getScreen(parent, modContainer.getModId())));
             }
