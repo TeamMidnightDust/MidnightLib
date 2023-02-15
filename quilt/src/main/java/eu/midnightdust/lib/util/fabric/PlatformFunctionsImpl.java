@@ -5,7 +5,7 @@ import eu.midnightdust.lib.util.PlatformFunctions;
 import net.fabricmc.api.EnvType;
 import net.minecraft.server.command.ServerCommandSource;
 import org.quiltmc.loader.api.QuiltLoader;
-import org.quiltmc.loader.impl.QuiltLoaderImpl;
+import org.quiltmc.loader.api.minecraft.MinecraftQuiltLoader;
 import org.quiltmc.qsl.command.api.CommandRegistrationCallback;
 
 import java.nio.file.Path;
@@ -18,7 +18,7 @@ public class PlatformFunctionsImpl {
         return QuiltLoader.getConfigDir();
     }
     public static boolean isClientEnv() {
-        return QuiltLoaderImpl.INSTANCE.getEnvironmentType() == EnvType.CLIENT;
+        return MinecraftQuiltLoader.getEnvironmentType() == EnvType.CLIENT;
     }
     public static boolean isModLoaded(String modid) {
         return QuiltLoader.isModLoaded(modid);
