@@ -14,7 +14,6 @@ public class MidnightLibClient {
 
     public static void onInitializeClient() {
         MidnightConfig.init("midnightlib", MidnightLibConfig.class);
-        hiddenMods.add("puzzle");
 
         if (MidnightLibConfig.special_hats) HatLoader.init();
     }
