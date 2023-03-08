@@ -1,0 +1,17 @@
+{
+	"midnightlib.overview.title":"Vue d'ensemble de MidnightConfig",
+	"midnightlib.midnightconfig.title":"Configuration de MidnightLib",
+	"midnightlib.midnightconfig.midnightlib_description":"§nMidnightLib",
+	"midnightlib.midnightconfig.config_screen_list":"Activer la liste de l'écran de configuration",
+	"midnightlib.midnightconfig.enum.ConfigButton.TRUE":"§aOui",
+	"midnightlib.midnightconfig.enum.ConfigButton.FALSE":"§cNon",
+	"midnightlib.midnightconfig.enum.ConfigButton.MODMENU":"§bModMenu",
+	"midnightlib.midnightconfig.background_texture":"Texture d'arrière-plan de l'écran de configuration",
+	"midnightlib.midnightconfig.midnighthats_description":"§nMidnightHats",
+	"midnightlib.midnightconfig.special_hats":"Activer les chapeaux de fan",
+	"midnightlib.modrinth":"Modrinth",
+	"midnightlib.curseforge":"CurseForge",
+	"midnightlib.wiki":"Wiki",
+	"modmenu.descriptionTranslation.midnightlib": "Bibliothèque commune pour les mods de la Team MidnightDust.\nFournit une API de configuration, une intégration automatique avec d'autres mods, des utilitaires courants et des cosmétiques.",
+	"modmenu.summaryTranslation.midnightlib": "Bibliothèque commune pour les mods de la Team MidnightDust."
+}
