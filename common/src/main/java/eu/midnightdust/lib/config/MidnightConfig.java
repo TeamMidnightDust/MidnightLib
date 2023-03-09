@@ -202,8 +202,9 @@ public abstract class MidnightConfig {
         public final String modid;
         public MidnightConfigListWidget list;
         public boolean reload = false;
-        public TabManager tabManager = new TabManager(a -> refresh(), a -> refresh());
+        public TabManager tabManager = new TabManager(a -> {}, a -> {});
         public Tab prevTab;
+        public TabNavigationWidget tabNavigation;
         public ButtonWidget done;
 
         // Real Time config update //
@@ -242,6 +243,11 @@ public abstract class MidnightConfig {
                     } catch (IllegalAccessException ignored) {}
             }
         }
+        @Override
+        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+            if (this.tabNavigation.trySwitchTabsWithKey(keyCode)) return true;
+            return super.keyPressed(keyCode, scanCode, modifiers);
+        }
         public Tooltip getTooltip(EntryInfo info) {
             return Tooltip.of(info.error != null ? info.error : I18n.hasTranslation(translationPrefix+info.field.getName()+".tooltip") ? Text.translatable(translationPrefix+info.field.getName()+".tooltip") : Text.empty());
         }
@@ -270,7 +276,7 @@ public abstract class MidnightConfig {
                     } else e.tab = tabs.get(name);
                 }
             }
-            TabNavigationWidget tabNavigation = TabNavigationWidget.builder(tabManager, this.width).tabs(tabs.values().toArray(new Tab[0])).build();
+            tabNavigation = TabNavigationWidget.builder(tabManager, this.width).tabs(tabs.values().toArray(new Tab[0])).build();
             if (tabs.size() > 1) this.addDrawableChild(tabNavigation);
             if (!reload) tabNavigation.selectTab(0, false);
             tabNavigation.init();
@@ -280,10 +286,6 @@ public abstract class MidnightConfig {
                 loadValues();
                 Objects.requireNonNull(client).setScreen(parent);
             }).dimensions(this.width / 2 - 154, this.height - 28, 150, 20).build());
-
-            this.list = new MidnightConfigListWidget(this.client, this.width, this.height, 32, this.height - 32, 25);
-            if (this.client != null && this.client.world != null) this.list.setRenderBackground(false);
-            this.addSelectableChild(this.list);
             done = this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
                 for (EntryInfo info : entries)
                     if (info.id.equals(modid)) {
@@ -294,6 +296,11 @@ public abstract class MidnightConfig {
                 write(modid);
                 Objects.requireNonNull(client).setScreen(parent);
             }).dimensions(this.width / 2 + 4, this.height - 28, 150, 20).build());
+
+            this.list = new MidnightConfigListWidget(this.client, this.width, this.height, 32, this.height - 32, 25);
+            if (this.client != null && this.client.world != null) this.list.setRenderBackground(false);
+            this.addSelectableChild(this.list);
+
             fillList();
         }
         public void fillList() {
