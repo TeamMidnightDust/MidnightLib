@@ -204,16 +204,17 @@ public abstract class MidnightConfig {
         public boolean reload = false;
         public TabManager tabManager = new TabManager(a -> refresh(), a -> refresh());
         public Tab prevTab;
+        public ButtonWidget done;
 
         // Real Time config update //
         @Override
         public void tick() {
             super.tick();
-            tabManager.tick();
             if (prevTab != null && prevTab != tabManager.getCurrentTab()) {
                 prevTab = tabManager.getCurrentTab();
                 this.list.clear();
                 fillList();
+                list.setScrollAmount(0);
             }
             for (EntryInfo info : entries) {
                 try {info.field.set(null, info.value);} catch (IllegalAccessException ignored) {}
@@ -283,10 +284,7 @@ public abstract class MidnightConfig {
             this.list = new MidnightConfigListWidget(this.client, this.width, this.height, 32, this.height - 32, 25);
             if (this.client != null && this.client.world != null) this.list.setRenderBackground(false);
             this.addSelectableChild(this.list);
-            this.fillList();
-        }
-        public void fillList() {
-            ButtonWidget done = this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
+            done = this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
                 for (EntryInfo info : entries)
                     if (info.id.equals(modid)) {
                         try {
@@ -296,6 +294,9 @@ public abstract class MidnightConfig {
                 write(modid);
                 Objects.requireNonNull(client).setScreen(parent);
             }).dimensions(this.width / 2 + 4, this.height - 28, 150, 20).build());
+            fillList();
+        }
+        public void fillList() {
             for (EntryInfo info : entries) {
                 if (info.id.equals(modid) && (info.tab == null || info.tab == tabManager.getCurrentTab())) {
                     Text name = Objects.requireNonNullElseGet(info.name, () -> Text.translatable(translationPrefix + info.field.getName()));

@@ -29,9 +29,9 @@ public class TexturedOverlayButtonWidget extends TexturedButtonWidget {
     public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         int i = 66;
         if (!this.isNarratable()) {
-            i += 40;
-        } else if (this.isHovered()) {
-            i += 20;
+            i += hoveredVOffset * 2;
+        } else if (this.isSelected()) {
+            i += hoveredVOffset;
         }
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
