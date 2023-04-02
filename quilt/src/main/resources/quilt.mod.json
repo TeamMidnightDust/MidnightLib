@@ -4,21 +4,7 @@
     "group": "${group}",
     "id": "midnightlib",
     "version": "${version}",
-    "name": "MidnightLib",
-    "description": "Common Library for Team MidnightDust's mods.",
-    "authors": [
-      "TeamMidnightDust",
-      "Motschen"
-    ],
-    "contact": {
-      "homepage": "https://www.midnightdust.eu/",
-      "sources": "https://github.com/TeamMidnightDust/MidnightLib",
-      "issues": "https://github.com/TeamMidnightDust/MidnightLib/issues"
-    },
-    "license": "MIT",
-    "icon": "assets/midnightlib/icon.png",
     "intermediate_mappings": "net.fabricmc:intermediary",
-    "environment": "*",
     "entrypoints": {
       "client_init": [
         "eu.midnightdust.quilt.core.MidnightLibClientQuilt"
@@ -47,6 +33,8 @@
     "metadata": {
       "name": "MidnightLib (Quilt)",
       "description": "Common Library for Team MidnightDust's mods.\nProvides a config api, automatic integration with other mods, common utils, and cosmetics.",
+      "license": "MIT",
+      "environment": "*",
       "contributors": {
         "Motschen": "Author",
         "TeamMidnightDust": "Mascot"
