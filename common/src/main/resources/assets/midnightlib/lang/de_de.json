@@ -1,11 +1,8 @@
 {
 	"midnightlib.overview.title":"MidnightConfig Übersicht",
 	"midnightlib.midnightconfig.title":"MidnightLib Konfiguration",
-	"midnightlib.midnightconfig.midnightlib_description":"§nMidnightLib",
 	"midnightlib.midnightconfig.config_screen_list":"Konfigurationsübersicht",
 	"midnightlib.midnightconfig.background_texture":"Textur der Konfigurationsbildschirme",
-	"midnightlib.midnightconfig.midnighthats_description":"§nMidnightHats",
-	"midnightlib.midnightconfig.special_hats":"Unterstützer-Hüte",
 	"modmenu.descriptionTranslation.midnightlib": "Code-Bibliothek für Mods von MidnightDust.\nStellt eine Konfigurationsschnittstelle, automatische Kompatibilität, oft genutzten Code und Hüte für Unterstützer bereit.",
 	"modmenu.summaryTranslation.midnightlib": "Code-Bibliothek für Mods von MidnightDust."
 }

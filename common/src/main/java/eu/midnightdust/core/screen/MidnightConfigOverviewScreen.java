@@ -37,7 +37,7 @@ public class MidnightConfigOverviewScreen extends Screen {
         sortedMods.forEach((modid) -> {
             if (!MidnightLibClient.hiddenMods.contains(modid)) {
                 list.addButton(ButtonWidget.builder(Text.translatable(modid +".midnightconfig.title"), (button) ->
-                        Objects.requireNonNull(client).setScreen(MidnightConfig.getScreen(this,modid))).dimensions(this.width / 2 - 100, this.height - 28, 200, 20).build());
+                        Objects.requireNonNull(client).setScreen(MidnightConfig.getScreen(this,modid))).dimensions(this.width / 2 - 125, this.height - 28, 250, 20).build());
             }
         });
         super.init();
@@ -59,7 +59,7 @@ public class MidnightConfigOverviewScreen extends Screen {
             textRenderer = minecraftClient.textRenderer;
         }
         @Override
-        public int getScrollbarPositionX() {return this.width -7;}
+        public int getScrollbarPositionX() {return this.width-7;}
 
         public void addButton(ClickableWidget button) {
             this.addEntry(OverviewButtonEntry.create(button));

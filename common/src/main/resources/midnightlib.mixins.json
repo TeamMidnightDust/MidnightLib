@@ -4,8 +4,7 @@
   "package": "eu.midnightdust.core.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "MixinOptionsScreen",
-    "MixinPlayerEntityRenderer"
+    "MixinOptionsScreen"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -38,6 +38,10 @@
       {
         "id": "quilt_base",
         "version": "*"
+      },
+      {
+        "id": "minecraft",
+        "version": ">=1.19.4"
       }
     ],
     "metadata": {
