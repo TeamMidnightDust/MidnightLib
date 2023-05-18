@@ -1,0 +1,14 @@
+{
+	"midnightlib.overview.title":"MidnightConfig 概述",
+	"midnightlib.midnightconfig.title":"MidnightLib 設定",
+	"midnightlib.midnightconfig.config_screen_list":"啟用設定畫面列表",
+	"midnightlib.midnightconfig.enum.ConfigButton.TRUE":"§a是",
+	"midnightlib.midnightconfig.enum.ConfigButton.FALSE":"§c否",
+	"midnightlib.midnightconfig.enum.ConfigButton.MODMENU":"§b模組選單",
+	"midnightlib.midnightconfig.background_texture":"設定背景畫面的材質",
+	"midnightlib.modrinth":"Modrinth",
+	"midnightlib.curseforge":"CurseForge",
+	"midnightlib.wiki":"維基",
+	"modmenu.descriptionTranslation.midnightlib": "MidnightDust 團隊的常用程式庫模組。\n提供設定 API、與其他模組自動整合、常用工具和美觀。",
+	"modmenu.summaryTranslation.midnightlib": "MidnightDust 團隊的常用程式庫模組。"
+}
