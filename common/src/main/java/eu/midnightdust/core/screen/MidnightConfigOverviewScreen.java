@@ -6,6 +6,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
@@ -43,11 +44,11 @@ public class MidnightConfigOverviewScreen extends Screen {
         super.init();
     }
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        this.renderBackground(matrices);
-        this.list.render(matrices, mouseX, mouseY, delta);
-        drawCenteredTextWithShadow(matrices, textRenderer, title, width / 2, 15, 0xFFFFFF);
-        super.render(matrices, mouseX, mouseY, delta);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        this.renderBackground(context);
+        this.list.render(context, mouseX, mouseY, delta);
+        context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 15, 0xFFFFFF);
+        super.render(context, mouseX, mouseY, delta);
     }
     @Environment(EnvType.CLIENT)
     public static class MidnightOverviewListWidget extends ElementListWidget<OverviewButtonEntry> {
@@ -76,9 +77,9 @@ public class MidnightConfigOverviewScreen extends Screen {
             this.buttonList.add(button);
         }
         public static OverviewButtonEntry create(ClickableWidget button) {return new OverviewButtonEntry(button);}
-        public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             button.setY(y);
-            button.render(matrices, mouseX, mouseY, tickDelta);
+            button.render(context, mouseX, mouseY, tickDelta);
         }
         public List<? extends Element> children() {return buttonList;}
         public List<? extends Selectable> selectableChildren() {return buttonList;}

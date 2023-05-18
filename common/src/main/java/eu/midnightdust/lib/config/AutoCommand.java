@@ -80,15 +80,17 @@ public class AutoCommand {
             return 0;
         }
 
-        source.sendFeedback(Text.literal("Successfully set " + entry.getName()+" to "+value), true);
+        source.sendFeedback(() -> Text.literal("Successfully set " + entry.getName()+" to "+value), true);
         return 1;
     }
     private int getValue(ServerCommandSource source) {
-        try {
-            source.sendFeedback(Text.literal("The value of "+entry.getName()+" is "+entry.get(null)), false);
-            return 1;
-        }
-        catch (IllegalAccessException ignored) {}
+        source.sendFeedback(() -> {
+            try {
+                return Text.literal("The value of "+entry.getName()+" is "+entry.get(null));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+            }, false);
         return 0;
     }
 }
