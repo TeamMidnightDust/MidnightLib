@@ -198,6 +198,26 @@ public abstract class MidnightConfig {
             this.parent = parent;
             this.modid = modid;
             this.translationPrefix = modid + ".midnightconfig.";
+            loadValues();
+
+            for (EntryInfo e : entries) {
+                if (e.id.equals(modid)) {
+                    String tabId = e.field.isAnnotationPresent(Entry.class) ? e.field.getAnnotation(Entry.class).category() : e.field.getAnnotation(Comment.class).category();
+                    String name = translationPrefix + "category." + tabId;
+                    if (!I18n.hasTranslation(name) && tabId.equals("default"))
+                        name = translationPrefix + "title";
+                    if (!tabs.containsKey(name)) {
+                        Tab tab = new GridScreenTab(Text.translatable(name));
+                        e.tab = tab;
+                        tabs.put(name, tab);
+                    } else e.tab = tabs.get(name);
+                }
+            }
+            tabNavigation = TabNavigationWidget.builder(tabManager, this.width).tabs(tabs.values().toArray(new Tab[0])).build();
+            if (tabs.size() > 1) this.addDrawableChild(tabNavigation);
+            tabNavigation.selectTab(0, false);
+            tabNavigation.init();
+            prevTab = tabManager.getCurrentTab();
         }
         public final String translationPrefix;
         public final Screen parent;
@@ -205,9 +225,11 @@ public abstract class MidnightConfig {
         public MidnightConfigListWidget list;
         public boolean reload = false;
         public TabManager tabManager = new TabManager(a -> {}, a -> {});
+        public Map<String, Tab> tabs = new HashMap<>();
         public Tab prevTab;
         public TabNavigationWidget tabNavigation;
         public ButtonWidget done;
+        public double scrollProgress = 0d;
 
         // Real Time config update //
         @Override
@@ -219,6 +241,7 @@ public abstract class MidnightConfig {
                 fillList();
                 list.setScrollAmount(0);
             }
+            scrollProgress = list.getScrollAmount();
             for (EntryInfo info : entries) {
                 try {info.field.set(null, info.value);} catch (IllegalAccessException ignored) {}
             }
@@ -250,36 +273,9 @@ public abstract class MidnightConfig {
             if (this.tabNavigation.trySwitchTabsWithKey(keyCode)) return true;
             return super.keyPressed(keyCode, scanCode, modifiers);
         }
-        public void refresh() {
-            double scrollAmount = list.getScrollAmount();
-            list.clear();
-            fillList();
-            list.setScrollAmount(scrollAmount);
-        }
         @Override
         public void init() {
             super.init();
-            loadValues();
-
-            Map<String, Tab> tabs = new HashMap<>();
-            for (EntryInfo e : entries) {
-                if (e.id.equals(modid)) {
-                    String tabId = e.field.isAnnotationPresent(Entry.class) ? e.field.getAnnotation(Entry.class).category() : e.field.getAnnotation(Comment.class).category();
-                    String name = translationPrefix + "category." + tabId;
-                    if (!I18n.hasTranslation(name) && tabId.equals("default"))
-                        name = translationPrefix + "title";
-                    if (!tabs.containsKey(name)) {
-                        Tab tab = new GridScreenTab(Text.translatable(name));
-                        e.tab = tab;
-                        tabs.put(name, tab);
-                    } else e.tab = tabs.get(name);
-                }
-            }
-            tabNavigation = TabNavigationWidget.builder(tabManager, this.width).tabs(tabs.values().toArray(new Tab[0])).build();
-            if (tabs.size() > 1) this.addDrawableChild(tabNavigation);
-            if (!reload) tabNavigation.selectTab(0, false);
-            tabNavigation.init();
-            prevTab = tabManager.getCurrentTab();
 
             this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, button -> {
                 loadValues();
@@ -301,6 +297,7 @@ public abstract class MidnightConfig {
             this.addSelectableChild(this.list);
 
             fillList();
+            reload = true;
         }
         public void fillList() {
             for (EntryInfo info : entries) {
@@ -310,7 +307,8 @@ public abstract class MidnightConfig {
                         info.value = info.defaultValue;
                         info.tempValue = info.defaultValue.toString();
                         info.index = 0;
-                        this.refresh();
+                        list.clear();
+                        fillList();
                     })).dimensions(width - 205, 0, 40, 20).build();
 
                     if (info.widget instanceof Map.Entry) {
@@ -332,9 +330,8 @@ public abstract class MidnightConfig {
                             if (((List<?>) info.value).contains("")) ((List<String>) info.value).remove("");
                             info.index = info.index + 1;
                             if (info.index > ((List<String>) info.value).size()) info.index = 0;
-                            this.reload = true;
-                            refresh();
-                            this.reload = false;
+                            list.clear();
+                            fillList();
                         })).dimensions(width - 185, 0, 20, 20).build();
                         widget.setTooltip(getTooltip(info));
                         this.list.addButton(List.of(widget, resetButton, cycleButton), name, info);
@@ -369,6 +366,7 @@ public abstract class MidnightConfig {
                         this.list.addButton(List.of(), name, info);
                     }
                 }
+                list.setScrollAmount(scrollProgress);
                 updateResetButtons();
             }
         }
@@ -377,7 +375,7 @@ public abstract class MidnightConfig {
             this.renderBackground(context);
             this.list.render(context, mouseX, mouseY, delta);
 
-            context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 15, 0xFFFFFF);
+            if (tabs.size() < 2) context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 15, 0xFFFFFF);
             super.render(context,mouseX,mouseY,delta);
         }
     }
@@ -433,7 +431,7 @@ public abstract class MidnightConfig {
         public List<? extends Element> children() {return children;}
         public List<? extends Selectable> selectableChildren() {return children;}
     }
-    private static class MidnightSliderWidget extends SliderWidget {
+    public static class MidnightSliderWidget extends SliderWidget {
         private final EntryInfo info; private final Entry e;
         public MidnightSliderWidget(int x, int y, int width, int height, Text text, double value, EntryInfo info) {
             super(x, y, width, height, text, value);
