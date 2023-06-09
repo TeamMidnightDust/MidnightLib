@@ -214,7 +214,6 @@ public abstract class MidnightConfig {
                 }
             }
             tabNavigation = TabNavigationWidget.builder(tabManager, this.width).tabs(tabs.values().toArray(new Tab[0])).build();
-            if (tabs.size() > 1) this.addDrawableChild(tabNavigation);
             tabNavigation.selectTab(0, false);
             tabNavigation.init();
             prevTab = tabManager.getCurrentTab();
@@ -276,6 +275,9 @@ public abstract class MidnightConfig {
         @Override
         public void init() {
             super.init();
+            tabNavigation.setWidth(this.width);
+            tabNavigation.init();
+            if (tabs.size() > 1) this.addDrawableChild(tabNavigation);
 
             this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, button -> {
                 loadValues();

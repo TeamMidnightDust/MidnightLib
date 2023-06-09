@@ -32,7 +32,7 @@
     ],
     "metadata": {
       "name": "MidnightLib (Quilt)",
-      "description": "Common Library for Team MidnightDust's mods.\nProvides a config api, automatic integration with other mods, common utils, and cosmetics.",
+      "description": "Common Library for Team MidnightDust's mods. Provides a config api, automatic integration with other mods, common utils, and cosmetics.",
       "license": "MIT",
       "environment": "*",
       "contributors": {
