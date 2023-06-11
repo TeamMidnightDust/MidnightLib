@@ -1,3 +1,3 @@
 # MidnightLib
-Common Library for Team MidnightDust's mods.  
-Provides a config api, common utils, and cosmetics.
+Lightweight Common Library for Minecraft mods.  
+Provides a config api with a nice GUI and common utilities, all in a very small file.
