@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = "midnightlib", value = Dist.DEDICATED_SERVER)
 public class MidnightLibServerEvents {
     @SubscribeEvent
-    public void registerCommands(RegisterCommandsEvent event) {
+    public static void registerCommands(RegisterCommandsEvent event) {
         for (LiteralArgumentBuilder<ServerCommandSource> command : AutoCommand.commands){
             event.getDispatcher().register(command);
         }
