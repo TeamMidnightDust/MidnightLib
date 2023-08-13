@@ -4,7 +4,10 @@
 	"midnightlib.midnightconfig.config_screen_list":"Көйләүләр экранының исемлеген кушу",
 	"midnightlib.midnightconfig.enum.ConfigButton.TRUE":"§aӘйе",
 	"midnightlib.midnightconfig.enum.ConfigButton.FALSE":"§cЮк",
+	"midnightlib.midnightconfig.enum.ConfigButton.MODMENU":"§bModMenu",
 	"midnightlib.midnightconfig.background_texture":"Көйләүләр экранының фонының текстурасы",
+	"midnightlib.modrinth":"Modrinth",
+	"midnightlib.curseforge":"CurseForge",
 	"midnightlib.wiki":"Вики",
 	"modmenu.descriptionTranslation.midnightlib": "MidnightDust төркеменең модлары өчен гомуми китапханә.\nКөйләүләр API-ын, башка модлар белән автоматик интеграцияне, гомуми хезмәти программаларны һәм бизәнүләрне тәэмин ителә.",
 	"modmenu.summaryTranslation.midnightlib": "MidnightDust төркеменең модлары өчен гомуми китапханә."
