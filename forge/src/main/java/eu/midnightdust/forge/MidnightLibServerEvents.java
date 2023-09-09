@@ -8,10 +8,10 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = "midnightlib", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.DEDICATED_SERVER)
+@Mod.EventBusSubscriber(modid = "midnightlib", value = Dist.DEDICATED_SERVER)
 public class MidnightLibServerEvents {
     @SubscribeEvent
-    public void registerCommands(RegisterCommandsEvent event) {
+    public static void registerCommands(RegisterCommandsEvent event) {
         for (LiteralArgumentBuilder<ServerCommandSource> command : AutoCommand.commands){
             event.getDispatcher().register(command);
         }
