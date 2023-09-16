@@ -2,7 +2,6 @@
 	"midnightlib.overview.title":"Огляд MidnightConfig",
 	"midnightlib.midnightconfig.title":"Конфігурація MidnightLib",
 	"midnightlib.midnightconfig.config_screen_list":"Увімкнути список екрана конфігурації",
-	"midnightlib.midnightconfig.background_texture":"Текстура фону екрана конфігурації",
 	"midnightlib.wiki":"Вікі",
 	"modmenu.descriptionTranslation.midnightlib": "Загальна бібліотека для модів команди MidnightDust.\nНадає конфігураційний API, автоматичну інтеграцію з іншими модами, загальні утиліти та косметику.",
 	"modmenu.summaryTranslation.midnightlib": "Загальна бібліотека для модів команди MidnightDust."

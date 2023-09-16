@@ -9,8 +9,5 @@ public class MidnightLibClientFabric implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         MidnightLibClient.onInitializeClient();
-        ClientTickEvents.END_CLIENT_TICK.register(
-                client -> MidnightColorUtil.tick()
-        );
     }
 }

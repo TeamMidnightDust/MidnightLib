@@ -10,8 +10,5 @@ public class MidnightLibClientQuilt implements ClientModInitializer {
     @Override
     public void onInitializeClient(ModContainer mod) {
         MidnightLibClient.onInitializeClient();
-        ClientTickEvents.END.register(
-                client -> MidnightColorUtil.tick()
-        );
     }
 }

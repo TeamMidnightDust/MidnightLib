@@ -2,7 +2,6 @@
 	"midnightlib.overview.title":"MidnightConfig Übersicht",
 	"midnightlib.midnightconfig.title":"MidnightLib Konfiguration",
 	"midnightlib.midnightconfig.config_screen_list":"Konfigurationsübersicht",
-	"midnightlib.midnightconfig.background_texture":"Textur der Konfigurationsbildschirme",
-	"modmenu.descriptionTranslation.midnightlib": "Code-Bibliothek für Mods von MidnightDust.\nStellt eine Konfigurationsschnittstelle, automatische Kompatibilität, oft genutzten Code und Hüte für Unterstützer bereit.",
-	"modmenu.summaryTranslation.midnightlib": "Code-Bibliothek für Mods von MidnightDust."
+	"modmenu.descriptionTranslation.midnightlib": "Code-Bibliothek für einfache Konfiguration.\nStellt eine Konfigurationsschnittstelle, automatische Kompatibilität und oft genutzten Code bereit.",
+	"modmenu.summaryTranslation.midnightlib": "Code-Bibliothek für einfache Konfiguration."
 }

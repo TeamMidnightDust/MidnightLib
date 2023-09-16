@@ -5,13 +5,11 @@ import eu.midnightdust.lib.config.MidnightConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.*;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.*;
 import java.util.*;
@@ -45,19 +43,15 @@ public class MidnightConfigOverviewScreen extends Screen {
     }
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context);
+        super.render(context, mouseX, mouseY, delta);
         this.list.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 15, 0xFFFFFF);
-        super.render(context, mouseX, mouseY, delta);
     }
     @Environment(EnvType.CLIENT)
     public static class MidnightOverviewListWidget extends ElementListWidget<OverviewButtonEntry> {
-        TextRenderer textRenderer;
-
         public MidnightOverviewListWidget(MinecraftClient minecraftClient, int i, int j, int k, int l, int m) {
             super(minecraftClient, i, j, k, l, m);
             this.centerListVertically = false;
-            textRenderer = minecraftClient.textRenderer;
         }
         @Override
         public int getScrollbarPositionX() {return this.width-7;}
@@ -70,18 +64,16 @@ public class MidnightConfigOverviewScreen extends Screen {
     }
     public static class OverviewButtonEntry extends ElementListWidget.Entry<OverviewButtonEntry> {
         private final ClickableWidget button;
-        private final List<ClickableWidget> buttonList = new ArrayList<>();
 
         private OverviewButtonEntry(ClickableWidget button) {
             this.button = button;
-            this.buttonList.add(button);
         }
         public static OverviewButtonEntry create(ClickableWidget button) {return new OverviewButtonEntry(button);}
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             button.setY(y);
             button.render(context, mouseX, mouseY, tickDelta);
         }
-        public List<? extends Element> children() {return buttonList;}
-        public List<? extends Selectable> selectableChildren() {return buttonList;}
+        public List<? extends Element> children() {return List.of(button);}
+        public List<? extends Selectable> selectableChildren() {return List.of(button);}
     }
 }

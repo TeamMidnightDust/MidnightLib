@@ -24,6 +24,7 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 
 import java.awt.Color;
 import java.lang.annotation.ElementType;
@@ -41,7 +42,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-/** MidnightConfig v2.4.1 by TeamMidnightDust & Motschen
+/** MidnightConfig v2.5.0 by TeamMidnightDust & Motschen
  *  Single class config library - feel free to copy!
  *  Based on <a href="https://github.com/Minenash/TinyConfig">...</a>
  *  Credits to Minenash */
@@ -49,7 +50,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unchecked")
 public abstract class MidnightConfig {
     private static final Pattern INTEGER_ONLY = Pattern.compile("(-?[0-9]*)");
-    private static final Pattern DECIMAL_ONLY = Pattern.compile("-?([\\d]+\\.?[\\d]*|[\\d]*\\.?[\\d]+|\\.)");
+    private static final Pattern DECIMAL_ONLY = Pattern.compile("-?(\\d+\\.?\\d*|\\d*\\.?\\d+|\\.)");
     private static final Pattern HEXADECIMAL_ONLY = Pattern.compile("(-?[#0-9a-fA-F]*)");
 
     private static final List<EntryInfo> entries = new ArrayList<>();
@@ -71,12 +72,12 @@ public abstract class MidnightConfig {
         Tab tab;
     }
 
-    public static final Map<String,Class<?>> configClass = new HashMap<>();
+    public static final Map<String, Class<? extends MidnightConfig>> configClass = new HashMap<>();
     private static Path path;
 
     private static final Gson gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.TRANSIENT).excludeFieldsWithModifiers(Modifier.PRIVATE).addSerializationExclusionStrategy(new HiddenAnnotationExclusionStrategy()).setPrettyPrinting().create();
 
-    public static void init(String modid, Class<?> config) {
+    public static void init(String modid, Class<? extends MidnightConfig> config) {
         path = PlatformFunctions.getConfigDirectory().resolve(modid + ".json");
         configClass.put(modid, config);
 
@@ -177,12 +178,18 @@ public abstract class MidnightConfig {
             return true;
         };
     }
-
+    public static MidnightConfig getClass(String modid) {
+        try { return configClass.get(modid).getDeclaredConstructor().newInstance(); } catch (Exception e) {throw new RuntimeException(e);}
+    }
     public static void write(String modid) {
+        getClass(modid).writeChanges(modid);
+    }
+
+    public void writeChanges(String modid) {
         path = PlatformFunctions.getConfigDirectory().resolve(modid + ".json");
         try {
             if (!Files.exists(path)) Files.createFile(path);
-            Files.write(path, gson.toJson(configClass.get(modid).getDeclaredConstructor().newInstance()).getBytes());
+            Files.write(path, gson.toJson(getClass(modid)).getBytes());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -251,6 +258,8 @@ public abstract class MidnightConfig {
                 for (ButtonEntry entry : this.list.children()) {
                     if (entry.buttons != null && entry.buttons.size() > 1 && entry.buttons.get(1) instanceof ButtonWidget button) {
                         button.active = !Objects.equals(entry.info.value.toString(), entry.info.defaultValue.toString());
+                        if (button.active) button.setTooltip(Tooltip.of(Text.translatable("controls.reset").formatted(Formatting.RED)));
+                        else button.setTooltip(Tooltip.of(Text.empty()));
                     }
                 }
             }
@@ -305,13 +314,14 @@ public abstract class MidnightConfig {
             for (EntryInfo info : entries) {
                 if (info.id.equals(modid) && (info.tab == null || info.tab == tabManager.getCurrentTab())) {
                     Text name = Objects.requireNonNullElseGet(info.name, () -> Text.translatable(translationPrefix + info.field.getName()));
-                    ButtonWidget resetButton = ButtonWidget.builder(Text.literal("Reset").formatted(Formatting.RED), (button -> {
+                    TextIconButtonWidget resetButton = TextIconButtonWidget.builder(Text.translatable("controls.reset"), (button -> {
                         info.value = info.defaultValue;
                         info.tempValue = info.defaultValue.toString();
                         info.index = 0;
                         list.clear();
                         fillList();
-                    })).dimensions(width - 205, 0, 40, 20).build();
+                    }), true).texture(new Identifier("midnightlib","icon/reset"), 12, 12).dimension(40, 20).build();
+                    resetButton.setPosition(width - 205, 0);
 
                     if (info.widget instanceof Map.Entry) {
                         Map.Entry<ButtonWidget.PressAction, Function<Object, Text>> widget = (Map.Entry<ButtonWidget.PressAction, Function<Object, Text>>) info.widget;
@@ -327,7 +337,6 @@ public abstract class MidnightConfig {
                         Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.widget).apply(widget, done);
                         widget.setTextPredicate(processor);
                         resetButton.setWidth(20);
-                        resetButton.setMessage(Text.literal("R").formatted(Formatting.RED));
                         ButtonWidget cycleButton = ButtonWidget.builder(Text.literal(String.valueOf(info.index)).formatted(Formatting.GOLD), (button -> {
                             if (((List<?>) info.value).contains("")) ((List<String>) info.value).remove("");
                             info.index = info.index + 1;
@@ -353,7 +362,6 @@ public abstract class MidnightConfig {
                         widget.setTooltip(getTooltip(info));
                         if (e.isColor()) {
                             resetButton.setWidth(20);
-                            resetButton.setMessage(Text.literal("R").formatted(Formatting.RED));
                             ButtonWidget colorButton = ButtonWidget.builder(Text.literal("⬛"), (button -> {
                             })).dimensions(width - 185, 0, 20, 20).build();
                             try {
@@ -374,11 +382,10 @@ public abstract class MidnightConfig {
         }
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-            this.renderBackground(context);
+            super.render(context,mouseX,mouseY,delta);
             this.list.render(context, mouseX, mouseY, delta);
 
             if (tabs.size() < 2) context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 15, 0xFFFFFF);
-            super.render(context,mouseX,mouseY,delta);
         }
     }
     @Environment(EnvType.CLIENT)

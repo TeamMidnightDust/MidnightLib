@@ -13,13 +13,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Mod.EventBusSubscriber(modid = "midnightlib", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class MidnightLibClientEvents {
-    public static void registerClientTick(TickEvent.ClientTickEvent event) {
-        MidnightColorUtil.tick();
-    }
-
     @SubscribeEvent
     public static void onPostInit(FMLClientSetupEvent event) {
-        MinecraftForge.EVENT_BUS.addListener(MidnightLibClientEvents::registerClientTick);
         ModList.get().forEachModContainer((modid, modContainer) -> {
             if (MidnightConfig.configClass.containsKey(modid)) {
                 modContainer.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () ->
