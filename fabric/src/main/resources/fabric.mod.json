@@ -21,10 +21,10 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "eu.midnightdust.fabric.core.MidnightLibClientFabric"
+      "eu.midnightdust.fabric.core.MidnightLibFabric"
     ],
     "server": [
-      "eu.midnightdust.fabric.core.MidnightLibServerFabric"
+      "eu.midnightdust.fabric.core.MidnightLibFabric"
     ],
     "modmenu": [
       "eu.midnightdust.lib.config.AutoModMenu"

@@ -12,7 +12,7 @@ loom {
 
 configurations {
     common
-    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+    shadowCommon // Don't use shadow from the shadow plugin since it *excludes* files.
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
     developmentFabric.extendsFrom common
@@ -25,8 +25,6 @@ dependencies {
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
-    common(project(path: ":fabric-like", configuration: "namedElements")) { transitive false }
-    shadowCommon(project(path: ":fabric-like", configuration: "transformProductionFabric")) { transitive false }
 }
 
 processResources {
@@ -41,17 +39,13 @@ shadowJar {
     exclude "architectury.common.json"
 
     configurations = [project.configurations.shadowCommon]
-    classifier "dev-shadow"
+    archiveClassifier = "dev-shadow"
 }
 
 remapJar {
+    injectAccessWidener = true
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    classifier null
-}
-
-jar {
-    classifier "dev"
 }
 
 sourcesJar {
@@ -69,7 +63,7 @@ components.java {
 publishing {
     publications {
         mavenFabric(MavenPublication) {
-            artifactId = rootProject.archives_base_name + "-" + project.name
+            artifactId = archives_base_name + "-" + project.name
             from components.java
         }
     }

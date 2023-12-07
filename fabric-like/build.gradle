@@ -13,5 +13,5 @@ dependencies {
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
     modImplementation ("com.terraformersmc:modmenu:${rootProject.mod_menu_version}")
 
-    compileClasspath(project(path: ":common", configuration: "namedElements")) { transitive false }
+    compileOnly(project(path: ":common", configuration: "namedElements")) { transitive false }
 }
