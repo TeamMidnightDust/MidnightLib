@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[43,)"
+loaderVersion = "[1,)"
 #issueTrackerURL = ""
 license = "MIT License"
 
@@ -15,15 +15,15 @@ Common Library for Team MidnightDust's mods.
 #logoFile = ""
 
 [[dependencies.midnightlib]]
-modId = "forge"
+modId = "neoforge"
 mandatory = true
-versionRange = "[43,)"
+versionRange = "[20.3,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.midnightlib]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.19.4,)"
+versionRange = "[1.20.3,)"
 ordering = "NONE"
 side = "BOTH"

@@ -194,7 +194,7 @@ public abstract class MidnightConfig {
             if (!Files.exists(path)) Files.createFile(path);
             Files.write(path, gson.toJson(getClass(modid)).getBytes());
         } catch (Exception e) {
-            e.printStackTrace();
+            e.fillInStackTrace();
         }
     }
     @Environment(EnvType.CLIENT)

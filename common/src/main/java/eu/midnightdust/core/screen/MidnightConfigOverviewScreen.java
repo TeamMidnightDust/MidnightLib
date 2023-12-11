@@ -1,14 +1,20 @@
 package eu.midnightdust.core.screen;
 
-import eu.midnightdust.core.MidnightLibClient;
+import eu.midnightdust.core.MidnightLib;
+import eu.midnightdust.core.config.MidnightLibConfig;
 import eu.midnightdust.lib.config.MidnightConfig;
+import eu.midnightdust.lib.util.PlatformFunctions;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.option.OptionsScreen;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.*;
+import net.minecraft.util.Identifier;
+
 import java.util.*;
 
 @Environment(EnvType.CLIENT)
@@ -31,7 +37,7 @@ public class MidnightConfigOverviewScreen extends Screen {
         List<String> sortedMods = new ArrayList<>(MidnightConfig.configClass.keySet());
         Collections.sort(sortedMods);
         sortedMods.forEach((modid) -> {
-            if (!MidnightLibClient.hiddenMods.contains(modid)) {
+            if (!MidnightLib.hiddenMods.contains(modid)) {
                 list.addButton(List.of(ButtonWidget.builder(Text.translatable(modid +".midnightconfig.title"), (button) ->
                         Objects.requireNonNull(client).setScreen(MidnightConfig.getScreen(this,modid))).dimensions(this.width / 2 - 125, this.height - 28, 250, 20).build()), null, null);
             }
@@ -47,4 +53,15 @@ public class MidnightConfigOverviewScreen extends Screen {
         context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 15, 0xFFFFFF);
     }
     @Override public void renderBackground(DrawContext c, int x, int y, float d) {}
+
+    public static void addButtonToOptionsScreen(Screen screen, MinecraftClient client) {
+        if (screen.getClass() == OptionsScreen.class && MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.TRUE)
+                || (MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.MODMENU) && !PlatformFunctions.isModLoaded("modmenu"))) {
+            TextIconButtonWidget button = TextIconButtonWidget.builder(Text.translatable("midnightlib.overview.title"), (
+                            buttonWidget) -> Objects.requireNonNull(client).setScreen(new MidnightConfigOverviewScreen(screen)), true)
+                    .texture(new Identifier("midnightlib","icon/midnightlib"), 16, 16).dimension(20, 20).build();
+            button.setPosition(screen.width / 2 + 158, screen.height / 6 - 12);
+            screen.addDrawableChild(button);
+        }
+    }
 }

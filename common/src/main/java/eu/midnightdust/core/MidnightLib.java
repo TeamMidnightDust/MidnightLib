@@ -1,12 +1,23 @@
 package eu.midnightdust.core;
 
+import eu.midnightdust.core.config.MidnightLibConfig;
 import eu.midnightdust.lib.config.AutoCommand;
 import eu.midnightdust.lib.config.MidnightConfig;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MidnightLibServer {
+public class MidnightLib {
+    public static List<String> hiddenMods = new ArrayList<>();
 
+    @Environment(EnvType.CLIENT)
+    public static void onInitializeClient() {
+        MidnightLibConfig.init("midnightlib", MidnightLibConfig.class);
+    }
+    @Environment(EnvType.SERVER)
     public static void onInitializeServer() {
         MidnightConfig.configClass.forEach((modid, config) -> {
             for (Field field : config.getFields()) {

@@ -2,7 +2,7 @@ package eu.midnightdust.lib.config;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
-import eu.midnightdust.core.MidnightLibClient;
+import eu.midnightdust.core.MidnightLib;
 import eu.midnightdust.core.config.MidnightLibConfig;
 
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public class AutoModMenu implements ModMenuApi {
     public Map<String, ConfigScreenFactory<?>> getProvidedConfigScreenFactories() {
         HashMap<String, ConfigScreenFactory<?>> map = new HashMap<>();
         MidnightConfig.configClass.forEach((modid, cClass) -> {
-            if (!MidnightLibClient.hiddenMods.contains(modid))
+            if (!MidnightLib.hiddenMods.contains(modid))
                 map.put(modid, parent -> MidnightConfig.getScreen(parent, modid));
             }
         );

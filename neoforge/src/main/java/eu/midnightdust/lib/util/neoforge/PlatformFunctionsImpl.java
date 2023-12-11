@@ -1,11 +1,11 @@
-package eu.midnightdust.lib.util.forge;
+package eu.midnightdust.lib.util.neoforge;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.nio.file.Path;
 

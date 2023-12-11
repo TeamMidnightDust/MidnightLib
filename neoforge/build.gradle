@@ -1,16 +1,17 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
 }
+repositories{
+    maven {url "https://maven.neoforged.net/releases"}
+}
 
 architectury {
     platformSetupLoomIde()
-    forge()
+    neoForge()
 }
 
 loom {
-    forge {
-        mixinConfig  "midnightlib.mixins.json"
-    }
+    accessWidenerPath = project(":common").loom.accessWidenerPath
 }
 
 configurations {
@@ -19,14 +20,14 @@ configurations {
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
     developmentForge.extendsFrom common
-    archivesBaseName = rootProject.archives_base_name + "-forge"
+    archivesBaseName = rootProject.archives_base_name + "-neoforge"
 }
 
 dependencies {
-    forge "net.minecraftforge:forge:${rootProject.forge_version}"
+    neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
-    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive = false }
 }
 
 processResources {
@@ -46,6 +47,7 @@ shadowJar {
 }
 
 remapJar {
+    atAccessWideners.add('midnightlib.accesswidener')
     input.set shadowJar.archiveFile
     dependsOn shadowJar
 }
