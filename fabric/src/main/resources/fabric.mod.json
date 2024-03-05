@@ -32,8 +32,12 @@
   },
   "depends": {
     "fabric-resource-loader-v0": "*",
-    "minecraft": ">=1.20.3"
+    "minecraft": ">=1.20.4"
   },
+
+  "mixins": [
+    "midnightlib.mixins.json"
+  ],
 
   "custom": {
     "modmenu": {
@@ -46,6 +50,5 @@
       },
       "badges": [ "library" ]
     }
-  },
-  "accessWidener": "midnightlib.accesswidener"
+  }
 }

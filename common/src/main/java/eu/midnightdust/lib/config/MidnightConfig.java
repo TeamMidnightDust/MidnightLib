@@ -292,7 +292,7 @@ public abstract class MidnightConfig {
             this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, button -> {
                 loadValues();
                 Objects.requireNonNull(client).setScreen(parent);
-            }).dimensions(this.width / 2 - 154, this.height - 28, 150, 20).build());
+            }).dimensions(this.width / 2 - 154, this.height - 26, 150, 20).build());
             done = this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
                 for (EntryInfo info : entries)
                     if (info.id.equals(modid)) {
@@ -302,10 +302,9 @@ public abstract class MidnightConfig {
                     }
                 write(modid);
                 Objects.requireNonNull(client).setScreen(parent);
-            }).dimensions(this.width / 2 + 4, this.height - 28, 150, 20).build());
+            }).dimensions(this.width / 2 + 4, this.height - 26, 150, 20).build());
 
-            this.list = new MidnightConfigListWidget(this.client, this.width, this.height - 64, 32, 25);
-            if (this.client != null && this.client.world != null) this.list.setRenderBackground(false);
+            this.list = new MidnightConfigListWidget(this.client, this.width, this.height - 64, 24, 25);
             this.addSelectableChild(this.list);
 
             fillList();
@@ -382,13 +381,11 @@ public abstract class MidnightConfig {
         }
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-            if (client != null && client.world != null) super.renderInGameBackground(context);
-            this.list.render(context, mouseX, mouseY, delta);
             super.render(context,mouseX,mouseY,delta);
+            this.list.render(context, mouseX, mouseY, delta);
 
-            if (tabs.size() < 2) context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 15, 0xFFFFFF);
+            if (tabs.size() < 2) context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 10, 0xFFFFFF);
         }
-        @Override public void renderBackground(DrawContext c, int x, int y, float d) {}
     }
     @Environment(EnvType.CLIENT)
     public static class MidnightConfigListWidget extends ElementListWidget<ButtonEntry> {
@@ -404,16 +401,6 @@ public abstract class MidnightConfig {
         public void clear() { this.clearEntries(); }
         @Override
         public int getRowWidth() { return 10000; }
-        @Override
-        protected void renderDecorations(DrawContext c, int mouseX, int mouseY) {
-            c.setShaderColor(0.25F, 0.25F, 0.25F, 1.0F);
-            c.drawTexture(Screen.OPTIONS_BACKGROUND_TEXTURE, this.getX(), 0, 0.0F, 0.0F, this.width, this.getY(), 32, 32);
-            c.drawTexture(Screen.OPTIONS_BACKGROUND_TEXTURE, this.getX(), this.getBottom(), 0.0F, 0.0F, this.width, this.height, 32, 32);
-            c.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            if (client == null || client.world == null) return;
-            c.fillGradient(RenderLayer.getGuiOverlay(), this.getX(), this.getY(), this.getRight(), this.getY() + 4, -16777216, 0, 0);
-            c.fillGradient(RenderLayer.getGuiOverlay(), this.getX(), this.getBottom() - 4, this.getRight(), this.getBottom(), 0, -16777216, 0);
-        }
     }
     public static class ButtonEntry extends ElementListWidget.Entry<ButtonEntry> {
         private static final TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
