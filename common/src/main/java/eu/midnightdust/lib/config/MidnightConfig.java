@@ -19,7 +19,6 @@ import net.minecraft.client.gui.tab.Tab;
 import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.OrderedText;
@@ -393,7 +392,7 @@ public abstract class MidnightConfig {
             super(client, width, height, y, itemHeight);
         }
         @Override
-        public int getScrollbarPositionX() { return this.width -7; }
+        public int getScrollbarX() { return this.width -7; }
 
         public void addButton(List<ClickableWidget> buttons, Text text, EntryInfo info) {
             this.addEntry(new ButtonEntry(buttons, text, info));
