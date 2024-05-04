@@ -1,5 +1,6 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "me.shedaniel.unified-publishing"
 }
 repositories {
     maven { url "https://maven.terraformersmc.com/releases" }
@@ -63,16 +64,38 @@ components.java {
     }
 }
 
-publishing {
-    publications {
-        mavenFabric(MavenPublication) {
-            artifactId = archives_base_name + "-" + project.name
-            from components.java
+unifiedPublishing {
+    project {
+        displayName = "MidnightLib v$project.version - Fabric $project.minecraft_version"
+        releaseType = "$project.release_type"
+        changelog = releaseChangelog()
+        gameVersions = []
+        gameLoaders = ["fabric","quilt"]
+        mainPublication remapJar
+        relations {
+            depends {
+                curseforge = "fabric-api"
+                modrinth = "fabric-api"
+            }
         }
-    }
 
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
+        var CURSEFORGE_TOKEN = project.findProperty("CURSEFORGE_TOKEN") ?: System.getenv("CURSEFORGE_TOKEN")
+        if (CURSEFORGE_TOKEN != null) {
+            curseforge {
+                token = CURSEFORGE_TOKEN
+                id = rootProject.curseforge_id
+                gameVersions.addAll "Java 21", project.minecraft_version
+            }
+        }
+
+        var MODRINTH_TOKEN = project.findProperty("MODRINTH_TOKEN") ?: System.getenv("MODRINTH_TOKEN")
+        if (MODRINTH_TOKEN != null) {
+            modrinth {
+                token = MODRINTH_TOKEN
+                id = rootProject.modrinth_id
+                version = "$project.version-$project.name"
+                gameVersions.addAll project.minecraft_version
+            }
+        }
     }
 }

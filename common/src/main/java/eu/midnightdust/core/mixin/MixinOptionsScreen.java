@@ -26,23 +26,24 @@ public class MixinOptionsScreen extends Screen {
     @Unique TextIconButtonWidget button = TextIconButtonWidget.builder(Text.translatable("midnightlib.overview.title"), (
             buttonWidget) -> Objects.requireNonNull(client).setScreen(new MidnightConfigOverviewScreen(this)), true)
             .texture(new Identifier("midnightlib","icon/midnightlib"), 16, 16).dimension(20, 20).build();
+    @Unique boolean shouldShowButton = MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.TRUE) || (MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.MODMENU) && !PlatformFunctions.isModLoaded("modmenu"));
 
     protected MixinOptionsScreen(Text title) {super(title);}
     @Inject(at = @At("HEAD"), method = "init")
     public void midnightlib$onInit(CallbackInfo ci) {
-        this.midnightlib$setupButton();
-        this.addDrawableChild(button);
+        if (shouldShowButton) {
+            this.midnightlib$setupButton();
+            this.addDrawableChild(button);
+        }
     }
 
     @Override
     public void resize(MinecraftClient client, int width, int height) {
         super.resize(client, width, height);
-        this.midnightlib$setupButton();
+        if (shouldShowButton) this.midnightlib$setupButton();
     }
     @Unique
     public void midnightlib$setupButton() {
-        if (MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.TRUE) || (MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.MODMENU) && !PlatformFunctions.isModLoaded("modmenu"))) {
-            button.setPosition(layout.getWidth() / 2  + 158, layout.getY() + layout.getFooterHeight() - 4);
-        }
+        button.setPosition(layout.getWidth() / 2  + 158, layout.getY() + layout.getFooterHeight() - 4);
     }
 }
