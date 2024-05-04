@@ -23,6 +23,6 @@ public class PlatformFunctionsImpl {
         return ModList.get().isLoaded(modid);
     }
     public static void registerCommand(LiteralArgumentBuilder<ServerCommandSource> command) {
-        // Ignored here, see MidnightLibServerEvents#registerCommands
+        // Ignored here, see MidnightLibNeoForge#registerCommands
     }
 }

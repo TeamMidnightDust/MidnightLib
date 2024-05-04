@@ -38,13 +38,6 @@ public class MidnightLibNeoForge {
             });
         }
     }
-    @Mod.EventBusSubscriber(modid = "midnightlib", value = Dist.CLIENT)
-    public static class MidnightLibClientEvents {
-        @SubscribeEvent
-        public static void afterInitScreen(ScreenEvent.Init.Post event) {
-            MidnightConfigOverviewScreen.addButtonToOptionsScreen(event.getScreen(), event.getScreen().getMinecraft());
-        }
-    }
 
     @Mod.EventBusSubscriber(modid = "midnightlib", value = Dist.DEDICATED_SERVER)
     public static class MidnightLibServerEvents {
