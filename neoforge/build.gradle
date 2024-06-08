@@ -75,7 +75,7 @@ components.java {
 
 unifiedPublishing {
     project {
-        displayName = "MidnightLib v$project.version - NeoForge $project.minecraft_version"
+        displayName = "MidnightLib $project.version - NeoForge $project.minecraft_version"
         releaseType = "$project.release_type"
         changelog = releaseChangelog()
         gameVersions = []

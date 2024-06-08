@@ -287,7 +287,10 @@ public abstract class MidnightConfig {
             super.init();
             tabNavigation.setWidth(this.width);
             tabNavigation.init();
-            if (tabs.size() > 1) this.addDrawableChild(tabNavigation);
+            if (tabs.size() > 1) {
+                this.addDrawableChild(tabNavigation);
+                list.renderHeaderSeparator = false;
+            }
 
             this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, button -> {
                 loadValues();
@@ -320,7 +323,7 @@ public abstract class MidnightConfig {
                         info.index = 0;
                         list.clear();
                         fillList();
-                    }), true).texture(new Identifier("midnightlib","icon/reset"), 12, 12).dimension(40, 20).build();
+                    }), true).texture(Identifier.of("midnightlib","icon/reset"), 12, 12).dimension(40, 20).build();
                     resetButton.setPosition(width - 205, 0);
 
                     if (info.widget instanceof Map.Entry) {
@@ -386,12 +389,11 @@ public abstract class MidnightConfig {
 
             if (tabs.size() < 2)
                 context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 10, 0xFFFFFF);
-            list.renderHeaderSeperator = tabs.size() < 2;
         }
     }
     @Environment(EnvType.CLIENT)
     public static class MidnightConfigListWidget extends ElementListWidget<ButtonEntry> {
-        boolean renderHeaderSeperator = true;
+        boolean renderHeaderSeparator = true;
         public MidnightConfigListWidget(MinecraftClient client, int width, int height, int y, int itemHeight) {
             super(client, width, height, y, itemHeight);
         }
@@ -400,7 +402,7 @@ public abstract class MidnightConfig {
 
         @Override
         protected void drawHeaderAndFooterSeparators(DrawContext context) {
-            if (renderHeaderSeperator) super.drawHeaderAndFooterSeparators(context);
+            if (renderHeaderSeparator) super.drawHeaderAndFooterSeparators(context);
             else {
                 RenderSystem.enableBlend();
                 context.drawTexture(this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE, this.getX(), this.getBottom(), 0.0F, 0.0F, this.getWidth(), 2, 32, 2);
