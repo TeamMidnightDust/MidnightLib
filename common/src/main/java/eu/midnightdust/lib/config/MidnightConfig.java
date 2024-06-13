@@ -287,10 +287,7 @@ public abstract class MidnightConfig {
             super.init();
             tabNavigation.setWidth(this.width);
             tabNavigation.init();
-            if (tabs.size() > 1) {
-                this.addDrawableChild(tabNavigation);
-                list.renderHeaderSeparator = false;
-            }
+            if (tabs.size() > 1) this.addDrawableChild(tabNavigation);
 
             this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, button -> {
                 loadValues();
@@ -311,6 +308,7 @@ public abstract class MidnightConfig {
             this.addSelectableChild(this.list);
 
             fillList();
+            if (tabs.size() > 1) list.renderHeaderSeparator = false;
             reload = true;
         }
         public void fillList() {
