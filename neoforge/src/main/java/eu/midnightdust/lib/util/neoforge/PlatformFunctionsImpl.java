@@ -10,6 +10,9 @@ import net.neoforged.fml.loading.FMLPaths;
 import java.nio.file.Path;
 
 public class PlatformFunctionsImpl {
+    public static String getPlatformName() {
+        return "neoforge";
+    }
     /**
      * This is our actual method to {@link PlatformFunctions#getConfigDirectory()}.
      */

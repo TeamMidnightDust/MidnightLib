@@ -26,7 +26,7 @@ public class MixinOptionsScreen extends Screen {
     @Unique TextIconButtonWidget button = TextIconButtonWidget.builder(Text.translatable("midnightlib.overview.title"), (
             buttonWidget) -> Objects.requireNonNull(client).setScreen(new MidnightConfigOverviewScreen(this)), true)
             .texture(Identifier.of("midnightlib","icon/midnightlib"), 16, 16).dimension(20, 20).build();
-    @Unique boolean shouldShowButton = MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.TRUE) || (MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.MODMENU) && !PlatformFunctions.isModLoaded("modmenu"));
+    @Unique boolean shouldShowButton = MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.TRUE) || (MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.MODMENU) && !PlatformFunctions.isModLoaded("modmenu") && PlatformFunctions.getPlatformName() != "neoforge");
 
     protected MixinOptionsScreen(Text title) {super(title);}
     @Inject(at = @At("HEAD"), method = "init")

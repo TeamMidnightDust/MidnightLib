@@ -12,7 +12,9 @@ authors = "TeamMidnightDust, Motschen"
 description = '''
 Common Library for Team MidnightDust's mods.
 '''
-#logoFile = ""
+
+[[mixins]]
+config = "midnightlib.mixins.json"
 
 [[dependencies.midnightlib]]
 modId = "neoforge"

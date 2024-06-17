@@ -10,6 +10,9 @@ import net.minecraft.server.command.ServerCommandSource;
 import java.nio.file.Path;
 
 public class PlatformFunctionsImpl {
+    public static String getPlatformName() {
+        return "fabric";
+    }
     /**
      * This is our actual method to {@link PlatformFunctions#getConfigDirectory()}.
      */

@@ -11,6 +11,6 @@ include("common")
 include("fabric-like")
 include("fabric")
 //include("quilt")
-//include("neoforge")
+include("neoforge")
 
 rootProject.name = "midnightlib"
