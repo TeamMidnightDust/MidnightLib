@@ -1,0 +1,11 @@
+{
+	"midnightlib.overview.title":"MidnightConfig 概述",
+	"midnightlib.midnightconfig.title":"MidnightLib 设定",
+	"midnightlib.midnightconfig.config_screen_list":"启用设定画面列表",
+	"midnightlib.midnightconfig.enum.ConfigButton.TRUE":"§a是",
+	"midnightlib.midnightconfig.enum.ConfigButton.FALSE":"§c否",
+	"midnightlib.midnightconfig.enum.ConfigButton.MODMENU":"§b模組菜单",
+	"midnightlib.wiki":"维基",
+	"modmenu.descriptionTranslation.midnightlib": "MidnightDust 团队的常用库模组。 n提供设定 API、与其他模块自动整合、常用工具和美观。",
+	"modmenu.summaryTranslation.midnightlib": "MidnightDust 团队的常用库模组。"
+}
