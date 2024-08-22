@@ -388,7 +388,7 @@ public abstract class MidnightConfig {
                                                     Text.translatable(translationPrefix + info.field.getName() + ".fileFilter.description").getString(),
                                                     e.fileExtensions()));
                                         }
-                                        if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                                        if (fileChooser.showDialog(null, null) == JFileChooser.APPROVE_OPTION) {
                                             info.value = fileChooser.getSelectedFile().getAbsolutePath();
                                             info.tempValue = info.value.toString();
                                             list.clear();
