@@ -10,6 +10,6 @@ public class MidnightLibConfig extends MidnightConfig {
     public static ConfigButton config_screen_list = (PlatformFunctions.isModLoaded("modmenu") || Objects.equals(PlatformFunctions.getPlatformName(), "neoforge")) ? ConfigButton.MODMENU : ConfigButton.TRUE;
 
     public enum ConfigButton {
-        TRUE,FALSE,MODMENU
+        TRUE, FALSE, MODMENU
     }
 }

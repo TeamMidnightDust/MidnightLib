@@ -28,6 +28,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.Color;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -70,7 +72,7 @@ public abstract class MidnightConfig {
         String id;
         Text name;
         int index;
-        ClickableWidget colorButton;
+        ClickableWidget functionButton;        // color picker button / explorer button
         Tab tab;
     }
 
@@ -175,7 +177,7 @@ public abstract class MidnightConfig {
                 if (!s.contains("#")) s = '#' + s;
                 if (!HEXADECIMAL_ONLY.matcher(s).matches()) return false;
                 try {
-                    info.colorButton.setMessage(Text.literal("⬛").setStyle(Style.EMPTY.withColor(Color.decode(info.tempValue).getRGB())));
+                    info.functionButton.setMessage(Text.literal("⬛").setStyle(Style.EMPTY.withColor(Color.decode(info.tempValue).getRGB())));
                 } catch (Exception ignored) {}
             }
             return true;
@@ -353,7 +355,9 @@ public abstract class MidnightConfig {
                         if (e.isSlider())
                             widget = new MidnightSliderWidget(width - 160, 0, 150, 20, Text.of(info.tempValue), (Double.parseDouble(info.tempValue) - e.min()) / (e.max() - e.min()), info);
                         else
-                            widget = new TextFieldWidget(textRenderer, width - 160, 0, 150, 20, null, Text.of(info.tempValue));
+                            widget = new TextFieldWidget(textRenderer,
+                                    width - (160 + (e.selectionMode() > -1 ? 20 : 0)),
+                                    0, 150, 20, null, Text.of(info.tempValue));
                         if (widget instanceof TextFieldWidget textField) {
                             textField.setMaxLength(info.width);
                             textField.setText(info.tempValue);
@@ -363,15 +367,43 @@ public abstract class MidnightConfig {
                         widget.setTooltip(getTooltip(info));
                         if (e.isColor()) {
                             resetButton.setWidth(20);
-                            ButtonWidget colorButton = ButtonWidget.builder(Text.literal("⬛"), (button -> {
-                            })).dimensions(width - 185, 0, 20, 20).build();
+                            ButtonWidget colorButton = ButtonWidget.builder(Text.literal("⬛"), (button -> {})).dimensions(width - 185, 0, 20, 20).build();
                             try {
                                 colorButton.setMessage(Text.literal("⬛").setStyle(Style.EMPTY.withColor(Color.decode(info.tempValue).getRGB())));
                             } catch (Exception ignored) {}
-                            info.colorButton = colorButton;
+                            info.functionButton = colorButton;
                             colorButton.active = false;
                             this.list.addButton(List.of(widget, resetButton, colorButton), name, info);
-                        } else this.list.addButton(List.of(widget, resetButton), name, info);
+                        } else if (e.selectionMode() > -1) {
+                            ButtonWidget explorerButton = TextIconButtonWidget.builder(
+                                    Text.of(""),
+                                    button -> {
+                                        JFileChooser fileChooser = new JFileChooser();
+                                        fileChooser.setFileSelectionMode(e.selectionMode());
+                                        fileChooser.setDialogType(e.fileChooserType());
+                                        fileChooser.setDialogTitle(Text.translatable(translationPrefix + info.field.getName() + ".fileChooser.title").getString());
+                                        if ((e.selectionMode() == JFileChooser.FILES_ONLY || e.selectionMode() == JFileChooser.FILES_AND_DIRECTORIES) &&
+                                                Arrays.stream(e.fileExtensions()).noneMatch("*"::equals)) {
+                                            fileChooser.setFileFilter(new FileNameExtensionFilter(
+                                                    Text.translatable(translationPrefix + info.field.getName() + ".fileFilter.description").getString(),
+                                                    e.fileExtensions()));
+                                        }
+                                        if (fileChooser.showDialog(null, null) == JFileChooser.APPROVE_OPTION) {
+                                            info.value = fileChooser.getSelectedFile().getAbsolutePath();
+                                            info.tempValue = info.value.toString();
+                                            list.clear();
+                                            fillList();
+                                        }
+                                    },
+                                    true
+                            ).texture(Identifier.of("midnightlib","icon/explorer"), 12, 12).dimension(20, 20).build();
+                            explorerButton.setPosition(width - 25, 0);
+                            resetButton.setWidth(20);
+                            info.functionButton = explorerButton;
+                            this.list.addButton(List.of(widget, resetButton, explorerButton), name, info);
+                        } else {
+                            this.list.addButton(List.of(widget, resetButton), name, info);
+                        }
                     } else {
                         this.list.addButton(List.of(), name, info);
                     }
@@ -463,16 +495,44 @@ public abstract class MidnightConfig {
             info.tempValue = String.valueOf(info.value);
         }
     }
-    @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Entry {
-        int width() default 100;
+
+    /**
+     * Entry Annotation<br>
+     * - <b>width</b>: The maximum character length of the {@link String} or {@link List<String>} field<br>
+     * - <b>min</b>: The minimum value of the <code>int</code>, <code>float</code> or <code>double</code> field<br>
+     * - <b>max</b>: The maximum value of the <code>int</code>, <code>float</code> or <code>double</code> field<br>
+     * - <b>name</b>: The name of the field in the config screen<br>
+     * - <b>selectionMode</b>: The selection mode of the file picker button for {@link String} fields,
+     *   -1 for none, {@link JFileChooser#FILES_ONLY} for files, {@link JFileChooser#DIRECTORIES_ONLY} for directories,
+     *   {@link JFileChooser#FILES_AND_DIRECTORIES} for both (default: -1). Remember to set the translation key
+     *   <code>[modid].midnightconfig.[fieldName].fileChooser.title</code> for the file picker dialog title<br>
+     * - <b>fileChooserType</b>: The type of the file picker button for {@link String} fields,
+     * can be {@link JFileChooser#OPEN_DIALOG} or {@link JFileChooser#SAVE_DIALOG} (default: {@link JFileChooser#OPEN_DIALOG}).
+     * Remember to set the translation key <code>[modid].midnightconfig.[fieldName].fileFilter.description</code> for the file filter description
+     * if <code>"*"</code> is not used as file extension<br>
+     * - <b>fileExtensions</b>: The file extensions for the file picker button for {@link String} fields (default: <code>{"*"}</code>),
+     *  only works if selectionMode is {@link JFileChooser#FILES_ONLY} or {@link JFileChooser#FILES_AND_DIRECTORIES}<br>
+     * - <b>isColor</b>: If the field is a hexadecimal color code (default: false)<br>
+     * - <b>isSlider</b>: If the field is a slider (default: false)<br>
+     * - <b>precision</b>: The precision of the <code>float</code> or <code>double</code> field (default: 100)<br>
+     * - <b>category</b>: The category of the field in the config screen (default: "default")<br>
+     * */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface Entry {
+        int width() default 400;
         double min() default Double.MIN_NORMAL;
         double max() default Double.MAX_VALUE;
         String name() default "";
+        int selectionMode() default -1;        // -1 for none, 0 for file, 1 for firectory, 2 for both
+        int fileChooserType() default JFileChooser.OPEN_DIALOG;
+        String[] fileExtensions() default {"*"};
         boolean isColor() default false;
         boolean isSlider() default false;
         int precision() default 100;
         String category() default "default";
     }
+
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Client {}
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Server {}
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Hidden {}
