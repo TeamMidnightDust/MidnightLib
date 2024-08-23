@@ -21,14 +21,16 @@ import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
-import javax.swing.JFileChooser;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.Color;
 import java.lang.annotation.ElementType;
@@ -37,16 +39,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-/** MidnightConfig v2.5.1 by TeamMidnightDust & Motschen
+/** MidnightConfig v2.6.0 by TeamMidnightDust & Motschen
  *  Single class config library - feel free to copy!
  *  Based on <a href="https://github.com/Minenash/TinyConfig">...</a>
  *  Credits to Minenash */
@@ -61,25 +63,62 @@ public abstract class MidnightConfig {
 
     public static class EntryInfo {
         Field field;
+        Class<?> dataType;
         Object widget;
         int width;
         boolean centered;
         Text error;
         Object defaultValue;
         Object value;
-        String tempValue;
+        String tempValue;   // The value visible in the config screen
         boolean inLimits = true;
-        String id;
+        String modid;
         Text name;
         int index;
-        ClickableWidget functionButton;        // color picker button / explorer button
+        ClickableWidget functionButton; // color picker button / explorer button
         Tab tab;
+
+        public void setValue(Object value) {
+            if (this.field.getType() != List.class) {
+                this.value = value;
+                this.tempValue = value.toString();
+            } else {
+                writeList(this.index, value);
+                this.tempValue = toTemporaryValue();
+            }
+        }
+        public String toTemporaryValue() {
+            if (this.field.getType() != List.class) return this.value.toString();
+            else {
+                try { return ((List<?>) this.value).get(this.index).toString();
+                } catch (Exception ignored) {return "";}
+            }
+        }
+        public <T> void writeList(int index, T value) {
+            var list = (List<T>) this.value;
+            if (index >= list.size()) list.add(value);
+            else list.set(index, value);
+        }
     }
 
     public static final Map<String, Class<? extends MidnightConfig>> configClass = new HashMap<>();
     private static Path path;
 
-    private static final Gson gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.TRANSIENT).excludeFieldsWithModifiers(Modifier.PRIVATE).addSerializationExclusionStrategy(new HiddenAnnotationExclusionStrategy()).setPrettyPrinting().create();
+    private static final Gson gson = new GsonBuilder()
+            .excludeFieldsWithModifiers(Modifier.TRANSIENT)
+            .excludeFieldsWithModifiers(Modifier.PRIVATE)
+            .addSerializationExclusionStrategy(new HiddenAnnotationExclusionStrategy())
+            .registerTypeAdapter(Identifier.class, new Identifier.Serializer())
+            .setPrettyPrinting().create();
+
+    public static @Nullable Object getDefaultValue(String modid, String entry) {
+        for (EntryInfo e : entries) {
+            if (modid.equals(e.modid) && entry.equals(e.field.getName())) {
+                return e.defaultValue;
+            }
+        }
+        return null;
+    }
 
     public static void init(String modid, Class<? extends MidnightConfig> config) {
         path = PlatformFunctions.getConfigDirectory().resolve(modid + ".json");
@@ -102,33 +141,41 @@ public abstract class MidnightConfig {
             if (info.field.isAnnotationPresent(Entry.class))
                 try {
                     info.value = info.field.get(null);
-                    info.tempValue = info.value.toString();
+                    info.tempValue = info.toTemporaryValue();
                 } catch (IllegalAccessException ignored) {}
         }
     }
     @Environment(EnvType.CLIENT)
     private static void initClient(String modid, Field field, EntryInfo info) {
-        Class<?> type = field.getType();
+        info.dataType = field.getType();
         Entry e = field.getAnnotation(Entry.class);
         info.width = e != null ? e.width() : 0;
         info.field = field;
-        info.id = modid;
+        info.modid = modid;
+        if (info.dataType == List.class) {
+            Class<?> listType = (Class<?>) ((ParameterizedType) info.field.getGenericType()).getActualTypeArguments()[0];
+            try { info.dataType = (Class<?>) listType.getField("TYPE").get(null);
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                info.dataType = listType;
+            }
+        }
 
         if (e != null) {
             if (!e.name().isEmpty()) info.name = Text.translatable(e.name());
-            if (type == int.class) textField(info, Integer::parseInt, INTEGER_ONLY, (int) e.min(), (int) e.max(), true);
-            else if (type == float.class) textField(info, Float::parseFloat, DECIMAL_ONLY, (float) e.min(), (float) e.max(), false);
-            else if (type == double.class) textField(info, Double::parseDouble, DECIMAL_ONLY, e.min(), e.max(), false);
-            else if (type == String.class || type == List.class) textField(info, String::length, null, Math.min(e.min(), 0), Math.max(e.max(), 1), true);
-            else if (type == boolean.class) {
+            if (info.dataType == int.class) textField(info, Integer::parseInt, INTEGER_ONLY, (int) e.min(), (int) e.max(), true);
+            else if (info.dataType == float.class) textField(info, Float::parseFloat, DECIMAL_ONLY, (float) e.min(), (float) e.max(), false);
+            else if (info.dataType == double.class) textField(info, Double::parseDouble, DECIMAL_ONLY, e.min(), e.max(), false);
+            else if (info.dataType == String.class || info.dataType == Identifier.class)
+                textField(info, String::length, null, Math.min(e.min(), 0), Math.max(e.max(), 1), true);
+            else if (info.dataType == boolean.class) {
                 Function<Object, Text> func = value -> Text.translatable((Boolean) value ? "gui.yes" : "gui.no").formatted((Boolean) value ? Formatting.GREEN : Formatting.RED);
                 info.widget = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
-                    info.value = !(Boolean) info.value;
+                    info.setValue(!(Boolean) info.value);
                     button.setMessage(func.apply(info.value));
                 }, func);
-            } else if (type.isEnum()) {
+            } else if (info.dataType.isEnum()) {
                 List<?> values = Arrays.asList(field.getType().getEnumConstants());
-                Function<Object, Text> func = value -> Text.translatable(modid + ".midnightconfig." + "enum." + type.getSimpleName() + "." + info.value.toString());
+                Function<Object, Text> func = value -> Text.translatable(modid + ".midnightconfig." + "enum." + info.dataType.getSimpleName() + "." + info.toTemporaryValue());
                 info.widget = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
                     int index = values.indexOf(info.value) + 1;
                     info.value = values.get(index >= values.size() ? 0 : index);
@@ -139,10 +186,11 @@ public abstract class MidnightConfig {
         entries.add(info);
     }
     public static Tooltip getTooltip(EntryInfo info) {
-        String key = info.id + ".midnightconfig."+info.field.getName()+".tooltip";
+        String key = info.modid + ".midnightconfig."+info.field.getName()+".tooltip";
         return Tooltip.of(info.error != null ? info.error : I18n.hasTranslation(key) ? Text.translatable(key) : Text.empty());
     }
 
+    // TODO: Maybe move this into the screen class itself to free up some RAM?
     private static void textField(EntryInfo info, Function<String,Number> f, Pattern pattern, double min, double max, boolean cast) {
         boolean isNumber = pattern != null;
         info.widget = (BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) (t, b) -> s -> {
@@ -166,11 +214,10 @@ public abstract class MidnightConfig {
             info.inLimits = inLimits;
             b.active = entries.stream().allMatch(e -> e.inLimits);
 
-            if (inLimits && info.field.getType() != List.class)
-                info.value = isNumber? value : s;
-            else if (inLimits) {
-                if (((List<String>) info.value).size() == info.index) ((List<String>) info.value).add("");
-                ((List<String>) info.value).set(info.index, Arrays.stream(info.tempValue.replace("[", "").replace("]", "").split(", ")).toList().getFirst());
+            if (inLimits) {
+                if (info.dataType == Identifier.class) {
+                    info.setValue(Identifier.tryParse(s));
+                } else info.setValue(isNumber ? value : s);
             }
 
             if (info.field.getAnnotation(Entry.class).isColor()) {
@@ -213,7 +260,7 @@ public abstract class MidnightConfig {
             loadValues();
 
             for (EntryInfo e : entries) {
-                if (e.id.equals(modid)) {
+                if (e.modid.equals(modid)) {
                     String tabId = e.field.isAnnotationPresent(Entry.class) ? e.field.getAnnotation(Entry.class).category() : e.field.getAnnotation(Comment.class).category();
                     String name = translationPrefix + "category." + tabId;
                     if (!I18n.hasTranslation(name) && tabId.equals("default"))
@@ -275,7 +322,7 @@ public abstract class MidnightConfig {
                 if (info.field.isAnnotationPresent(Entry.class))
                     try {
                         info.value = info.field.get(null);
-                        info.tempValue = info.value.toString();
+                        info.tempValue = info.toTemporaryValue();
                     } catch (IllegalAccessException ignored) {}
             }
         }
@@ -297,7 +344,7 @@ public abstract class MidnightConfig {
             }).dimensions(this.width / 2 - 154, this.height - 26, 150, 20).build());
             done = this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
                 for (EntryInfo info : entries)
-                    if (info.id.equals(modid)) {
+                    if (info.modid.equals(modid)) {
                         try {
                             info.field.set(null, info.value);
                         } catch (IllegalAccessException ignored) {}
@@ -315,49 +362,33 @@ public abstract class MidnightConfig {
         }
         public void fillList() {
             for (EntryInfo info : entries) {
-                if (info.id.equals(modid) && (info.tab == null || info.tab == tabManager.getCurrentTab())) {
+                if (info.modid.equals(modid) && (info.tab == null || info.tab == tabManager.getCurrentTab())) {
                     Text name = Objects.requireNonNullElseGet(info.name, () -> Text.translatable(translationPrefix + info.field.getName()));
                     TextIconButtonWidget resetButton = TextIconButtonWidget.builder(Text.translatable("controls.reset"), (button -> {
                         info.value = info.defaultValue;
-                        info.tempValue = info.defaultValue.toString();
+                        info.tempValue = info.toTemporaryValue();
                         info.index = 0;
                         list.clear();
                         fillList();
-                    }), true).texture(Identifier.of("midnightlib","icon/reset"), 12, 12).dimension(40, 20).build();
-                    resetButton.setPosition(width - 205, 0);
+                    }), true).texture(Identifier.of("midnightlib","icon/reset"), 12, 12).dimension(20, 20).build();
+                    resetButton.setPosition(width - 205 + 150 + 25, 0);
 
-                    if (info.widget instanceof Map.Entry) {
-                        Map.Entry<ButtonWidget.PressAction, Function<Object, Text>> widget = (Map.Entry<ButtonWidget.PressAction, Function<Object, Text>>) info.widget;
-                        if (info.field.getType().isEnum())
-                            widget.setValue(value -> Text.translatable(translationPrefix + "enum." + info.field.getType().getSimpleName() + "." + info.value.toString()));
-                        this.list.addButton(List.of(ButtonWidget.builder(widget.getValue().apply(info.value), widget.getKey()).dimensions(width - 160, 0, 150, 20).tooltip(getTooltip(info)).build(), resetButton), name, info);
-                    } else if (info.field.getType() == List.class) {
+                    if (info.widget != null) {
                         if (!reload) info.index = 0;
-                        TextFieldWidget widget = new TextFieldWidget(textRenderer, width - 160, 0, 150, 20, Text.empty());
-                        widget.setMaxLength(info.width);
-                        if (info.index < ((List<String>) info.value).size())
-                            widget.setText((String.valueOf(((List<String>) info.value).get(info.index))));
-                        Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.widget).apply(widget, done);
-                        widget.setTextPredicate(processor);
-                        resetButton.setWidth(20);
-                        ButtonWidget cycleButton = ButtonWidget.builder(Text.literal(String.valueOf(info.index)).formatted(Formatting.GOLD), (button -> {
-                            if (((List<?>) info.value).contains("")) ((List<String>) info.value).remove("");
-                            info.index = info.index + 1;
-                            if (info.index > ((List<String>) info.value).size()) info.index = 0;
-                            list.clear();
-                            fillList();
-                        })).dimensions(width - 185, 0, 20, 20).build();
-                        widget.setTooltip(getTooltip(info));
-                        this.list.addButton(List.of(widget, resetButton, cycleButton), name, info);
-                    } else if (info.widget != null) {
                         ClickableWidget widget;
                         Entry e = info.field.getAnnotation(Entry.class);
-                        if (e.isSlider())
-                            widget = new MidnightSliderWidget(width - 160, 0, 150, 20, Text.of(info.tempValue), (Double.parseDouble(info.tempValue) - e.min()) / (e.max() - e.min()), info);
+
+                        if (info.widget instanceof Map.Entry) { // Enums & booleans
+                            var values = (Map.Entry<ButtonWidget.PressAction, Function<Object, Text>>) info.widget;
+                            if (info.dataType.isEnum())
+                                values.setValue(value -> Text.translatable(translationPrefix + "enum." + info.field.getType().getSimpleName() + "." + info.value.toString()));
+                            widget = ButtonWidget.builder(values.getValue().apply(info.value), values.getKey()).dimensions(width - 185, 0, 150, 20).tooltip(getTooltip(info)).build();
+                        }
+                        else if (e.isSlider())
+                            widget = new MidnightSliderWidget(width - 185, 0, 150, 20, Text.of(info.tempValue), (Double.parseDouble(info.tempValue) - e.min()) / (e.max() - e.min()), info);
                         else
-                            widget = new TextFieldWidget(textRenderer,
-                                    width - (160 + (e.selectionMode() > -1 ? 20 : 0)),
-                                    0, 150, 20, null, Text.of(info.tempValue));
+                            widget = new MidnightTextFieldWidget(textRenderer, width - 185, 0, 150, 20, info);
+
                         if (widget instanceof TextFieldWidget textField) {
                             textField.setMaxLength(info.width);
                             textField.setText(info.tempValue);
@@ -365,19 +396,40 @@ public abstract class MidnightConfig {
                             textField.setTextPredicate(processor);
                         }
                         widget.setTooltip(getTooltip(info));
+
+                        ButtonWidget cycleButton = null;
+                        if (info.field.getType() == List.class) {
+                            cycleButton = ButtonWidget.builder(Text.literal(String.valueOf(info.index)).formatted(Formatting.GOLD), (button -> {
+                                var values = (List<?>) info.value;
+                                values.remove("");
+                                info.index = info.index + 1;
+                                if (info.index > values.size()) info.index = 0;
+                                info.tempValue = info.toTemporaryValue();
+                                if (info.index == values.size()) info.tempValue = "";
+                                list.clear();
+                                fillList();
+                            })).dimensions(width - 185, 0, 20, 20).build();
+                        }
                         if (e.isColor()) {
-                            resetButton.setWidth(20);
-                            ButtonWidget colorButton = ButtonWidget.builder(Text.literal("⬛"), (button -> {})).dimensions(width - 185, 0, 20, 20).build();
+                            ButtonWidget colorButton = ButtonWidget.builder(
+                                    Text.literal("⬛"),
+                                    button -> new Thread(()-> {
+                                        Color newColor = JColorChooser.showDialog(null, Text.translatable("midnightconfig.colorChooser.title").getString(), Color.decode(!Objects.equals(info.tempValue, "") ? info.tempValue : "#FFFFFF"));
+                                        if (newColor != null) {
+                                            info.setValue("#" + Integer.toHexString(newColor.getRGB()).substring(2));
+                                            list.clear();
+                                            fillList();
+                                        }
+                                    }).start()
+                            ).dimensions(width - 185, 0, 20, 20).build();
                             try {
                                 colorButton.setMessage(Text.literal("⬛").setStyle(Style.EMPTY.withColor(Color.decode(info.tempValue).getRGB())));
                             } catch (Exception ignored) {}
                             info.functionButton = colorButton;
-                            colorButton.active = false;
-                            this.list.addButton(List.of(widget, resetButton, colorButton), name, info);
                         } else if (e.selectionMode() > -1) {
                             ButtonWidget explorerButton = TextIconButtonWidget.builder(
                                     Text.of(""),
-                                    button -> {
+                                    button -> new Thread(()-> {
                                         JFileChooser fileChooser = new JFileChooser();
                                         fileChooser.setFileSelectionMode(e.selectionMode());
                                         fileChooser.setDialogType(e.fileChooserType());
@@ -389,21 +441,28 @@ public abstract class MidnightConfig {
                                                     e.fileExtensions()));
                                         }
                                         if (fileChooser.showDialog(null, null) == JFileChooser.APPROVE_OPTION) {
-                                            info.value = fileChooser.getSelectedFile().getAbsolutePath();
-                                            info.tempValue = info.value.toString();
+                                            info.setValue(fileChooser.getSelectedFile().getAbsolutePath());
                                             list.clear();
                                             fillList();
                                         }
-                                    },
+                                    }).start(),
                                     true
-                            ).texture(Identifier.of("midnightlib","icon/explorer"), 12, 12).dimension(20, 20).build();
-                            explorerButton.setPosition(width - 25, 0);
-                            resetButton.setWidth(20);
+                            ).texture(Identifier.of("midnightlib", "icon/explorer"), 12, 12).dimension(20, 20).build();
+                            explorerButton.setPosition(width - 185, 0);
                             info.functionButton = explorerButton;
-                            this.list.addButton(List.of(widget, resetButton, explorerButton), name, info);
-                        } else {
-                            this.list.addButton(List.of(widget, resetButton), name, info);
                         }
+                        List<ClickableWidget> widgets = Lists.newArrayList(widget, resetButton);
+                        if (info.functionButton != null) {
+                            widget.setWidth(widget.getWidth() - 22);
+                            widget.setX(widget.getX() + 22);
+                            widgets.add(info.functionButton);
+                        } if (cycleButton != null) {
+                            if (info.functionButton != null) info.functionButton.setX(info.functionButton.getX() + 22);
+                            widget.setWidth(widget.getWidth() - 22);
+                            widget.setX(widget.getX() + 22);
+                            widgets.add(cycleButton);
+                        }
+                        this.list.addButton(widgets, name, info);
                     } else {
                         this.list.addButton(List.of(), name, info);
                     }
@@ -489,10 +548,25 @@ public abstract class MidnightConfig {
 
         @Override
         protected void applyValue() {
-            if (info.field.getType() == int.class) info.value = ((Number) (e.min() + value * (e.max() - e.min()))).intValue();
-            else if (info.field.getType() == double.class) info.value = Math.round((e.min() + value * (e.max() - e.min())) * (double) e.precision()) / (double) e.precision();
-            else if (info.field.getType() == float.class) info.value = Math.round((e.min() + value * (e.max() - e.min())) * (float) e.precision()) / (float) e.precision();
-            info.tempValue = String.valueOf(info.value);
+            if (info.dataType == int.class) info.setValue(((Number) (e.min() + value * (e.max() - e.min()))).intValue());
+            else if (info.field.getType() == double.class) info.setValue(Math.round((e.min() + value * (e.max() - e.min())) * (double) e.precision()) / (double) e.precision());
+            else if (info.field.getType() == float.class) info.setValue(Math.round((e.min() + value * (e.max() - e.min())) * (float) e.precision()) / (float) e.precision());
+        }
+    }
+    public static class MidnightTextFieldWidget extends TextFieldWidget {
+        private final EntryInfo info;
+        private final boolean isItem;
+
+        public MidnightTextFieldWidget(TextRenderer textRenderer, int x, int y, int width, int height, EntryInfo info) {
+            super(textRenderer, x, y, width, height, Text.of(info.tempValue));
+            this.info = info;
+            this.isItem = info.field.getAnnotation(Entry.class).isItem();
+        }
+
+        public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+            super.renderWidget(context, mouseX, mouseY, delta);
+            if (isItem)
+                context.drawItem(Registries.ITEM.get(Identifier.tryParse(info.tempValue)).getDefaultStack(), this.getX()+this.getWidth()-18, this.getY()+2);
         }
     }
 
@@ -524,9 +598,10 @@ public abstract class MidnightConfig {
         double min() default Double.MIN_NORMAL;
         double max() default Double.MAX_VALUE;
         String name() default "";
-        int selectionMode() default -1;        // -1 for none, 0 for file, 1 for firectory, 2 for both
+        int selectionMode() default -1;        // -1 for none, 0 for file, 1 for directory, 2 for both
         int fileChooserType() default JFileChooser.OPEN_DIALOG;
         String[] fileExtensions() default {"*"};
+        boolean isItem() default false;
         boolean isColor() default false;
         boolean isSlider() default false;
         int precision() default 100;
