@@ -64,7 +64,7 @@ public abstract class MidnightConfig {
     public static class EntryInfo {
         Field field;
         Class<?> dataType;
-        Object widget;
+        Object function;
         int width;
         boolean centered;
         Text error;
@@ -75,7 +75,7 @@ public abstract class MidnightConfig {
         String modid;
         Text name;
         int index;
-        ClickableWidget functionButton; // color picker button / explorer button
+        ClickableWidget actionButton; // color picker button / explorer button
         Tab tab;
 
         public void setValue(Object value) {
@@ -169,14 +169,14 @@ public abstract class MidnightConfig {
                 textField(info, String::length, null, Math.min(e.min(), 0), Math.max(e.max(), 1), true);
             else if (info.dataType == boolean.class) {
                 Function<Object, Text> func = value -> Text.translatable((Boolean) value ? "gui.yes" : "gui.no").formatted((Boolean) value ? Formatting.GREEN : Formatting.RED);
-                info.widget = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
+                info.function = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
                     info.setValue(!(Boolean) info.value);
                     button.setMessage(func.apply(info.value));
                 }, func);
             } else if (info.dataType.isEnum()) {
                 List<?> values = Arrays.asList(field.getType().getEnumConstants());
                 Function<Object, Text> func = value -> Text.translatable(modid + ".midnightconfig." + "enum." + info.dataType.getSimpleName() + "." + info.toTemporaryValue());
-                info.widget = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
+                info.function = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
                     int index = values.indexOf(info.value) + 1;
                     info.value = values.get(index >= values.size() ? 0 : index);
                     button.setMessage(func.apply(info.value));
@@ -193,7 +193,7 @@ public abstract class MidnightConfig {
     // TODO: Maybe move this into the screen class itself to free up some RAM?
     private static void textField(EntryInfo info, Function<String,Number> f, Pattern pattern, double min, double max, boolean cast) {
         boolean isNumber = pattern != null;
-        info.widget = (BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) (t, b) -> s -> {
+        info.function = (BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) (t, b) -> s -> {
             s = s.trim();
             if (!(s.isEmpty() || !isNumber || pattern.matcher(s).matches())) return false;
 
@@ -224,7 +224,7 @@ public abstract class MidnightConfig {
                 if (!s.contains("#")) s = '#' + s;
                 if (!HEXADECIMAL_ONLY.matcher(s).matches()) return false;
                 try {
-                    info.functionButton.setMessage(Text.literal("⬛").setStyle(Style.EMPTY.withColor(Color.decode(info.tempValue).getRGB())));
+                    info.actionButton.setMessage(Text.literal("⬛").setStyle(Style.EMPTY.withColor(Color.decode(info.tempValue).getRGB())));
                 } catch (Exception ignored) {}
             }
             return true;
@@ -281,7 +281,6 @@ public abstract class MidnightConfig {
         public final Screen parent;
         public final String modid;
         public MidnightConfigListWidget list;
-        public boolean reload = false;
         public TabManager tabManager = new TabManager(a -> {}, a -> {});
         public Map<String, Tab> tabs = new HashMap<>();
         public Tab prevTab;
@@ -303,13 +302,18 @@ public abstract class MidnightConfig {
             for (EntryInfo info : entries) {
                 try {info.field.set(null, info.value);} catch (IllegalAccessException ignored) {}
             }
-            updateResetButtons();
+            updateButtons();
         }
-        public void updateResetButtons() {
+        public void updateButtons() {
             if (this.list != null) {
                 for (ButtonEntry entry : this.list.children()) {
-                    if (entry.buttons != null && entry.buttons.size() > 1 && entry.buttons.get(1) instanceof ButtonWidget button) {
-                        button.active = !Objects.equals(entry.info.value.toString(), entry.info.defaultValue.toString());
+                    if (entry.buttons != null) {
+                        if (entry.buttons.size() > 1 && entry.buttons.get(0) instanceof ClickableWidget widget && (widget.isFocused() || widget.isHovered())) {
+                            widget.setTooltip(getTooltip(entry.info));
+                        }
+                        if (entry.buttons.size() > 1 && entry.buttons.get(1) instanceof ButtonWidget button) {
+                            button.active = !Objects.equals(entry.info.value.toString(), entry.info.defaultValue.toString());
+                        }
                     }
                 }
             }
@@ -332,16 +336,30 @@ public abstract class MidnightConfig {
             return super.keyPressed(keyCode, scanCode, modifiers);
         }
         @Override
+        public void close() {
+            loadValues();
+            cleanup();
+            Objects.requireNonNull(client).setScreen(parent);
+        }
+        private void cleanup() {
+            entries.forEach(info -> {
+                info.error = null;
+                info.value = null;
+                info.tempValue = null;
+                info.actionButton = null;
+                info.index = 0;
+                info.tab = null;
+                info.inLimits = true;
+            });
+        }
+        @Override
         public void init() {
             super.init();
             tabNavigation.setWidth(this.width);
             tabNavigation.init();
             if (tabs.size() > 1) this.addDrawableChild(tabNavigation);
 
-            this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, button -> {
-                loadValues();
-                Objects.requireNonNull(client).setScreen(parent);
-            }).dimensions(this.width / 2 - 154, this.height - 26, 150, 20).build());
+            this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, button -> this.close()).dimensions(this.width / 2 - 154, this.height - 26, 150, 20).build());
             done = this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
                 for (EntryInfo info : entries)
                     if (info.modid.equals(modid)) {
@@ -350,6 +368,7 @@ public abstract class MidnightConfig {
                         } catch (IllegalAccessException ignored) {}
                     }
                 write(modid);
+                cleanup();
                 Objects.requireNonNull(client).setScreen(parent);
             }).dimensions(this.width / 2 + 4, this.height - 26, 150, 20).build());
 
@@ -358,7 +377,6 @@ public abstract class MidnightConfig {
 
             fillList();
             if (tabs.size() > 1) list.renderHeaderSeparator = false;
-            reload = true;
         }
         public void fillList() {
             for (EntryInfo info : entries) {
@@ -373,13 +391,12 @@ public abstract class MidnightConfig {
                     }), true).texture(Identifier.of("midnightlib","icon/reset"), 12, 12).dimension(20, 20).build();
                     resetButton.setPosition(width - 205 + 150 + 25, 0);
 
-                    if (info.widget != null) {
-                        if (!reload) info.index = 0;
+                    if (info.function != null) {
                         ClickableWidget widget;
                         Entry e = info.field.getAnnotation(Entry.class);
 
-                        if (info.widget instanceof Map.Entry) { // Enums & booleans
-                            var values = (Map.Entry<ButtonWidget.PressAction, Function<Object, Text>>) info.widget;
+                        if (info.function instanceof Map.Entry) { // Enums & booleans
+                            var values = (Map.Entry<ButtonWidget.PressAction, Function<Object, Text>>) info.function;
                             if (info.dataType.isEnum())
                                 values.setValue(value -> Text.translatable(translationPrefix + "enum." + info.field.getType().getSimpleName() + "." + info.value.toString()));
                             widget = ButtonWidget.builder(values.getValue().apply(info.value), values.getKey()).dimensions(width - 185, 0, 150, 20).tooltip(getTooltip(info)).build();
@@ -392,7 +409,7 @@ public abstract class MidnightConfig {
                         if (widget instanceof TextFieldWidget textField) {
                             textField.setMaxLength(info.width);
                             textField.setText(info.tempValue);
-                            Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.widget).apply(textField, done);
+                            Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.function).apply(textField, done);
                             textField.setTextPredicate(processor);
                         }
                         widget.setTooltip(getTooltip(info));
@@ -425,7 +442,7 @@ public abstract class MidnightConfig {
                             try {
                                 colorButton.setMessage(Text.literal("⬛").setStyle(Style.EMPTY.withColor(Color.decode(info.tempValue).getRGB())));
                             } catch (Exception ignored) {}
-                            info.functionButton = colorButton;
+                            info.actionButton = colorButton;
                         } else if (e.selectionMode() > -1) {
                             ButtonWidget explorerButton = TextIconButtonWidget.builder(
                                     Text.of(""),
@@ -449,15 +466,15 @@ public abstract class MidnightConfig {
                                     true
                             ).texture(Identifier.of("midnightlib", "icon/explorer"), 12, 12).dimension(20, 20).build();
                             explorerButton.setPosition(width - 185, 0);
-                            info.functionButton = explorerButton;
+                            info.actionButton = explorerButton;
                         }
                         List<ClickableWidget> widgets = Lists.newArrayList(widget, resetButton);
-                        if (info.functionButton != null) {
+                        if (info.actionButton != null) {
                             widget.setWidth(widget.getWidth() - 22);
                             widget.setX(widget.getX() + 22);
-                            widgets.add(info.functionButton);
+                            widgets.add(info.actionButton);
                         } if (cycleButton != null) {
-                            if (info.functionButton != null) info.functionButton.setX(info.functionButton.getX() + 22);
+                            if (info.actionButton != null) info.actionButton.setX(info.actionButton.getX() + 22);
                             widget.setWidth(widget.getWidth() - 22);
                             widget.setX(widget.getX() + 22);
                             widgets.add(cycleButton);
@@ -468,7 +485,7 @@ public abstract class MidnightConfig {
                     }
                 }
                 list.setScrollAmount(scrollProgress);
-                updateResetButtons();
+                updateButtons();
             }
         }
         @Override
