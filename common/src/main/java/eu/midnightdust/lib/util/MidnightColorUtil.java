@@ -8,9 +8,7 @@ public class MidnightColorUtil {
      * @return Color as RGB
      */
     public static Color hex2Rgb(String colorStr) {
-        try {
-            return Color.decode("#" + colorStr.replace("#", ""));
-        } catch (Exception ignored) {}
-        return Color.BLACK;
+        try { return Color.decode("#" + colorStr.replace("#", ""));
+        } catch (Exception ignored) { return Color.BLACK; }
     }
 }

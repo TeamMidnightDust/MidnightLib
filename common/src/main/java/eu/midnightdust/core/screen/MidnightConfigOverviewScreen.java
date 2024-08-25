@@ -26,16 +26,14 @@ public class MidnightConfigOverviewScreen extends Screen {
     protected void init() {
         this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> Objects.requireNonNull(client).setScreen(parent)).dimensions(this.width / 2 - 100, this.height - 26, 200, 20).build());
 
-        this.list = new MidnightConfig.MidnightConfigListWidget(this.client, this.width, this.height - 57, 24, 25);
-        this.addSelectableChild(this.list);
+        this.addSelectableChild(this.list = new MidnightConfig.MidnightConfigListWidget(this.client, this.width, this.height - 57, 24, 25));
         List<String> sortedMods = new ArrayList<>(MidnightConfig.configClass.keySet());
         Collections.sort(sortedMods);
         sortedMods.forEach((modid) -> {
             if (!MidnightLib.hiddenMods.contains(modid)) {
                 list.addButton(List.of(ButtonWidget.builder(Text.translatable(modid +".midnightconfig.title"), (button) ->
                         Objects.requireNonNull(client).setScreen(MidnightConfig.getScreen(this,modid))).dimensions(this.width / 2 - 125, this.height - 28, 250, 20).build()), null, null);
-            }
-        });
+        }});
         super.init();
     }
     @Override

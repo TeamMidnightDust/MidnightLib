@@ -21,8 +21,6 @@ public class AutoModMenu implements ModMenuApi {
         MidnightConfig.configClass.forEach((modid, cClass) -> {
             if (!MidnightLib.hiddenMods.contains(modid))
                 map.put(modid, parent -> MidnightConfig.getScreen(parent, modid));
-            }
-        );
-        return map;
+        }); return map;
     }
 }

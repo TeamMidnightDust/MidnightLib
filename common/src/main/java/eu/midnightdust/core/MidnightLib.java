@@ -20,11 +20,8 @@ public class MidnightLib {
     @Environment(EnvType.CLIENT)
     public static void onInitializeClient() {
         System.setProperty("java.awt.headless", "false");
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            LOGGER.error("Error setting system look and feel", e);
-        }
+        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) { LOGGER.error("Error setting system look and feel", e); }
         MidnightLibConfig.init("midnightlib", MidnightLibConfig.class);
     }
     @Environment(EnvType.SERVER)
