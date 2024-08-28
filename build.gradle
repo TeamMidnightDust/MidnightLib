@@ -50,7 +50,7 @@ allprojects {
         releaseChangelog = {
             def changes = new StringBuilder()
             changes << "## MidnightLib v$project.version for $project.minecraft_version\n[View the changelog](https://www.github.com/TeamMidnightDust/MidnightLib/commits/)"
-            def proc = "git log --max-count=1 --pretty=format:%s".execute()
+            def proc = "git log --max-count=10 --pretty=format:%s".execute()
             proc.in.eachLine { line ->
                 def processedLine = line.toString()
                 if (!processedLine.contains("New translations") && !processedLine.contains("Merge") && !processedLine.contains("branch")) {

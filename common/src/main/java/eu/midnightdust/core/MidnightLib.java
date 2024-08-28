@@ -29,7 +29,7 @@ public class MidnightLib {
         MidnightConfig.configClass.forEach((modid, config) -> {
             for (Field field : config.getFields()) {
                 if (field.isAnnotationPresent(MidnightConfig.Entry.class) && !field.isAnnotationPresent(MidnightConfig.Client.class) && !field.isAnnotationPresent(MidnightConfig.Hidden.class))
-                    new AutoCommand(field, modid).register();
+                    new AutoCommand(field, modid);
             }
         });
     }

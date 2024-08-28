@@ -351,7 +351,7 @@ public abstract class MidnightConfig {
                             } catch (Exception ignored) {}
                             info.actionButton = colorButton;
                         } else if (e.selectionMode() > -1) {
-                            ButtonWidget explorerButton = TextIconButtonWidget.builder(Text.of(""),
+                            ButtonWidget explorerButton = TextIconButtonWidget.builder(Text.empty(),
                                     button -> new Thread(() -> {
                                         JFileChooser fileChooser = new JFileChooser();
                                         fileChooser.setFileSelectionMode(e.selectionMode()); fileChooser.setDialogType(e.fileChooserType());
