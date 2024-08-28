@@ -15,6 +15,7 @@ import java.util.Objects;
 
 public class AutoCommand {
     public static List<LiteralArgumentBuilder<ServerCommandSource>> commands = new ArrayList<>();
+    final static String BASE = "midnightconfig";
     final static String VALUE = "value";
     final Field field;
     final Class<?> type;
@@ -27,7 +28,7 @@ public class AutoCommand {
         this.type = field.getType();
         this.isList = field.getType() == List.class;
 
-        LiteralArgumentBuilder<ServerCommandSource> command = CommandManager.literal("midnightconfig").requires(source -> source.hasPermissionLevel(2)).then(
+        LiteralArgumentBuilder<ServerCommandSource> command = CommandManager.literal(BASE).requires(source -> source.hasPermissionLevel(2)).then(
                 CommandManager.literal(modid).then(CommandManager.literal(field.getName()).executes(this::getValue)));
 
         if (type.isEnum()) {

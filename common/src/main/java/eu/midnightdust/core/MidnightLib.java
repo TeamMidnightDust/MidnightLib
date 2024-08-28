@@ -15,14 +15,15 @@ import java.util.List;
 
 public class MidnightLib {
     public static List<String> hiddenMods = new ArrayList<>();
-    public static final Logger LOGGER = LoggerFactory.getLogger("midnightlib");
+    public static final String MOD_ID = "midnightlib";
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     @Environment(EnvType.CLIENT)
     public static void onInitializeClient() {
         System.setProperty("java.awt.headless", "false");
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) { LOGGER.error("Error setting system look and feel", e); }
-        MidnightLibConfig.init("midnightlib", MidnightLibConfig.class);
+        MidnightLibConfig.init(MOD_ID, MidnightLibConfig.class);
     }
     @Environment(EnvType.SERVER)
     public static void onInitializeServer() {

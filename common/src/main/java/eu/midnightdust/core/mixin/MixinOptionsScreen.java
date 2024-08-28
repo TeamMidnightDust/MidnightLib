@@ -1,9 +1,6 @@
 package eu.midnightdust.core.mixin;
 
-import eu.midnightdust.core.config.MidnightLibConfig;
 import eu.midnightdust.core.screen.MidnightConfigOverviewScreen;
-import eu.midnightdust.lib.util.PlatformFunctions;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.OptionsScreen;
 import net.minecraft.client.gui.widget.TextIconButtonWidget;
@@ -20,30 +17,33 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Objects;
 
-@Mixin(OptionsScreen.class)
-public class MixinOptionsScreen extends Screen {
-    @Shadow @Final private ThreePartsLayoutWidget layout;
-    @Unique TextIconButtonWidget button = TextIconButtonWidget.builder(Text.translatable("midnightlib.overview.title"), (
-            buttonWidget) -> Objects.requireNonNull(client).setScreen(new MidnightConfigOverviewScreen(this)), true)
-            .texture(Identifier.of("midnightlib","icon/midnightlib"), 16, 16).dimension(20, 20).build();
-    @Unique boolean shouldShowButton = MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.TRUE) || (MidnightLibConfig.config_screen_list.equals(MidnightLibConfig.ConfigButton.MODMENU) && !PlatformFunctions.isModLoaded("modmenu") && PlatformFunctions.getPlatformName() != "neoforge");
+import static eu.midnightdust.core.MidnightLib.MOD_ID;
+import static eu.midnightdust.core.config.MidnightLibConfig.shouldShowButton;
 
-    protected MixinOptionsScreen(Text title) {super(title);}
+@Mixin(OptionsScreen.class)
+public abstract class MixinOptionsScreen extends Screen {
+    @Shadow @Final private ThreePartsLayoutWidget layout;
+    @Unique TextIconButtonWidget midnightlib$button = TextIconButtonWidget.builder(Text.translatable("midnightlib.overview.title"), (
+            buttonWidget) -> Objects.requireNonNull(client).setScreen(new MidnightConfigOverviewScreen(this)), true)
+            .texture(Identifier.of(MOD_ID,"icon/"+MOD_ID), 16, 16).dimension(20, 20).build();
+
+    private MixinOptionsScreen(Text title) {super(title);}
+
     @Inject(at = @At("HEAD"), method = "init")
     public void midnightlib$onInit(CallbackInfo ci) {
-        if (shouldShowButton) {
-            this.midnightlib$setupButton();
-            this.addDrawableChild(button);
+        if (shouldShowButton()) {
+            this.midnightlib$setButtonPos();
+            this.addDrawableChild(midnightlib$button);
         }
     }
 
-    @Override
-    public void resize(MinecraftClient client, int width, int height) {
-        super.resize(client, width, height);
-        if (shouldShowButton) this.midnightlib$setupButton();
+    @Inject(at = @At("TAIL"), method = "initTabNavigation")
+    public void midnightlib$onResize(CallbackInfo ci) {
+        if (shouldShowButton()) this.midnightlib$setButtonPos();
     }
+
     @Unique
-    public void midnightlib$setupButton() {
-        button.setPosition(layout.getWidth() / 2  + 158, layout.getY() + layout.getFooterHeight() - 4);
+    public void midnightlib$setButtonPos() {
+        midnightlib$button.setPosition(layout.getWidth() / 2  + 158, layout.getY() + layout.getFooterHeight() - 4);
     }
 }
