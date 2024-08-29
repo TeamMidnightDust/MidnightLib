@@ -29,10 +29,10 @@
 
     "environment": "*",
     "entrypoints": {
-        "client": [
+        "main": [
             "eu.midnightdust.fabric.core.MidnightLibFabric"
         ],
-        "server": [
+        "client": [
             "eu.midnightdust.fabric.core.MidnightLibFabric"
         ],
         "modmenu": [

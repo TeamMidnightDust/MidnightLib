@@ -15,11 +15,16 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Mod("midnightlib")
 public class MidnightLibNeoForge {
+    public static List<LiteralArgumentBuilder<ServerCommandSource>> commands = new ArrayList<>();
+
     public MidnightLibNeoForge() {
         if (FMLEnvironment.dist == Dist.CLIENT) MidnightLib.onInitializeClient();
-        else MidnightLib.onInitializeServer();
+        MidnightLib.onInitialize();
     }
 
     @EventBusSubscriber(modid = "midnightlib", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -38,9 +43,7 @@ public class MidnightLibNeoForge {
     public static class MidnightLibServerEvents {
         @SubscribeEvent
         public static void registerCommands(RegisterCommandsEvent event) {
-            for (LiteralArgumentBuilder<ServerCommandSource> command : AutoCommand.commands) {
-                event.getDispatcher().register(command);
-            }
+            commands.forEach(command -> event.getDispatcher().register(command));
         }
     }
 }

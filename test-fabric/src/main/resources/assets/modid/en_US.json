@@ -1,0 +1,23 @@
+{
+  "modid.midnightconfig.title":"I am a title",
+  "modid.midnightconfig.text1":"I am a comment *u*",
+  "modid.midnightconfig.text2":"I am a centered comment (╯°□°）╯︵ ┻━┻",
+  "modid.midnightconfig.name":"I am a string!",
+  "modid.midnightconfig.name.tooltip":"I am a tooltip uwu \nI am a new line",
+  "modid.midnightconfig.fabric":"I am an int",
+  "modid.midnightconfig.world":"I am a double",
+  "modid.midnightconfig.showInfo":"I am a boolean",
+  "modid.midnightconfig.hello":"I am a limited int!",
+  "modid.midnightconfig.id":"I am an Item Identifier!",
+  "modid.midnightconfig.testEnum":"I am an enum!",
+  "modid.midnightconfig.enum.TestEnum.FORGE":"Slow",
+  "modid.midnightconfig.enum.TestEnum.FABRIC":"Fancy",
+  "modid.midnightconfig.enum.TestEnum.QUILT":"Fabulous",
+  "modid.midnightconfig.myFileOrDirectory.fileChooser": "Select an image or directory",
+  "modid.midnightconfig.myFileOrDirectory.fileFilter": "Supported Images (.png, .jpg, .jpeg)",
+  "modid.midnightconfig.category.numbers": "Numbers",
+  "modid.midnightconfig.category.text": "Text",
+  "modid.midnightconfig.category.sliders": "Sliders",
+  "modid.midnightconfig.category.lists": "Lists",
+  "modid.midnightconfig.category.files": "Files"
+}

@@ -107,15 +107,10 @@ public abstract class MidnightConfig {
     }
     @Environment(EnvType.CLIENT)
     private static void initClient(String modid, Field field, EntryInfo info) {
-        info.dataType = field.getType();
+        info.dataType = getUnderlyingType(field);
         Entry e = field.getAnnotation(Entry.class);
         info.width = e != null ? e.width() : 0;
         info.field = field; info.modid = modid;
-        if (info.dataType == List.class) {
-            Class<?> listType = (Class<?>) ((ParameterizedType) info.field.getGenericType()).getActualTypeArguments()[0];
-            try { info.dataType = (Class<?>) listType.getField("TYPE").get(null);
-            } catch (NoSuchFieldException | IllegalAccessException ignored) { info.dataType = listType; }
-        }
 
         if (e != null) {
             if (!e.name().isEmpty()) info.name = Text.translatable(e.name());
@@ -137,6 +132,13 @@ public abstract class MidnightConfig {
                 }, func);
         }}
         entries.add(info);
+    }
+    public static Class<?> getUnderlyingType(Field field) {
+        if (field.getType() == List.class) {
+            Class<?> listType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+            try { return (Class<?>) listType.getField("TYPE").get(null);
+            } catch (NoSuchFieldException | IllegalAccessException ignored) { return listType; }
+        } else return field.getType();
     }
     public static Tooltip getTooltip(EntryInfo info) {
         String key = info.modid + ".midnightconfig."+info.field.getName()+".tooltip";

@@ -1,7 +1,6 @@
 package eu.midnightdust.lib.config;
 
 import com.mojang.brigadier.arguments.*;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import net.minecraft.server.command.CommandManager;
@@ -9,47 +8,41 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static eu.midnightdust.lib.config.MidnightConfig.Entry;
+
 public class AutoCommand {
-    public static List<LiteralArgumentBuilder<ServerCommandSource>> commands = new ArrayList<>();
-    final static String BASE = "midnightconfig";
     final static String VALUE = "value";
     final Field field;
     final Class<?> type;
     final String modid;
-    final boolean isList;
+    final boolean isList, isNumber;
 
     public AutoCommand(Field field, String modid) {
-        this.field = field;
-        this.modid = modid;
-        this.type = field.getType();
+        this.field = field; this.modid = modid;
+        this.type = MidnightConfig.getUnderlyingType(field);
         this.isList = field.getType() == List.class;
+        this.isNumber = type == int.class || type == double.class || type == float.class;
 
-        LiteralArgumentBuilder<ServerCommandSource> command = CommandManager.literal(BASE).requires(source -> source.hasPermissionLevel(2)).then(
-                CommandManager.literal(modid).then(CommandManager.literal(field.getName()).executes(this::getValue)));
+        var command = CommandManager.literal(field.getName()).executes(this::getValue);
 
         if (type.isEnum()) {
-            for (Object enumValue : field.getType().getEnumConstants()) {
+            for (Object enumValue : field.getType().getEnumConstants())
                 command = command.then(CommandManager.literal(enumValue.toString()).executes(ctx -> this.setValue(ctx.getSource(), enumValue, "")));
-            }
-        }
-        else if (isList) {
-            for (String action : List.of("add", "remove")) {
+        } else if (isList) {
+            for (String action : List.of("add", "remove"))
                 command = command.then(CommandManager.literal(action).then(
                         CommandManager.argument(VALUE, getArgType()).executes(ctx -> setValueFromArg(ctx, action))));
-            }
-        }
-        else command = command.then(CommandManager.argument(VALUE, getArgType()).executes(ctx -> setValueFromArg(ctx, "")));
+        } else command = command.then(CommandManager.argument(VALUE, getArgType()).executes(ctx -> setValueFromArg(ctx, "")));
 
-        PlatformFunctions.registerCommand(command); commands.add(command);
+        PlatformFunctions.registerCommand(CommandManager.literal("midnightconfig").requires(source -> source.hasPermissionLevel(2)).then(CommandManager.literal(modid).then(command)));
     }
 
     public ArgumentType<?> getArgType() {
-        MidnightConfig.Entry entry = type.getAnnotation(MidnightConfig.Entry.class);
-        if (type.isInstance(Number.class)) {
+        if (isNumber) {
+            Entry entry = field.getAnnotation(Entry.class);
             if (type == int.class) return IntegerArgumentType.integer((int) entry.min(), (int) entry.max());
             else if (type == double.class) return DoubleArgumentType.doubleArg(entry.min(), entry.max());
             else if (type == float.class) return FloatArgumentType.floatArg((float) entry.min(), (float) entry.max());
@@ -58,7 +51,7 @@ public class AutoCommand {
         return StringArgumentType.string();
     }
     public int setValueFromArg(CommandContext<ServerCommandSource> context, String action) {
-        if (type.isInstance(Number.class)) {
+        if (isNumber) {
             if (type == int.class) return setValue(context.getSource(), IntegerArgumentType.getInteger(context, VALUE), action);
             else if (type == double.class) return setValue(context.getSource(), DoubleArgumentType.getDouble(context, VALUE), action);
             else if (type == float.class) return setValue(context.getSource(), FloatArgumentType.getFloat(context, VALUE), action);

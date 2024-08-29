@@ -9,6 +9,8 @@ import net.neoforged.fml.loading.FMLPaths;
 
 import java.nio.file.Path;
 
+import static eu.midnightdust.neoforge.MidnightLibNeoForge.commands;
+
 public class PlatformFunctionsImpl {
     public static String getPlatformName() {
         return "neoforge";
@@ -26,6 +28,6 @@ public class PlatformFunctionsImpl {
         return ModList.get().isLoaded(modid);
     }
     public static void registerCommand(LiteralArgumentBuilder<ServerCommandSource> command) {
-        // Ignored here, see MidnightLibNeoForge#registerCommands
+        commands.add(command);
     }
 }

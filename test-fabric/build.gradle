@@ -1,0 +1,32 @@
+plugins {
+    id 'com.github.johnrengelman.shadow'
+    id "me.shedaniel.unified-publishing"
+}
+repositories {
+    maven { url "https://maven.terraformersmc.com/releases" }
+}
+
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
+loom {
+}
+
+configurations {
+    common
+    shadowCommon // Don't use shadow from the shadow plugin since it *excludes* files.
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
+    archivesBaseName = rootProject.archives_base_name + "-fabric"
+}
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+
+    implementation project(path: ":fabric", configuration: "namedElements")
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+}

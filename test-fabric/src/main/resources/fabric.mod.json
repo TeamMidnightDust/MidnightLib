@@ -1,0 +1,23 @@
+{
+    "schemaVersion": 1,
+    "id": "midnightlib-example",
+    "version": "${version}",
+
+    "name": "MidnightLib Example",
+    "description": "Wow, you can do so much.",
+    "authors": [ "MidnightDust" ],
+
+    "license": "CC0",
+    "icon": "assets/midnightlib/icon.png",
+
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "eu.midnightdust.fabric.example.MLExampleFabric"
+        ]
+    },
+    "depends": {
+        "fabric-resource-loader-v0": "*",
+        "midnightlib": ">=1.6.0"
+    }
+}
