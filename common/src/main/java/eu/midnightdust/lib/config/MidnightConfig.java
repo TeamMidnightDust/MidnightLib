@@ -355,7 +355,7 @@ public abstract class MidnightConfig {
                         } else if (e.selectionMode() > -1) {
                             ButtonWidget explorerButton = TextIconButtonWidget.builder(Text.empty(),
                                     button -> new Thread(() -> {
-                                        JFileChooser fileChooser = new JFileChooser();
+                                        JFileChooser fileChooser = new JFileChooser(info.tempValue);
                                         fileChooser.setFileSelectionMode(e.selectionMode()); fileChooser.setDialogType(e.fileChooserType());
                                         fileChooser.setDialogTitle(Text.translatable(translationPrefix + info.field.getName() + ".fileChooser").getString());
                                         if ((e.selectionMode() == JFileChooser.FILES_ONLY || e.selectionMode() == JFileChooser.FILES_AND_DIRECTORIES) && Arrays.stream(e.fileExtensions()).noneMatch("*"::equals))
