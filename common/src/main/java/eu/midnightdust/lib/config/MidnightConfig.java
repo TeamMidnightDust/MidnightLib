@@ -3,6 +3,7 @@ package eu.midnightdust.lib.config;
 import com.google.common.collect.Lists;
 import com.google.gson.ExclusionStrategy; import com.google.gson.FieldAttributes; import com.google.gson.Gson; import com.google.gson.GsonBuilder;
 import com.mojang.blaze3d.systems.RenderSystem;
+import eu.midnightdust.lib.util.MidnightFileChooser;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import net.fabricmc.api.EnvType; import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient; import net.minecraft.client.font.TextRenderer; import net.minecraft.client.gui.DrawContext;
@@ -14,9 +15,13 @@ import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.OrderedText; import net.minecraft.text.Style; import net.minecraft.text.Text;
 import net.minecraft.util.Formatting; import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*; import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.JColorChooser;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.Color;
 import java.lang.annotation.ElementType; import java.lang.annotation.Retention; import java.lang.annotation.RetentionPolicy; import java.lang.annotation.Target;
 import java.lang.reflect.Field; import java.lang.reflect.Modifier; import java.lang.reflect.ParameterizedType;
@@ -76,6 +81,7 @@ public abstract class MidnightConfig {
             .registerTypeAdapter(Identifier.class, new Identifier.Serializer())
             .setPrettyPrinting().create();
 
+    // TODO "Method 'getDefaultValue(java.lang.String, java.lang.String)' is never used"
     public static @Nullable Object getDefaultValue(String modid, String entry) {
         for (EntryInfo e : entries) {
             if (modid.equals(e.modid) && entry.equals(e.field.getName())) return e.defaultValue;
@@ -106,7 +112,7 @@ public abstract class MidnightConfig {
         }
     }
     @Environment(EnvType.CLIENT)
-    private static void initClient(String modid, Field field, EntryInfo info) {
+    private static void initClient(String modid, Field field, @NotNull EntryInfo info) {
         info.dataType = getUnderlyingType(field);
         Entry e = field.getAnnotation(Entry.class);
         info.width = e != null ? e.width() : 0;
@@ -133,20 +139,20 @@ public abstract class MidnightConfig {
         }}
         entries.add(info);
     }
-    public static Class<?> getUnderlyingType(Field field) {
+    public static Class<?> getUnderlyingType(@NotNull Field field) {
         if (field.getType() == List.class) {
             Class<?> listType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
             try { return (Class<?>) listType.getField("TYPE").get(null);
             } catch (NoSuchFieldException | IllegalAccessException ignored) { return listType; }
         } else return field.getType();
     }
-    public static Tooltip getTooltip(EntryInfo info) {
+    public static @NotNull Tooltip getTooltip(@NotNull EntryInfo info) {
         String key = info.modid + ".midnightconfig."+info.field.getName()+".tooltip";
         return Tooltip.of(info.error != null ? info.error : I18n.hasTranslation(key) ? Text.translatable(key) : Text.empty());
     }
 
     // TODO: Maybe move this into the screen class itself to free up some RAM?
-    private static void textField(EntryInfo info, Function<String,Number> f, Pattern pattern, double min, double max, boolean cast) {
+    private static void textField(@NotNull EntryInfo info, Function<String,Number> f, Pattern pattern, double min, double max, boolean cast) {
         boolean isNumber = pattern != null;
         info.function = (BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) (t, b) -> s -> {
             s = s.trim();
@@ -181,7 +187,7 @@ public abstract class MidnightConfig {
             return true;
         };
     }
-    public static MidnightConfig getClass(String modid) {
+    public static @NotNull MidnightConfig getClass(String modid) {
         try { return configClass.get(modid).getDeclaredConstructor().newInstance(); } catch (Exception e) {throw new RuntimeException(e);}
     }
     public static void write(String modid) { getClass(modid).writeChanges(modid); }
@@ -191,8 +197,9 @@ public abstract class MidnightConfig {
               Files.write(path, gson.toJson(getClass(modid)).getBytes());
         } catch (Exception e) { e.fillInStackTrace(); }
     }
+    @Contract("_, _ -> new")
     @Environment(EnvType.CLIENT)
-    public static Screen getScreen(Screen parent, String modid) {
+    public static @NotNull Screen getScreen(Screen parent, String modid) {
         return new MidnightConfigScreen(parent, modid);
     }
     @Environment(EnvType.CLIENT)
@@ -352,13 +359,13 @@ public abstract class MidnightConfig {
                             try { colorButton.setMessage(Text.literal("⬛").setStyle(Style.EMPTY.withColor(Color.decode(info.tempValue).getRGB())));
                             } catch (Exception ignored) {}
                             info.actionButton = colorButton;
-                        } else if (e.selectionMode() > -1) {
+                        } else if (e.fileSelectionMode() > -1) {
                             ButtonWidget explorerButton = TextIconButtonWidget.builder(Text.empty(),
                                     button -> new Thread(() -> {
-                                        JFileChooser fileChooser = new JFileChooser(info.tempValue);
-                                        fileChooser.setFileSelectionMode(e.selectionMode()); fileChooser.setDialogType(e.fileChooserType());
+                                        MidnightFileChooser fileChooser = new MidnightFileChooser(info.tempValue, info.modid);
+                                        fileChooser.setFileSelectionMode(e.fileSelectionMode()); fileChooser.setDialogType(e.fileChooserType());
                                         fileChooser.setDialogTitle(Text.translatable(translationPrefix + info.field.getName() + ".fileChooser").getString());
-                                        if ((e.selectionMode() == JFileChooser.FILES_ONLY || e.selectionMode() == JFileChooser.FILES_AND_DIRECTORIES) && Arrays.stream(e.fileExtensions()).noneMatch("*"::equals))
+                                        if ((e.fileSelectionMode() == JFileChooser.FILES_ONLY || e.fileSelectionMode() == JFileChooser.FILES_AND_DIRECTORIES) && Arrays.stream(e.fileExtensions()).noneMatch("*"::equals))
                                             fileChooser.setFileFilter(new FileNameExtensionFilter(
                                                     Text.translatable(translationPrefix + info.field.getName() + ".fileFilter").getString(), e.fileExtensions()));
                                         if (fileChooser.showDialog(null, null) == JFileChooser.APPROVE_OPTION) {
@@ -440,7 +447,7 @@ public abstract class MidnightConfig {
     }
     public static class MidnightSliderWidget extends SliderWidget {
         private final EntryInfo info; private final Entry e;
-        public MidnightSliderWidget(int x, int y, int width, int height, Text text, double value, EntryInfo info) {
+        public MidnightSliderWidget(int x, int y, int width, int height, Text text, double value, @NotNull EntryInfo info) {
             super(x, y, width, height, text, value);
             this.e = info.field.getAnnotation(Entry.class);
             this.info = info;
@@ -463,7 +470,7 @@ public abstract class MidnightConfig {
      * - <b>min</b>: The minimum value of the <code>int</code>, <code>float</code> or <code>double</code> field<br>
      * - <b>max</b>: The maximum value of the <code>int</code>, <code>float</code> or <code>double</code> field<br>
      * - <b>name</b>: The name of the field in the config screen<br>
-     * - <b>selectionMode</b>: The selection mode of the file picker button for {@link String} fields,
+     * - <b>fileSelectionMode</b>: The selection mode of the file picker button for {@link String} fields,
      *   -1 for none, {@link JFileChooser#FILES_ONLY} for files, {@link JFileChooser#DIRECTORIES_ONLY} for directories,
      *   {@link JFileChooser#FILES_AND_DIRECTORIES} for both (default: -1). Remember to set the translation key
      *   <code>[modid].midnightconfig.[fieldName].fileChooser.title</code> for the file picker dialog title<br>
@@ -472,7 +479,7 @@ public abstract class MidnightConfig {
      * Remember to set the translation key <code>[modid].midnightconfig.[fieldName].fileFilter.description</code> for the file filter description
      * if <code>"*"</code> is not used as file extension<br>
      * - <b>fileExtensions</b>: The file extensions for the file picker button for {@link String} fields (default: <code>{"*"}</code>),
-     *  only works if selectionMode is {@link JFileChooser#FILES_ONLY} or {@link JFileChooser#FILES_AND_DIRECTORIES}<br>
+     *  only works if fileSelectionMode is {@link JFileChooser#FILES_ONLY} or {@link JFileChooser#FILES_AND_DIRECTORIES}<br>
      * - <b>isColor</b>: If the field is a hexadecimal color code (default: false)<br>
      * - <b>isSlider</b>: If the field is a slider (default: false)<br>
      * - <b>precision</b>: The precision of the <code>float</code> or <code>double</code> field (default: 100)<br>
@@ -485,7 +492,7 @@ public abstract class MidnightConfig {
         double min() default Double.MIN_NORMAL;
         double max() default Double.MAX_VALUE;
         String name() default "";
-        int selectionMode() default -1;        // -1 for none, 0 for file, 1 for directory, 2 for both
+        int fileSelectionMode() default -1;        // -1 for none, 0 for file, 1 for directory, 2 for both
         int fileChooserType() default JFileChooser.OPEN_DIALOG;
         String[] fileExtensions() default {"*"};
         int idMode() default -1;               // -1 for none, 0 for item, 1 for block
@@ -505,6 +512,6 @@ public abstract class MidnightConfig {
 
     public static class HiddenAnnotationExclusionStrategy implements ExclusionStrategy {
         public boolean shouldSkipClass(Class<?> clazz) { return false; }
-        public boolean shouldSkipField(FieldAttributes fieldAttributes) { return fieldAttributes.getAnnotation(Entry.class) == null; }
+        public boolean shouldSkipField(@NotNull FieldAttributes fieldAttributes) { return fieldAttributes.getAnnotation(Entry.class) == null; }
     }
 }

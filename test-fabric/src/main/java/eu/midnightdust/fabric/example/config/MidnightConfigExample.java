@@ -42,26 +42,26 @@ public class MidnightConfigExample extends MidnightConfig {
     @Entry(category = LISTS, name = "I am a float list!") public static List<Float> floatList = Lists.newArrayList(4.1f, -1.3f, -1f);
 
     @Entry(category = FILES,
-            selectionMode = JFileChooser.FILES_ONLY,
+            fileSelectionMode = JFileChooser.FILES_ONLY,
             fileExtensions = {"json", "txt", "log"}, // Define valid file extensions
             fileChooserType = JFileChooser.SAVE_DIALOG,
             name = "I am a file!")
     public static String myFile = ""; // The isFile property adds a file picker button
 
     @Entry(category = FILES,
-            selectionMode = JFileChooser.DIRECTORIES_ONLY,
+            fileSelectionMode = JFileChooser.DIRECTORIES_ONLY,
             fileChooserType = JFileChooser.OPEN_DIALOG,
             name = "I am a directory!")
     public static String myDirectory = ""; // The isDirectory property adds a directory picker button
 
     @Entry(category = FILES,
-            selectionMode = JFileChooser.FILES_AND_DIRECTORIES,
+            fileSelectionMode = JFileChooser.FILES_AND_DIRECTORIES,
             fileExtensions = {"png", "jpg", "jpeg"},
             fileChooserType = JFileChooser.OPEN_DIALOG,
             name = "I can choose both files & directories!")
     public static String myFileOrDirectory = ""; // The isFileOrDirectory property adds a file or directory picker button
     @Entry(category = FILES,
-            selectionMode = JFileChooser.FILES_AND_DIRECTORIES,
+            fileSelectionMode = JFileChooser.FILES_AND_DIRECTORIES,
             fileExtensions = {"png", "jpg", "jpeg"},
             fileChooserType = JFileChooser.OPEN_DIALOG,
             name = "I am a mf file/directory list!")
