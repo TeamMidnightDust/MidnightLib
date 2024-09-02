@@ -24,7 +24,7 @@ public class MidnightLibNeoForge {
 
     public MidnightLibNeoForge() {
         if (FMLEnvironment.dist == Dist.CLIENT) MidnightLib.onInitializeClient();
-        MidnightLib.onInitialize();
+        MidnightLib.registerAutoCommand();
     }
 
     @EventBusSubscriber(modid = "midnightlib", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -39,8 +39,8 @@ public class MidnightLibNeoForge {
         }
     }
 
-    @EventBusSubscriber(modid = "midnightlib", value = Dist.DEDICATED_SERVER)
-    public static class MidnightLibServerEvents {
+    @EventBusSubscriber(modid = "midnightlib")
+    public static class MidnightLibEvents {
         @SubscribeEvent
         public static void registerCommands(RegisterCommandsEvent event) {
             commands.forEach(command -> event.getDispatcher().register(command));

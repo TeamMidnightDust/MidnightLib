@@ -29,7 +29,7 @@
 
     "environment": "*",
     "entrypoints": {
-        "main": [
+        "server": [
             "eu.midnightdust.fabric.core.MidnightLibFabric"
         ],
         "client": [

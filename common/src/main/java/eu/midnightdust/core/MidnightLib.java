@@ -13,6 +13,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.minecraft.client.MinecraftClient.IS_SYSTEM_MAC;
+
 public class MidnightLib {
     public static List<String> hiddenMods = new ArrayList<>();
     public static final String MOD_ID = "midnightlib";
@@ -20,12 +22,12 @@ public class MidnightLib {
 
     @Environment(EnvType.CLIENT)
     public static void onInitializeClient() {
-        System.setProperty("java.awt.headless", "false");
-        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        try { System.setProperty("java.awt.headless", "false");
+            if (!IS_SYSTEM_MAC) UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) { LOGGER.error("Error setting system look and feel", e); }
         MidnightLibConfig.init(MOD_ID, MidnightLibConfig.class);
     }
-    public static void onInitialize() {
+    public static void registerAutoCommand() {
         MidnightConfig.configClass.forEach((modid, config) -> {
             for (Field field : config.getFields()) {
                 if (field.isAnnotationPresent(MidnightConfig.Entry.class) && !field.isAnnotationPresent(MidnightConfig.Client.class) && !field.isAnnotationPresent(MidnightConfig.Hidden.class))
