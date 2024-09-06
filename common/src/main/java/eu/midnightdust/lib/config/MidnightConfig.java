@@ -25,6 +25,8 @@ import java.util.*;
 import java.util.function.BiFunction; import java.util.function.Function; import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import static net.minecraft.client.MinecraftClient.IS_SYSTEM_MAC;
+
 /** MidnightConfig v2.6.0 by Martin "Motschen" Prokoph
  *  Single class config library - feel free to copy!
  *  Based on <a href="https://github.com/Minenash/TinyConfig">...</a>
@@ -372,6 +374,7 @@ public abstract class MidnightConfig {
                         }
                         List<ClickableWidget> widgets = Lists.newArrayList(widget, resetButton);
                         if (info.actionButton != null) {
+                            if (IS_SYSTEM_MAC) info.actionButton.active = false;
                             widget.setWidth(widget.getWidth() - 22); widget.setX(widget.getX() + 22);
                             widgets.add(info.actionButton);
                         } if (cycleButton != null) {
@@ -401,7 +404,7 @@ public abstract class MidnightConfig {
     }
     @Environment(EnvType.CLIENT)
     public static class MidnightConfigListWidget extends ElementListWidget<ButtonEntry> {
-        boolean renderHeaderSeparator = true;
+        public boolean renderHeaderSeparator = true;
         public MidnightConfigListWidget(MinecraftClient client, int width, int height, int y, int itemHeight) { super(client, width, height, y, itemHeight); }
         @Override public int getScrollbarX() { return this.width -7; }
 
@@ -418,7 +421,7 @@ public abstract class MidnightConfig {
     }
     public static class ButtonEntry extends ElementListWidget.Entry<ButtonEntry> {
         private static final TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        private final Text text;
+        public final Text text;
         public final List<ClickableWidget> buttons;
         public final EntryInfo info;
         public boolean centered = false;

@@ -22,9 +22,10 @@ public class MidnightLib {
 
     @Environment(EnvType.CLIENT)
     public static void onInitializeClient() {
-        try { System.setProperty("java.awt.headless", "false");
-            if (!IS_SYSTEM_MAC) UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) { LOGGER.error("Error setting system look and feel", e); }
+        try { if (!IS_SYSTEM_MAC) {
+            System.setProperty("java.awt.headless", "false");
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }} catch (Exception e) { LOGGER.error("Error setting system look and feel", e); }
         MidnightLibConfig.init(MOD_ID, MidnightLibConfig.class);
     }
     public static void registerAutoCommand() {
