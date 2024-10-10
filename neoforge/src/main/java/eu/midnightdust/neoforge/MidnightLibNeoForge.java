@@ -2,7 +2,6 @@ package eu.midnightdust.neoforge;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import eu.midnightdust.core.MidnightLib;
-import eu.midnightdust.lib.config.AutoCommand;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.minecraft.server.command.ServerCommandSource;
 import net.neoforged.api.distmarker.Dist;
@@ -16,6 +15,7 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 
 @Mod("midnightlib")
@@ -32,7 +32,7 @@ public class MidnightLibNeoForge {
         @SubscribeEvent
         public static void onPostInit(FMLClientSetupEvent event) {
             ModList.get().forEachModContainer((modid, modContainer) -> {
-                if (MidnightConfig.configClass.containsKey(modid)) {
+                if (MidnightConfig.configClass.containsKey(modid) && !MidnightLib.hiddenMods.contains(modid)) {
                     modContainer.registerExtensionPoint(IConfigScreenFactory.class, (minecraftClient, screen) -> MidnightConfig.getScreen(screen, modid));
                 }
             });
@@ -43,7 +43,10 @@ public class MidnightLibNeoForge {
     public static class MidnightLibEvents {
         @SubscribeEvent
         public static void registerCommands(RegisterCommandsEvent event) {
-            commands.forEach(command -> event.getDispatcher().register(command));
+            try {
+                commands.forEach(command -> event.getDispatcher().register(command));
+            }
+            catch (ConcurrentModificationException ignored) {}
         }
     }
 }

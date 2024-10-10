@@ -21,6 +21,7 @@ configurations {
     runtimeClasspath.extendsFrom common
     developmentFabric.extendsFrom common
     archivesBaseName = rootProject.archives_base_name + "-fabric"
+    version = rootProject.mod_version + "+" + rootProject.minecraft_version
 }
 
 dependencies {
@@ -33,10 +34,10 @@ dependencies {
 }
 
 processResources {
-    inputs.property "version", project.version
+    inputs.property "version", rootProject.version
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        expand "version": rootProject.version
     }
 }
 
@@ -66,7 +67,7 @@ components.java {
 
 unifiedPublishing {
     project {
-        displayName = "MidnightLib $project.version - Fabric $project.minecraft_version"
+        displayName = "MidnightLib $rootProject.version - Fabric $project.minecraft_version"
         releaseType = "$project.release_type"
         changelog = releaseChangelog()
         gameVersions = []
@@ -93,7 +94,7 @@ unifiedPublishing {
             modrinth {
                 token = MODRINTH_TOKEN
                 id = rootProject.modrinth_id
-                version = "$project.version-$project.name"
+                version = "$rootProject.version-$project.name"
                 gameVersions.addAll project.minecraft_version, project.supported_versions
             }
         }

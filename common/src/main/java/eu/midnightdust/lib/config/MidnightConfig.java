@@ -92,7 +92,6 @@ public abstract class MidnightConfig {
             EntryInfo info = new EntryInfo();
             if ((field.isAnnotationPresent(Entry.class) || field.isAnnotationPresent(Comment.class)) && !field.isAnnotationPresent(Server.class) && !field.isAnnotationPresent(Hidden.class) && PlatformFunctions.isClientEnv())
                 initClient(modid, field, info);
-            if (field.isAnnotationPresent(Comment.class)) info.centered = field.getAnnotation(Comment.class).centered();
             if (field.isAnnotationPresent(Entry.class))
                 try { info.defaultValue = field.get(null);
                 } catch (IllegalAccessException ignored) {}
@@ -111,10 +110,14 @@ public abstract class MidnightConfig {
     private static void initClient(String modid, Field field, EntryInfo info) {
         info.dataType = getUnderlyingType(field);
         Entry e = field.getAnnotation(Entry.class);
+        Comment c = field.getAnnotation(Comment.class);
         info.width = e != null ? e.width() : 0;
         info.field = field; info.modid = modid;
+        boolean requiredModLoaded = true;
 
         if (e != null) {
+            if (!e.requiredMod().isEmpty()) requiredModLoaded = PlatformFunctions.isModLoaded(e.requiredMod());
+            if (!requiredModLoaded) return;
             if (!e.name().isEmpty()) info.name = Text.translatable(e.name());
             if (info.dataType == int.class) textField(info, Integer::parseInt, INTEGER_ONLY, (int) e.min(), (int) e.max(), true);
             else if (info.dataType == float.class) textField(info, Float::parseFloat, DECIMAL_ONLY, (float) e.min(), (float) e.max(), false);
@@ -132,8 +135,11 @@ public abstract class MidnightConfig {
                     int index = values.indexOf(info.value) + 1;
                     info.value = values.get(index >= values.size() ? 0 : index); button.setMessage(func.apply(info.value));
                 }, func);
-        }}
-        entries.add(info);
+        }} else if (c != null) {
+            if (!c.requiredMod().isEmpty()) requiredModLoaded = PlatformFunctions.isModLoaded(c.requiredMod());
+            info.centered = c.centered();
+        }
+        if (requiredModLoaded) entries.add(info);
     }
     public static Class<?> getUnderlyingType(Field field) {
         if (field.getType() == List.class) {
@@ -496,6 +502,7 @@ public abstract class MidnightConfig {
         boolean isSlider() default false;
         int precision() default 100;
         String category() default "default";
+        String requiredMod() default "";
     }
 
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Client {}
@@ -504,6 +511,7 @@ public abstract class MidnightConfig {
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Comment {
         boolean centered() default false;
         String category() default "default";
+        String requiredMod() default "";
     }
 
     public static class HiddenAnnotationExclusionStrategy implements ExclusionStrategy {
