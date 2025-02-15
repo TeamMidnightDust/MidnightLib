@@ -146,11 +146,11 @@ public abstract class MidnightConfig {
         if (requiredModLoaded) entries.add(info);
     }
     public static Class<?> getUnderlyingType(Field field) {
-        if (field.getType() == List.class) {
-            Class<?> listType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-            try { return (Class<?>) listType.getField("TYPE").get(null);
-            } catch (NoSuchFieldException | IllegalAccessException ignored) { return listType; }
-        } else return field.getType();
+        Class<?> rawType = field.getType();
+        if (field.getType() == List.class)
+            rawType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+        try { return (Class<?>) rawType.getField("TYPE").get(null); // Tries to get primitive types from non-primitives (e.g. Boolean -> boolean)
+        } catch (NoSuchFieldException | IllegalAccessException ignored) { return rawType; }
     }
     public static Tooltip getTooltip(EntryInfo info, boolean isButton) {
         String key = info.modid + ".midnightconfig."+info.field.getName()+(!isButton ? ".label" : "" )+".tooltip";
@@ -476,8 +476,8 @@ public abstract class MidnightConfig {
         @Override
         public void applyValue() {
             if (info.dataType == int.class) info.setValue(((Number) (e.min() + value * (e.max() - e.min()))).intValue());
-            else if (info.field.getType() == double.class) info.setValue(Math.round((e.min() + value * (e.max() - e.min())) * (double) e.precision()) / (double) e.precision());
-            else if (info.field.getType() == float.class) info.setValue(Math.round((e.min() + value * (e.max() - e.min())) * (float) e.precision()) / (float) e.precision());
+            else if (info.dataType == double.class) info.setValue(Math.round((e.min() + value * (e.max() - e.min())) * (double) e.precision()) / (double) e.precision());
+            else if (info.dataType == float.class) info.setValue(Math.round((e.min() + value * (e.max() - e.min())) * (float) e.precision()) / (float) e.precision());
         }
     }
 

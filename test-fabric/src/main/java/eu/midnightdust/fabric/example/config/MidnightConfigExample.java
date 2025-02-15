@@ -22,6 +22,7 @@ public class MidnightConfigExample extends MidnightConfig {
     @Comment(category = TEXT, centered = true) public static Comment text2;      // Centered comments are the same as normal ones - just centered!
     @Comment(category = TEXT) public static Comment spacer1;                     // Comments containing the word "spacer" will just appear as a blank line
     @Entry(category = TEXT) public static boolean showInfo = true;               // Example for a boolean option
+    @Entry(category = TEXT, name="I am a (non-primitive) Boolean") public static Boolean nonPrimitive = true;           // Example for a non-primative boolean option
     @Entry(category = TEXT) public static String name = "Hello World!";          // Example for a string option, which is in a category!
     @Entry(category = TEXT, width = 7, min = 7, isColor = true, name = "I am a color!") public static String titleColor = "#ffffff"; // The isColor property adds a color chooser for a hexadecimal color
     @Entry(category = TEXT, idMode = 0) public static Identifier id = Identifier.ofVanilla("diamond");          // Example for an identifier with matching items displayed next to it!
@@ -34,6 +35,7 @@ public class MidnightConfigExample extends MidnightConfig {
     @Entry(category = NUMBERS, min=69,max=420) public static int hello = 420;   // - The entered number has to be larger than 69 and smaller than 420
     @Entry(category = SLIDERS, name = "I am an int slider.",isSlider = true, min = 0, max = 100) public static int intSlider = 35; // Int fields can also be displayed as a Slider
     @Entry(category = SLIDERS, name = "I am a float slider!", isSlider = true, min = 0f, max = 1f, precision = 1000) public static float floatSlider = 0.24f; // And so can floats! Precision defines the amount of decimal places
+    @Entry(category = SLIDERS, name = "I am a non-primitive double slider!", isSlider = true, min = 0d, max = 4d, precision = 10000) public static Double nonPrimitiveDoubleSlider = 3.76d; // Even works for non-primitive fields
     // The name field can be used to specify a custom translation string or plain text
     @Entry(category = LISTS, name = "I am a string list!") public static List<String> stringList = Lists.newArrayList("String1", "String2"); // Array String Lists are also supported
     @Entry(category = LISTS, isColor = true, name = "I am a color list!") public static List<String> colorList = Lists.newArrayList("#ac5f99", "#11aa44"); // Lists also support colors
