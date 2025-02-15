@@ -99,7 +99,7 @@ unifiedPublishing {
             modrinth {
                 token = MODRINTH_TOKEN
                 id = rootProject.modrinth_id
-                version = version
+                version = rootProject.mod_version + "+" + rootProject.minecraft_version + "-" + project.name
                 gameVersions.addAll project.minecraft_version
                 if (project.supported_versions != "") gameVersions.addAll project.supported_versions
             }
