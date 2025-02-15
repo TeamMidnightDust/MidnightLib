@@ -9,6 +9,7 @@ import net.minecraft.client.MinecraftClient; import net.minecraft.client.font.Te
 import net.minecraft.client.gui.Element; import net.minecraft.client.gui.Selectable; import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tab.GridScreenTab; import net.minecraft.client.gui.tab.Tab; import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.tooltip.Tooltip; import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenTexts;
@@ -253,9 +254,9 @@ public abstract class MidnightConfig {
             if (prevTab != null && prevTab != tabManager.getCurrentTab()) {
                 prevTab = tabManager.getCurrentTab();
                 this.list.clear(); fillList();
-                list.setScrollAmount(0);
+                list.setScrollY(0);
             }
-            scrollProgress = list.getScrollAmount();
+            scrollProgress = list.getScrollY();
             for (EntryInfo info : entries) try {info.field.set(null, info.value);} catch (IllegalAccessException ignored) {}
             updateButtons();
         }
@@ -397,7 +398,7 @@ public abstract class MidnightConfig {
                         }
                         this.list.addButton(widgets, name, info);
                     } else this.list.addButton(List.of(), name, info);
-                } list.setScrollAmount(scrollProgress);
+                } list.setScrollY(scrollProgress);
                 updateButtons();
             }
         }
@@ -425,7 +426,7 @@ public abstract class MidnightConfig {
         protected void drawHeaderAndFooterSeparators(DrawContext context) {
             if (renderHeaderSeparator) super.drawHeaderAndFooterSeparators(context);
             else { RenderSystem.enableBlend();
-                context.drawTexture(this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE, this.getX(), this.getBottom(), 0.0F, 0.0F, this.getWidth(), 2, 32, 2);
+                context.drawTexture(RenderLayer::getGuiTextured, this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE, this.getX(), this.getBottom(), 0.0F, 0.0F, this.getWidth(), 2, 32, 2);
                 RenderSystem.disableBlend(); }
         }
         public void addButton(List<ClickableWidget> buttons, Text text, EntryInfo info) { this.addEntry(new ButtonEntry(buttons, text, info)); }
