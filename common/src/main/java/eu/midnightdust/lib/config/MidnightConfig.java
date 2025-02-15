@@ -9,6 +9,7 @@ import net.minecraft.client.MinecraftClient; import net.minecraft.client.font.Te
 import net.minecraft.client.gui.Element; import net.minecraft.client.gui.Selectable; import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tab.GridScreenTab; import net.minecraft.client.gui.tab.Tab; import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.tooltip.Tooltip; import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenTexts;
@@ -133,7 +134,10 @@ public abstract class MidnightConfig {
                 }, func);
             } else if (info.dataType.isEnum()) {
                 List<?> values = Arrays.asList(field.getType().getEnumConstants());
-                Function<Object, Text> func = value -> Text.translatable(modid + ".midnightconfig." + "enum." + info.dataType.getSimpleName() + "." + info.toTemporaryValue());
+                Function<Object, Text> func = value -> {
+                    String translationKey = modid + ".midnightconfig.enum." + info.dataType.getSimpleName() + "." + info.toTemporaryValue();
+                    return I18n.hasTranslation(translationKey) ? Text.translatable(translationKey) : Text.literal(info.toTemporaryValue());
+                };
                 info.function = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
                     int index = values.indexOf(info.value) + 1;
                     info.value = values.get(index >= values.size() ? 0 : index); button.setMessage(func.apply(info.value));
@@ -145,11 +149,11 @@ public abstract class MidnightConfig {
         if (requiredModLoaded) entries.add(info);
     }
     public static Class<?> getUnderlyingType(Field field) {
-        if (field.getType() == List.class) {
-            Class<?> listType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-            try { return (Class<?>) listType.getField("TYPE").get(null);
-            } catch (NoSuchFieldException | IllegalAccessException ignored) { return listType; }
-        } else return field.getType();
+        Class<?> rawType = field.getType();
+        if (field.getType() == List.class)
+            rawType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+        try { return (Class<?>) rawType.getField("TYPE").get(null); // Tries to get primitive types from non-primitives (e.g. Boolean -> boolean)
+        } catch (NoSuchFieldException | IllegalAccessException ignored) { return rawType; }
     }
     public static Tooltip getTooltip(EntryInfo info, boolean isButton) {
         String key = info.modid + ".midnightconfig."+info.field.getName()+(!isButton ? ".label" : "" )+".tooltip";
@@ -250,9 +254,9 @@ public abstract class MidnightConfig {
             if (prevTab != null && prevTab != tabManager.getCurrentTab()) {
                 prevTab = tabManager.getCurrentTab();
                 this.list.clear(); fillList();
-                list.setScrollAmount(0);
+                list.setScrollY(0);
             }
-            scrollProgress = list.getScrollAmount();
+            scrollProgress = list.getScrollY();
             for (EntryInfo info : entries) try {info.field.set(null, info.value);} catch (IllegalAccessException ignored) {}
             updateButtons();
         }
@@ -394,7 +398,7 @@ public abstract class MidnightConfig {
                         }
                         this.list.addButton(widgets, name, info);
                     } else this.list.addButton(List.of(), name, info);
-                } list.setScrollAmount(scrollProgress);
+                } list.setScrollY(scrollProgress);
                 updateButtons();
             }
         }
@@ -422,7 +426,7 @@ public abstract class MidnightConfig {
         protected void drawHeaderAndFooterSeparators(DrawContext context) {
             if (renderHeaderSeparator) super.drawHeaderAndFooterSeparators(context);
             else { RenderSystem.enableBlend();
-                context.drawTexture(this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE, this.getX(), this.getBottom(), 0.0F, 0.0F, this.getWidth(), 2, 32, 2);
+                context.drawTexture(RenderLayer::getGuiTextured, this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE, this.getX(), this.getBottom(), 0.0F, 0.0F, this.getWidth(), 2, 32, 2);
                 RenderSystem.disableBlend(); }
         }
         public void addButton(List<ClickableWidget> buttons, Text text, EntryInfo info) { this.addEntry(new ButtonEntry(buttons, text, info)); }
@@ -475,8 +479,8 @@ public abstract class MidnightConfig {
         @Override
         public void applyValue() {
             if (info.dataType == int.class) info.setValue(((Number) (e.min() + value * (e.max() - e.min()))).intValue());
-            else if (info.field.getType() == double.class) info.setValue(Math.round((e.min() + value * (e.max() - e.min())) * (double) e.precision()) / (double) e.precision());
-            else if (info.field.getType() == float.class) info.setValue(Math.round((e.min() + value * (e.max() - e.min())) * (float) e.precision()) / (float) e.precision());
+            else if (info.dataType == double.class) info.setValue(Math.round((e.min() + value * (e.max() - e.min())) * (double) e.precision()) / (double) e.precision());
+            else if (info.dataType == float.class) info.setValue(Math.round((e.min() + value * (e.max() - e.min())) * (float) e.precision()) / (float) e.precision());
         }
     }
 

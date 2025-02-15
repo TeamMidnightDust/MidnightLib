@@ -24,7 +24,6 @@ public class MidnightLibNeoForge {
 
     public MidnightLibNeoForge() {
         if (FMLEnvironment.dist == Dist.CLIENT) MidnightLib.onInitializeClient();
-        MidnightLib.registerAutoCommand();
     }
 
     @EventBusSubscriber(modid = "midnightlib", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -36,6 +35,7 @@ public class MidnightLibNeoForge {
                     modContainer.registerExtensionPoint(IConfigScreenFactory.class, (minecraftClient, screen) -> MidnightConfig.getScreen(screen, modid));
                 }
             });
+            MidnightLib.registerAutoCommand();
         }
     }
 

@@ -35,8 +35,8 @@ configurations {
         canBeResolved = true
         canBeConsumed = false
     }
-    archivesBaseName = rootProject.archives_base_name + "-neoforge"
-    version = rootProject.mod_version + "+" + rootProject.minecraft_version
+    archivesBaseName = rootProject.archives_base_name
+    version = rootProject.mod_version + "-" + project.name + "+" + rootProject.minecraft_version
 }
 
 dependencies {
@@ -99,7 +99,7 @@ unifiedPublishing {
             modrinth {
                 token = MODRINTH_TOKEN
                 id = rootProject.modrinth_id
-                version = "$rootProject.version-$project.name"
+                version = rootProject.mod_version + "+" + rootProject.minecraft_version + "-" + project.name
                 gameVersions.addAll project.minecraft_version
                 if (project.supported_versions != "") gameVersions.addAll project.supported_versions
             }
