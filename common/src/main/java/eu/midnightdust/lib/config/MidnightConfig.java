@@ -134,7 +134,10 @@ public abstract class MidnightConfig {
                 }, func);
             } else if (info.dataType.isEnum()) {
                 List<?> values = Arrays.asList(field.getType().getEnumConstants());
-                Function<Object, Text> func = value -> Text.translatable(modid + ".midnightconfig." + "enum." + info.dataType.getSimpleName() + "." + info.toTemporaryValue());
+                Function<Object, Text> func = value -> {
+                    String translationKey = modid + ".midnightconfig.enum." + info.dataType.getSimpleName() + "." + info.toTemporaryValue();
+                    return I18n.hasTranslation(translationKey) ? Text.translatable(translationKey) : Text.literal(info.toTemporaryValue());
+                };
                 info.function = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
                     int index = values.indexOf(info.value) + 1;
                     info.value = values.get(index >= values.size() ? 0 : index); button.setMessage(func.apply(info.value));
