@@ -240,7 +240,7 @@ public abstract class MidnightConfig {
         public final Screen parent;
         public MidnightConfigListWidget list;
         public TabManager tabManager = new TabManager(a -> {}, a -> {});
-        public Map<String, Tab> tabs = new HashMap<>();
+        public Map<String, Tab> tabs = new LinkedHashMap<>();
         public Tab prevTab;
         public TabNavigationWidget tabNavigation;
         public ButtonWidget done;
