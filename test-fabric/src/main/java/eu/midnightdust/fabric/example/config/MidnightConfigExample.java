@@ -1,6 +1,7 @@
 package eu.midnightdust.fabric.example.config;
 
 import com.google.common.collect.Lists;
+import eu.midnightdust.core.config.MidnightLibConfig;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.minecraft.util.Identifier;
 
@@ -10,13 +11,28 @@ import java.util.List;
 
 /** Every option in a MidnightConfig class has to be public and static, so we can access it from other classes.
  * The config class also has to extend MidnightConfig*/
-
+@SuppressWarnings({"unused", "DefaultAnnotationParam"})
 public class MidnightConfigExample extends MidnightConfig {
     public static final String TEXT = "text";
     public static final String NUMBERS = "numbers";
     public static final String SLIDERS = "sliders";
     public static final String LISTS = "lists";
     public static final String FILES = "files";
+
+    @Entry public static boolean show_dependant = false;
+
+    @Comment
+    @Requires(
+            requirementSource = MidnightLibConfig.class,
+            requirement = "show_dependant"
+    )
+    public static boolean hidden_one;
+    @Comment
+    @Requires(
+            requirementSource = MidnightLibConfig.class,
+            requirement = "show_dependant",
+            behaviour = Behaviour.LOCK)
+    public static boolean hidden_two;
 
     @Comment(category = TEXT) public static Comment text1;                       // Comments are rendered like an option without a button and are excluded from the config file
     @Comment(category = TEXT, centered = true) public static Comment text2;      // Centered comments are the same as normal ones - just centered!

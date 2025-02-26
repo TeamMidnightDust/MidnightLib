@@ -85,6 +85,25 @@ public abstract class MidnightConfig {
         } return null;
     }
 
+    public static boolean checkRequirements(Requires req) {
+        String reqString = req.requirement();
+        Field reqField;
+        try {
+             reqField = req.requirementSource().getDeclaredField(reqString);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException("Field does not exist!", e);
+        }
+
+        reqField.setAccessible(true);
+
+        try {
+            return reqField.getBoolean(null);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Field is not accessible!", e);
+        }
+
+    }
+
     public static void init(String modid, Class<? extends MidnightConfig> config) {
         path = PlatformFunctions.getConfigDirectory().resolve(modid + ".json");
         configClass.put(modid, config);
@@ -113,9 +132,11 @@ public abstract class MidnightConfig {
         info.dataType = getUnderlyingType(field);
         Entry e = field.getAnnotation(Entry.class);
         Comment c = field.getAnnotation(Comment.class);
+        Requires req = field.getAnnotation(Requires.class);
         info.width = e != null ? e.width() : 0;
         info.field = field; info.modid = modid;
         boolean requiredModLoaded = true;
+        boolean requirementChecks = req == null || checkRequirements(req);
 
         if (e != null) {
             if (!e.requiredMod().isEmpty()) requiredModLoaded = PlatformFunctions.isModLoaded(e.requiredMod());
@@ -522,6 +543,29 @@ public abstract class MidnightConfig {
         String requiredMod() default "";
     }
 
+    /**
+     * Requires Annotation<br>
+     * - <b>{@link Requires#requirementSource()}</b>: The {@link Class} to which the {@link Requires#requirement()} field belongs.<br>
+     * - <b>{@link Requires#requirement()}</b>: The {@link Field} which will be used to define whether or not an {@link Entry} should be editable/viewable.<br>
+     * - <b>{@link Requires#behaviour()}</b>: The behaviour to take when {@link Requires#requirement()} returns false. This can be: <br>
+     *  <b>{@link Behaviour#HIDE}</b> -> The {@link Entry} will not be visible <b>(default)</b>; <br>
+     *  <b>{@link Behaviour#LOCK}</b> -> The {@link Entry} will be visible, but not editable. <br>
+     * */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface Requires {
+        Class<? extends MidnightConfig> requirementSource();
+        String requirement();
+        int behaviour() default Behaviour.HIDE;
+    }
+
+    // stub
+    public static class Behaviour {
+        public static final int HIDE = 0;
+        public static final int LOCK = 1;
+    }
+
+
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Client {}
 
     /**
@@ -542,6 +586,8 @@ public abstract class MidnightConfig {
         String category() default "default";
         String requiredMod() default "";
     }
+
+
 
     public static class HiddenAnnotationExclusionStrategy implements ExclusionStrategy {
         public boolean shouldSkipClass(Class<?> clazz) { return false; }
