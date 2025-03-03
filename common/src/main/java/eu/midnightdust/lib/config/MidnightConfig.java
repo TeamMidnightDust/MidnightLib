@@ -3,6 +3,7 @@ package eu.midnightdust.lib.config;
 import com.google.common.collect.Lists;
 import com.google.gson.ExclusionStrategy; import com.google.gson.FieldAttributes; import com.google.gson.Gson; import com.google.gson.GsonBuilder;
 import com.mojang.blaze3d.systems.RenderSystem;
+import eu.midnightdust.core.MidnightLib;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import net.fabricmc.api.EnvType; import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient; import net.minecraft.client.font.TextRenderer; import net.minecraft.client.gui.DrawContext;
@@ -44,6 +45,7 @@ public abstract class MidnightConfig {
         Field field;
         Class<?> dataType;
         int width, listIndex;
+        boolean lock = false;
         boolean centered;
         Object defaultValue, value, function;
         String modid, tempValue;   // The value visible in the config screen
@@ -86,20 +88,15 @@ public abstract class MidnightConfig {
     }
 
     public static boolean checkRequirements(Requires req) {
-        String reqString = req.requirement();
+        String reqString = req.condition();
         Field reqField;
         try {
-             reqField = req.requirementSource().getDeclaredField(reqString);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException("Field does not exist!", e);
-        }
-
-        reqField.setAccessible(true);
-
-        try {
+            reqField = req.getClass().getDeclaredField(reqString);
+            reqField.setAccessible(true);
             return reqField.getBoolean(null);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Field is not accessible!", e);
+        } catch (Exception e) {
+            MidnightLib.LOGGER.error("Caught Exception: {} - Requirement '{}' will not be considered", e, reqString);
+            return false;
         }
 
     }
@@ -108,9 +105,15 @@ public abstract class MidnightConfig {
         path = PlatformFunctions.getConfigDirectory().resolve(modid + ".json");
         configClass.put(modid, config);
 
+        // oof that's a lot of conditions
+        // de-lb at will, just separated this for readability sake during dev
         for (Field field : config.getFields()) {
             EntryInfo info = new EntryInfo();
-            if ((field.isAnnotationPresent(Entry.class) || field.isAnnotationPresent(Comment.class)) && !field.isAnnotationPresent(Server.class) && !field.isAnnotationPresent(Hidden.class) && PlatformFunctions.isClientEnv())
+            if ((field.isAnnotationPresent(Entry.class) || field.isAnnotationPresent(Comment.class))
+                    && !field.isAnnotationPresent(Server.class)
+                    && !field.isAnnotationPresent(Hidden.class)
+                    && !(field.isAnnotationPresent(Requires.class) && field.getAnnotation(Requires.class).behaviour() == Behaviour.HIDE && checkRequirements(field.getAnnotation(Requires.class))) // maybe move this to initClient? unsure how to best handle it
+                    && PlatformFunctions.isClientEnv())
                 initClient(modid, field, info);
             if (field.isAnnotationPresent(Entry.class))
                 try { info.defaultValue = field.get(null);
@@ -135,12 +138,11 @@ public abstract class MidnightConfig {
         Requires req = field.getAnnotation(Requires.class);
         info.width = e != null ? e.width() : 0;
         info.field = field; info.modid = modid;
+        info.lock = req.behaviour() == Behaviour.LOCK && !checkRequirements(req);
         boolean requiredModLoaded = true;
-        boolean requirementChecks = req == null || checkRequirements(req);
 
         if (e != null) {
             if (!e.requiredMod().isEmpty()) requiredModLoaded = PlatformFunctions.isModLoaded(e.requiredMod());
-
             if (!requiredModLoaded) return;
             if (!e.name().isEmpty()) info.name = Text.translatable(e.name());
             if (info.dataType == int.class) textField(info, Integer::parseInt, INTEGER_ONLY, (int) e.min(), (int) e.max(), true);
@@ -433,7 +435,11 @@ public abstract class MidnightConfig {
                     if (entry.buttons != null && entry.buttons.size() > 1) {
                         if (entry.buttons.getFirst() instanceof ClickableWidget widget) {
                             int idMode = entry.info.field.getAnnotation(Entry.class).idMode();
-                            if (idMode != -1) context.drawItem(idMode == 0 ? Registries.ITEM.get(Identifier.tryParse(entry.info.tempValue)).getDefaultStack() : Registries.BLOCK.get(Identifier.tryParse(entry.info.tempValue)).asItem().getDefaultStack(), widget.getX() + widget.getWidth() - 18, widget.getY() + 2);
+                            if (idMode != -1)
+                                context.drawItem(idMode == 0
+                                        ? Registries.ITEM.get(Identifier.tryParse(entry.info.tempValue)).getDefaultStack()
+                                        : Registries.BLOCK.get(Identifier.tryParse(entry.info.tempValue)).asItem().getDefaultStack(),
+                                        widget.getX() + widget.getWidth() - 18, widget.getY() + 2);
             }}}}}
     }
     @Environment(EnvType.CLIENT)
@@ -473,7 +479,7 @@ public abstract class MidnightConfig {
             }
         }
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            buttons.forEach(b -> { b.setY(y); b.render(context, mouseX, mouseY, tickDelta);});
+            buttons.forEach(b -> { b.setY(y); b.render(context, mouseX, mouseY, tickDelta); }); //TODO: define entry "active"ness here, and maybe move the show/hide behaviour here as well?
             if (title != null) {
                 title.setY(y + 9);
                 title.renderWidget(context, mouseX, mouseY, tickDelta);
@@ -545,26 +551,24 @@ public abstract class MidnightConfig {
 
     /**
      * Requires Annotation<br>
-     * - <b>{@link Requires#requirementSource()}</b>: The {@link Class} to which the {@link Requires#requirement()} field belongs.<br>
-     * - <b>{@link Requires#requirement()}</b>: The {@link Field} which will be used to define whether or not an {@link Entry} should be editable/viewable.<br>
-     * - <b>{@link Requires#behaviour()}</b>: The behaviour to take when {@link Requires#requirement()} returns false. This can be: <br>
-     *  <b>{@link Behaviour#HIDE}</b> -> The {@link Entry} will not be visible <b>(default)</b>; <br>
-     *  <b>{@link Behaviour#LOCK}</b> -> The {@link Entry} will be visible, but not editable. <br>
-     * */
+     * - <b>{@link Requires#condition()}</b>: The {@link Field} which will be used to define whether or not the annotated {@link Entry} should be editable/viewable.<br>
+     * - <b>{@link Requires#behaviour()}</b>: The behaviour to take when {@link Requires#condition()} returns false. See {@link Behaviour}.<br
+     */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     public @interface Requires {
-        Class<? extends MidnightConfig> requirementSource();
-        String requirement();
+        String condition();
         int behaviour() default Behaviour.HIDE;
     }
 
-    // stub
+    /** Defines how the configuration entry will behave when its condition is not met.<br>
+     * - <b>{@link Behaviour#HIDE}</b> -> The {@link Entry} will not be visible <b>(default)</b>; <br>
+     * - <b>{@link Behaviour#LOCK}</b> -> The {@link Entry} will be visible, but not editable. <br>
+     */
     public static class Behaviour {
         public static final int HIDE = 0;
         public static final int LOCK = 1;
     }
-
 
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Client {}
 
@@ -586,8 +590,6 @@ public abstract class MidnightConfig {
         String category() default "default";
         String requiredMod() default "";
     }
-
-
 
     public static class HiddenAnnotationExclusionStrategy implements ExclusionStrategy {
         public boolean shouldSkipClass(Class<?> clazz) { return false; }

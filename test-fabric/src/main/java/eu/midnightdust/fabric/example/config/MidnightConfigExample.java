@@ -23,14 +23,12 @@ public class MidnightConfigExample extends MidnightConfig {
 
     @Comment
     @Requires(
-            requirementSource = MidnightLibConfig.class,
-            requirement = "show_dependant"
+            condition = "show_dependant"
     )
     public static boolean hidden_one;
     @Comment
     @Requires(
-            requirementSource = MidnightLibConfig.class,
-            requirement = "show_dependant",
+            condition = "show_dependant",
             behaviour = Behaviour.LOCK)
     public static boolean hidden_two;
 
