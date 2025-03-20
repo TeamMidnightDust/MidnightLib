@@ -1,8 +1,8 @@
 package eu.midnightdust.lib.config;
 
 import com.google.common.collect.Lists;
-import com.google.gson.ExclusionStrategy; import com.google.gson.FieldAttributes; import com.google.gson.Gson; import com.google.gson.GsonBuilder;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.google.gson.*; import com.google.gson.stream.*;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import net.fabricmc.api.EnvType; import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient; import net.minecraft.client.font.TextRenderer; import net.minecraft.client.gui.DrawContext;
@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*; import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.Color;
+import java.io.IOException;
 import java.lang.annotation.ElementType; import java.lang.annotation.Retention; import java.lang.annotation.RetentionPolicy; import java.lang.annotation.Target;
 import java.lang.reflect.Field; import java.lang.reflect.Modifier; import java.lang.reflect.ParameterizedType;
 import java.nio.file.Files; import java.nio.file.Path;
@@ -76,8 +77,10 @@ public abstract class MidnightConfig {
     private static final Gson gson = new GsonBuilder()
             .excludeFieldsWithModifiers(Modifier.TRANSIENT).excludeFieldsWithModifiers(Modifier.PRIVATE)
             .addSerializationExclusionStrategy(new HiddenAnnotationExclusionStrategy())
-            .registerTypeAdapter(Identifier.class, new Identifier.Serializer())
-            .setPrettyPrinting().create();
+            .registerTypeAdapter(Identifier.class, new TypeAdapter<Identifier>() {
+                public void write(JsonWriter out, Identifier id) throws IOException { out.value(id.toString()); }
+                public Identifier read(JsonReader in) throws IOException { return Identifier.of(in.nextString()); }
+            }).setPrettyPrinting().create();
 
     @SuppressWarnings("unused") // Utility for mod authors
     public static @Nullable Object getDefaultValue(String modid, String entry) {
