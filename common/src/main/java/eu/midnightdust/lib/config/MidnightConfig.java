@@ -406,17 +406,10 @@ public abstract class MidnightConfig {
         }
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-            super.render(context,mouseX,mouseY,delta);
+            super.render(context, mouseX, mouseY, delta);
             this.list.render(context, mouseX, mouseY, delta);
             if (tabs.size() < 2) context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 10, 0xFFFFFF);
-
-            if (this.list != null) {
-                for (ButtonEntry entry : this.list.children()) {
-                    if (entry.buttons != null && entry.buttons.size() > 1) {
-                        if (entry.buttons.getFirst() instanceof ClickableWidget widget) {
-                            int idMode = entry.info.field.getAnnotation(Entry.class).idMode();
-                            if (idMode != -1) context.drawItem(idMode == 0 ? Registries.ITEM.get(Identifier.tryParse(entry.info.tempValue)).getDefaultStack() : Registries.BLOCK.get(Identifier.tryParse(entry.info.tempValue)).asItem().getDefaultStack(), widget.getX() + widget.getWidth() - 18, widget.getY() + 2);
-            }}}}}
+        }
     }
     @Environment(EnvType.CLIENT)
     public static class MidnightConfigListWidget extends ElementListWidget<ButtonEntry> {
@@ -460,6 +453,11 @@ public abstract class MidnightConfig {
 
                 boolean tooltipVisible = mouseX >= title.getX() && mouseX < title.getWidth() + title.getX() && mouseY >= title.getY() && mouseY < title.getHeight() + title.getY();
                 if (tooltipVisible && title.getTooltip() != null) context.drawOrderedTooltip(textRenderer, title.getTooltip().getLines(MinecraftClient.getInstance()), mouseX, mouseY);
+
+                if (!this.buttons.isEmpty() && this.buttons.getFirst() instanceof ClickableWidget widget) {
+                    int idMode = this.info.field.getAnnotation(Entry.class).idMode();
+                    if (idMode != -1) context.drawItem(idMode == 0 ? Registries.ITEM.get(Identifier.tryParse(this.info.tempValue)).getDefaultStack() : Registries.BLOCK.get(Identifier.tryParse(this.info.tempValue)).asItem().getDefaultStack(), widget.getX() + widget.getWidth() - 18, y + 2);
+                }
             }
         }
         public List<? extends Element> children() {return Lists.newArrayList(buttons);}
