@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 
 import static net.minecraft.client.MinecraftClient.IS_SYSTEM_MAC;
 
-/** MidnightConfig v2.6.0 by Martin "Motschen" Prokoph
+/** MidnightConfig by Martin "Motschen" Prokoph
  *  Single class config library - feel free to copy!
  *  Based on <a href="https://github.com/Minenash/TinyConfig">...</a>
  *  Credits to Minenash */
@@ -42,17 +42,26 @@ public abstract class MidnightConfig {
     private static final List<EntryInfo> entries = new ArrayList<>();
 
     public static class EntryInfo {
-        Field field;
+        public Entry entry;
+        public Comment comment;
+        final Field field;
         Class<?> dataType;
-        int width, listIndex;
-        boolean centered;
+        int listIndex;
         Object defaultValue, value, function;
-        String modid, tempValue;   // The value visible in the config screen
+        String modid, fieldName, tempValue = "";   // The value visible in the config screen
         boolean inLimits = true;
         Text name, error;
         ClickableWidget actionButton; // color picker button / explorer button
         Tab tab;
 
+        public EntryInfo(Field field) {
+            this.field = field;
+            if (field != null) {
+                this.fieldName = field.getName();
+                this.entry = field.getAnnotation(Entry.class);
+                this.comment = field.getAnnotation(Comment.class);
+            }
+        }
         public void setValue(Object value) {
             if (this.field.getType() != List.class) { this.value = value;
                 this.tempValue = value.toString();
@@ -62,6 +71,9 @@ public abstract class MidnightConfig {
         public String toTemporaryValue() {
             if (this.field.getType() != List.class) return this.value.toString();
             else try { return ((List<?>) this.value).get(this.listIndex).toString(); } catch (Exception ignored) {return "";}
+        }
+        public void updateFieldValue() {
+            try { this.field.set(null, this.value); } catch (IllegalAccessException ignored) {}
         }
         public <T> void writeList(int index, T value) {
             var list = (List<T>) this.value;
@@ -75,7 +87,7 @@ public abstract class MidnightConfig {
 
     private static final Gson gson = new GsonBuilder()
             .excludeFieldsWithModifiers(Modifier.TRANSIENT).excludeFieldsWithModifiers(Modifier.PRIVATE)
-            .addSerializationExclusionStrategy(new HiddenAnnotationExclusionStrategy())
+            .addSerializationExclusionStrategy(new NonEntryExclusionStrategy())
             .registerTypeAdapter(Identifier.class, new TypeAdapter<Identifier>() {
                 public void write(JsonWriter out, Identifier id) throws IOException { out.value(id.toString()); }
                 public Identifier read(JsonReader in) throws IOException { return Identifier.of(in.nextString()); }
@@ -87,37 +99,35 @@ public abstract class MidnightConfig {
             if (modid.equals(e.modid) && entry.equals(e.field.getName())) return e.defaultValue;
         } return null;
     }
+    public static void loadValuesFromJson(String modid) {
+        try { gson.fromJson(Files.newBufferedReader(path), configClass.get(modid)); }
+        catch (Exception e) { write(modid); }
 
+        for (EntryInfo info : entries) if (info.field != null && info.entry != null) {
+            try { info.value = info.field.get(null); info.tempValue = info.toTemporaryValue();
+            } catch (IllegalAccessException ignored) {}
+        }
+    }
     public static void init(String modid, Class<? extends MidnightConfig> config) {
         path = PlatformFunctions.getConfigDirectory().resolve(modid + ".json");
         configClass.put(modid, config);
 
         for (Field field : config.getFields()) {
-            EntryInfo info = new EntryInfo();
+            EntryInfo info = new EntryInfo(field);
             if ((field.isAnnotationPresent(Entry.class) || field.isAnnotationPresent(Comment.class)) && !field.isAnnotationPresent(Server.class) && !field.isAnnotationPresent(Hidden.class) && PlatformFunctions.isClientEnv())
                 initClient(modid, field, info);
             if (field.isAnnotationPresent(Entry.class))
                 try { info.defaultValue = field.get(null);
                 } catch (IllegalAccessException ignored) {}
         }
-        try { gson.fromJson(Files.newBufferedReader(path), config); }
-        catch (Exception e) { write(modid); }
-
-        for (EntryInfo info : entries) {
-            if (info.field.isAnnotationPresent(Entry.class)) try {
-                info.value = info.field.get(null);
-                info.tempValue = info.toTemporaryValue();
-            } catch (IllegalAccessException ignored) {}
-        }
+        loadValuesFromJson(modid);
     }
     @SuppressWarnings("ConstantValue") //pertains to requiredModLoaded
     @Environment(EnvType.CLIENT)
     private static void initClient(String modid, Field field, EntryInfo info) {
         info.dataType = getUnderlyingType(field);
-        Entry e = field.getAnnotation(Entry.class);
-        Comment c = field.getAnnotation(Comment.class);
-        info.width = e != null ? e.width() : 0;
-        info.field = field; info.modid = modid;
+        Entry e = info.entry; Comment c = info.comment;
+        info.modid = modid;
         boolean requiredModLoaded = true;
 
         if (e != null) {
@@ -146,7 +156,6 @@ public abstract class MidnightConfig {
                 }, func);
         }} else if (c != null) {
             if (!c.requiredMod().isEmpty()) requiredModLoaded = PlatformFunctions.isModLoaded(c.requiredMod());
-            info.centered = c.centered();
         }
         if (requiredModLoaded) entries.add(info);
     }
@@ -158,11 +167,9 @@ public abstract class MidnightConfig {
         } catch (NoSuchFieldException | IllegalAccessException ignored) { return rawType; }
     }
     public static Tooltip getTooltip(EntryInfo info, boolean isButton) {
-        String key = info.modid + ".midnightconfig."+info.field.getName()+(!isButton ? ".label" : "" )+".tooltip";
+        String key = info.modid + ".midnightconfig."+info.fieldName+(!isButton ? ".label" : "" )+".tooltip";
         return Tooltip.of(isButton && info.error != null ? info.error : I18n.hasTranslation(key) ? Text.translatable(key) : Text.empty());
     }
-
-    // TODO: Maybe move this into the screen class itself to free up some RAM?
 
     private static void textField(EntryInfo info, Function<String,Number> f, Pattern pattern, double min, double max, boolean cast) {
         boolean isNumber = pattern != null;
@@ -190,7 +197,7 @@ public abstract class MidnightConfig {
                 else info.setValue(isNumber ? value : s);
             }
 
-            if (info.field.getAnnotation(Entry.class).isColor()) {
+            if (info.entry.isColor()) {
                 if (!s.contains("#")) s = '#' + s;
                 if (!HEXADECIMAL_ONLY.matcher(s).matches()) return false;
                 try { info.actionButton.setMessage(Text.literal("⬛").setStyle(Style.EMPTY.withColor(Color.decode(info.tempValue).getRGB())));
@@ -219,20 +226,17 @@ public abstract class MidnightConfig {
             super(Text.translatable(modid + ".midnightconfig." + "title"));
             this.parent = parent; this.modid = modid;
             this.translationPrefix = modid + ".midnightconfig.";
-            loadValues();
+            loadValuesFromJson(modid);
 
-            for (EntryInfo e : entries) {
-                if (e.modid.equals(modid)) {
-                    String tabId = e.field.isAnnotationPresent(Entry.class) ? e.field.getAnnotation(Entry.class).category() : e.field.getAnnotation(Comment.class).category();
-                    String name = translationPrefix + "category." + tabId;
-                    if (!I18n.hasTranslation(name) && tabId.equals("default"))
-                        name = translationPrefix + "title";
-                    if (!tabs.containsKey(name)) {
-                        Tab tab = new GridScreenTab(Text.translatable(name));
-                        e.tab = tab;
-                        tabs.put(name, tab);
-                    } else e.tab = tabs.get(name);
-                }
+            for (EntryInfo e : entries) if (e.modid.equals(modid)) {
+                String tabId = e.entry != null ? e.entry.category() : e.comment.category();
+                String name = translationPrefix + "category." + tabId;
+                if (!I18n.hasTranslation(name) && tabId.equals("default"))
+                    name = translationPrefix + "title";
+                if (!tabs.containsKey(name)) {
+                    Tab tab = new GridScreenTab(Text.translatable(name));
+                    e.tab = tab; tabs.put(name, tab);
+                } else e.tab = tabs.get(name);
             }
             tabNavigation = TabNavigationWidget.builder(tabManager, this.width).tabs(tabs.values().toArray(new Tab[0])).build();
             tabNavigation.selectTab(0, false);
@@ -259,7 +263,7 @@ public abstract class MidnightConfig {
                 list.setScrollY(0);
             }
             scrollProgress = list.getScrollY();
-            for (EntryInfo info : entries) try {info.field.set(null, info.value);} catch (IllegalAccessException ignored) {}
+            for (EntryInfo info : entries) info.updateFieldValue();
             updateButtons();
         }
         public void updateButtons() {
@@ -271,16 +275,6 @@ public abstract class MidnightConfig {
                         if (entry.buttons.get(1) instanceof ButtonWidget button)
                             button.active = !Objects.equals(entry.info.value.toString(), entry.info.defaultValue.toString());
         }}}}
-        public void loadValues() {
-            try { gson.fromJson(Files.newBufferedReader(path), configClass.get(modid)); }
-            catch (Exception e) { write(modid); }
-
-            for (EntryInfo info : entries) {
-                if (info.field.isAnnotationPresent(Entry.class))
-                    try { info.value = info.field.get(null); info.tempValue = info.toTemporaryValue();
-                    } catch (IllegalAccessException ignored) {}
-            }
-        }
         @Override
         public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
             if (this.tabNavigation.trySwitchTabsWithKey(keyCode)) return true;
@@ -288,7 +282,7 @@ public abstract class MidnightConfig {
         }
         @Override
         public void close() {
-            loadValues(); cleanup();
+            loadValuesFromJson(modid); cleanup();
             Objects.requireNonNull(client).setScreen(parent);
         }
         private void cleanup() {
@@ -304,7 +298,7 @@ public abstract class MidnightConfig {
 
             this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, button -> this.close()).dimensions(this.width / 2 - 154, this.height - 26, 150, 20).build());
             done = this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
-                for (EntryInfo info : entries) if (info.modid.equals(modid)) try { info.field.set(null, info.value); } catch (IllegalAccessException ignored) {}
+                for (EntryInfo info : entries) if (info.modid.equals(modid)) info.updateFieldValue();
                 write(modid); cleanup();
                 Objects.requireNonNull(client).setScreen(parent);
             }).dimensions(this.width / 2 + 4, this.height - 26, 150, 20).build());
@@ -316,7 +310,7 @@ public abstract class MidnightConfig {
         public void fillList() {
             for (EntryInfo info : entries) {
                 if (info.modid.equals(modid) && (info.tab == null || info.tab == tabManager.getCurrentTab())) {
-                    Text name = Objects.requireNonNullElseGet(info.name, () -> Text.translatable(translationPrefix + info.field.getName()));
+                    Text name = Objects.requireNonNullElseGet(info.name, () -> Text.translatable(translationPrefix + info.fieldName));
                     TextIconButtonWidget resetButton = TextIconButtonWidget.builder(Text.translatable("controls.reset"), (button -> {
                         info.value = info.defaultValue; info.listIndex = 0;
                         info.tempValue = info.toTemporaryValue();
@@ -326,12 +320,12 @@ public abstract class MidnightConfig {
 
                     if (info.function != null) {
                         ClickableWidget widget;
-                        Entry e = info.field.getAnnotation(Entry.class);
+                        Entry e = info.entry;
 
                         if (info.function instanceof Map.Entry) { // Enums & booleans
                             var values = (Map.Entry<ButtonWidget.PressAction, Function<Object, Text>>) info.function;
                             if (info.dataType.isEnum())
-                                values.setValue(value -> Text.translatable(translationPrefix + "enum." + info.field.getType().getSimpleName() + "." + info.value.toString()));
+                                values.setValue(value -> Text.translatable(translationPrefix + "enum." + info.dataType.getSimpleName() + "." + info.value.toString()));
                             widget = ButtonWidget.builder(values.getValue().apply(info.value), values.getKey()).dimensions(width - 185, 0, 150, 20).tooltip(getTooltip(info, true)).build();
                         }
                         else if (e.isSlider())
@@ -339,7 +333,7 @@ public abstract class MidnightConfig {
                         else widget = new TextFieldWidget(textRenderer, width - 185, 0, 150, 20, Text.empty());
 
                         if (widget instanceof TextFieldWidget textField) {
-                            textField.setMaxLength(info.width); textField.setText(info.tempValue);
+                            textField.setMaxLength(e.width()); textField.setText(info.tempValue);
                             Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.function).apply(textField, done);
                             textField.setTextPredicate(processor);
                         }
@@ -375,10 +369,10 @@ public abstract class MidnightConfig {
                                     button -> new Thread(() -> {
                                         JFileChooser fileChooser = new JFileChooser(info.tempValue);
                                         fileChooser.setFileSelectionMode(e.selectionMode()); fileChooser.setDialogType(e.fileChooserType());
-                                        fileChooser.setDialogTitle(Text.translatable(translationPrefix + info.field.getName() + ".fileChooser").getString());
+                                        fileChooser.setDialogTitle(Text.translatable(translationPrefix + info.fieldName + ".fileChooser").getString());
                                         if ((e.selectionMode() == JFileChooser.FILES_ONLY || e.selectionMode() == JFileChooser.FILES_AND_DIRECTORIES) && Arrays.stream(e.fileExtensions()).noneMatch("*"::equals))
                                             fileChooser.setFileFilter(new FileNameExtensionFilter(
-                                                    Text.translatable(translationPrefix + info.field.getName() + ".fileFilter").getString(), e.fileExtensions()));
+                                                    Text.translatable(translationPrefix + info.fieldName + ".fileFilter").getString(), e.fileExtensions()));
                                         if (fileChooser.showDialog(null, null) == JFileChooser.APPROVE_OPTION) {
                                             info.setValue(fileChooser.getSelectedFile().getAbsolutePath());
                                             list.clear(); fillList();
@@ -436,7 +430,7 @@ public abstract class MidnightConfig {
 
         public ButtonEntry(List<ClickableWidget> buttons, Text text, EntryInfo info) {
             this.buttons = buttons; this.text = text; this.info = info;
-            if (info != null) this.centered = info.centered;
+            if (info != null && info.comment != null) this.centered = info.comment.centered();
             int scaledWidth = MinecraftClient.getInstance().getWindow().getScaledWidth();
 
             if (text != null && (!text.getString().contains("spacer") || !buttons.isEmpty())) {
@@ -454,8 +448,8 @@ public abstract class MidnightConfig {
                 boolean tooltipVisible = mouseX >= title.getX() && mouseX < title.getWidth() + title.getX() && mouseY >= title.getY() && mouseY < title.getHeight() + title.getY();
                 if (tooltipVisible && title.getTooltip() != null) context.drawOrderedTooltip(textRenderer, title.getTooltip().getLines(MinecraftClient.getInstance()), mouseX, mouseY);
 
-                if (!this.buttons.isEmpty() && this.buttons.getFirst() instanceof ClickableWidget widget) {
-                    int idMode = this.info.field.getAnnotation(Entry.class).idMode();
+                if (info.entry != null && !this.buttons.isEmpty() && this.buttons.getFirst() instanceof ClickableWidget widget) {
+                    int idMode = this.info.entry.idMode();
                     if (idMode != -1) context.drawItem(idMode == 0 ? Registries.ITEM.get(Identifier.tryParse(this.info.tempValue)).getDefaultStack() : Registries.BLOCK.get(Identifier.tryParse(this.info.tempValue)).asItem().getDefaultStack(), widget.getX() + widget.getWidth() - 18, y + 2);
                 }
             }
@@ -467,7 +461,7 @@ public abstract class MidnightConfig {
         private final EntryInfo info; private final Entry e;
         public MidnightSliderWidget(int x, int y, int width, int height, Text text, double value, EntryInfo info) {
             super(x, y, width, height, text, value);
-            this.e = info.field.getAnnotation(Entry.class);
+            this.e = info.entry;
             this.info = info;
         }
 
@@ -480,6 +474,10 @@ public abstract class MidnightConfig {
             else if (info.dataType == double.class) info.setValue(Math.round((e.min() + value * (e.max() - e.min())) * (double) e.precision()) / (double) e.precision());
             else if (info.dataType == float.class) info.setValue(Math.round((e.min() + value * (e.max() - e.min())) * (float) e.precision()) / (float) e.precision());
         }
+    }
+    public static class NonEntryExclusionStrategy implements ExclusionStrategy {
+        public boolean shouldSkipClass(Class<?> clazz) { return false; }
+        public boolean shouldSkipField(FieldAttributes fieldAttributes) { return fieldAttributes.getAnnotation(Entry.class) == null; }
     }
 
     /**
@@ -524,8 +522,7 @@ public abstract class MidnightConfig {
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Client {}
 
     /**
-     * Hides the entry in config screens, but still makes it
-     * accessible through the command {@code /midnightconfig MOD_ID ENTRY} and directly editing the config file.
+     * Hides the entry in config screens, but still makes it accessible through the command {@code /midnightconfig MOD_ID ENTRY} and directly editing the config file.
      */
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Server {}
 
@@ -540,10 +537,5 @@ public abstract class MidnightConfig {
         boolean centered() default false;
         String category() default "default";
         String requiredMod() default "";
-    }
-
-    public static class HiddenAnnotationExclusionStrategy implements ExclusionStrategy {
-        public boolean shouldSkipClass(Class<?> clazz) { return false; }
-        public boolean shouldSkipField(FieldAttributes fieldAttributes) { return fieldAttributes.getAnnotation(Entry.class) == null; }
     }
 }
