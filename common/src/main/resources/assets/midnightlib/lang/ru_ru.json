@@ -5,11 +5,7 @@
   "midnightlib.midnightconfig.enum.ConfigButton.TRUE": "§aДа",
   "midnightlib.midnightconfig.enum.ConfigButton.FALSE": "§cНет",
   "midnightlib.midnightconfig.enum.ConfigButton.MODMENU": "§bModMenu",
-  "midnightlib.midnightconfig.background_texture": "Текстура фона экрана настройки",
-  "midnightlib.modrinth": "Modrinth",
-  "midnightlib.curseforge": "CurseForge",
   "midnightlib.wiki": "Вики",
-  "modmenu.descriptionTranslation.midnightlib": "Общая библиотека для простой настройки.\nПредоставляет API настройки, автоматическую интеграцию с другими модами и распространённые утилиты.",
   "modmenu.summaryTranslation.midnightlib": "Общая библиотека для простой настройки.",
   "midnightconfig.colorChooser.title": "Выберите цвет"
 }

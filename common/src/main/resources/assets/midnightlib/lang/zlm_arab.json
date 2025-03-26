@@ -4,10 +4,6 @@
 	"midnightlib.midnightconfig.config_screen_list": "داياکن سناراي سکرين کونفيݢوراسي",
 	"midnightlib.midnightconfig.enum.ConfigButton.TRUE": "§aيا",
 	"midnightlib.midnightconfig.enum.ConfigButton.FALSE": "§cتيدق",
-	"midnightlib.midnightconfig.enum.ConfigButton.MODMENU": "§bModMenu",
-	"midnightlib.modrinth": "Modrinth",
-	"midnightlib.curseforge": "CurseForge",
 	"midnightlib.wiki": "ويکي",
-	"modmenu.descriptionTranslation.midnightlib": "ڤوستاک بياسا اونتوق کونفيݢوراسي موده.\nمڽدياکن API کونفيݢوراسي⹁ اينتݢراسي اٴوتوماتيک دڠن مود لاٴين دان اوتيليتي بياسا.",
 	"modmenu.summaryTranslation.midnightlib": "ڤوستاک بياسا اونتوق کونفيݢوراسي موده."
 }

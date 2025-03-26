@@ -8,8 +8,6 @@
 	"midnightlib.modrinth":"Modrinth",
 	"midnightlib.curseforge":"CurseForge",
 	"midnightlib.wiki":"Wiki",
-	"modmenu.descriptionTranslation.midnightlib": "Common Library for easy configuration.\nProvides a config api, automatic integration with other mods and common utils.",
 	"modmenu.summaryTranslation.midnightlib": "Common Library for easy configuration.",
-
 	"midnightconfig.colorChooser.title": "Choose a color"
 }

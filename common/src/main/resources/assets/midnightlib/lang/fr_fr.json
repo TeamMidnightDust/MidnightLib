@@ -4,6 +4,5 @@
 	"midnightlib.midnightconfig.config_screen_list":"Activer la liste de l'écran de configuration",
 	"midnightlib.midnightconfig.enum.ConfigButton.TRUE":"§aOui",
 	"midnightlib.midnightconfig.enum.ConfigButton.FALSE":"§cNon",
-	"modmenu.descriptionTranslation.midnightlib": "Bibliothèque commune pour les mods de la Team MidnightDust.\nFournit une API de configuration, une intégration automatique avec d'autres mods et des utilitaires courants.",
 	"modmenu.summaryTranslation.midnightlib": "Bibliothèque commune pour les mods de la Team MidnightDust."
 }

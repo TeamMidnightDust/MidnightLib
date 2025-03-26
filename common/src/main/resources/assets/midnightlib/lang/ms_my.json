@@ -4,10 +4,5 @@
 	"midnightlib.midnightconfig.config_screen_list": "Dayakan Senarai Skrin Konfigurasi",
 	"midnightlib.midnightconfig.enum.ConfigButton.TRUE": "§aYa",
 	"midnightlib.midnightconfig.enum.ConfigButton.FALSE": "§cTidak",
-	"midnightlib.midnightconfig.enum.ConfigButton.MODMENU": "§bModMenu",
-	"midnightlib.modrinth": "Modrinth",
-	"midnightlib.curseforge": "CurseForge",
-	"midnightlib.wiki": "Wiki",
-	"modmenu.descriptionTranslation.midnightlib": "Pustaka Biasa untuk konfigurasi mudah.\nMenyediakan API konfigurasi, integrasi automatik dengan mod lain dan utiliti biasa.",
 	"modmenu.summaryTranslation.midnightlib": "Pustaka Biasa untuk konfigurasi mudah."
 }

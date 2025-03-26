@@ -10,13 +10,8 @@
         "TeamMidnightDust"
     ],
     "contributors": [
-        {
-            "name": "Jaffe2718",
-            "contact": {
-                "email": "qqyttwqeei@163.com",
-                "homepage": "https://space.bilibili.com/1671742926"
-            }
-        }
+        "maloryware",
+        "Jaffe2718"
     ],
     "contact": {
         "homepage": "https://www.midnightdust.eu/",
@@ -51,11 +46,9 @@
     "custom": {
         "modmenu": {
             "links": {
-                "modmenu.discord": "https://discord.midnightdust.eu/",
-                "modmenu.website": "https://www.midnightdust.eu/",
-                "midnightlib.curseforge": "https://www.curseforge.com/minecraft/mc-mods/midnightlib",
-                "midnightlib.modrinth": "https://modrinth.com/mod/midnightlib",
-                "midnightlib.wiki": "https://github.com/TeamMidnightDust/MidnightLib/wiki"
+                "modmenu.discord": "http://discord.midnightdust.eu/",
+                "modmenu.website": "https://midnightdust.eu/midnightlib",
+                "midnightlib.wiki": "https://midnightdust.eu/wiki/midnightlib"
             },
             "badges": [ "library" ]
         }

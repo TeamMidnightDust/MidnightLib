@@ -5,11 +5,6 @@
 	"midnightlib.midnightconfig.enum.ConfigButton.TRUE":"§a是",
 	"midnightlib.midnightconfig.enum.ConfigButton.FALSE":"§c否",
 	"midnightlib.midnightconfig.enum.ConfigButton.MODMENU":"§b模组菜单",
-	"midnightlib.modrinth":"Modrinth",
-	"midnightlib.curseforge":"CurseForge",
-	"midnightlib.wiki":"Wiki",
-	"modmenu.descriptionTranslation.midnightlib": "本模组是一个便于模组配置的通用库模组。\n提供了一个配置接口，能够自动与其他模组兼容，还提供了一些通用功能。",
 	"modmenu.summaryTranslation.midnightlib": "一个便于模组配置的通用库模组",
-
 	"midnightconfig.colorChooser.title": "选择一种颜色"
 }
