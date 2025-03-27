@@ -40,27 +40,34 @@ public abstract class MidnightConfig {
     private static final Pattern HEXADECIMAL_ONLY = Pattern.compile("(-?[#0-9a-fA-F]*)");
 
     private static final List<EntryInfo> entries = new ArrayList<>();
+    private static boolean reloadScreen = false;
 
     public static class EntryInfo {
         public Entry entry;
         public Comment comment;
-        final Field field;
-        Class<?> dataType;
+        public Condition condition;
+        public final Field field;
+        public final Class<?> dataType;
+        public final String modid, fieldName;
         int listIndex;
         Object defaultValue, value, function;
-        String modid, fieldName, tempValue = "";   // The value visible in the config screen
+        String tempValue;   // The value visible in the config screen
         boolean inLimits = true;
         Text name, error;
         ClickableWidget actionButton; // color picker button / explorer button
         Tab tab;
+        boolean conditionsMet = true;
 
-        public EntryInfo(Field field) {
-            this.field = field;
+        public EntryInfo(Field field, String modid) {
+            this.field = field; this.modid = modid;
             if (field != null) {
-                this.fieldName = field.getName();
-                this.entry = field.getAnnotation(Entry.class);
-                this.comment = field.getAnnotation(Comment.class);
+                this.fieldName = field.getName(); this.dataType = getUnderlyingType(field);
+                this.entry = field.getAnnotation(Entry.class); this.comment = field.getAnnotation(Comment.class); this.condition = field.getAnnotation(Condition.class);
+            } else {
+                this.fieldName = ""; this.dataType = null;
             }
+            if (entry != null && !entry.name().isEmpty()) this.name = Text.translatable(entry.name());
+            else if (comment != null && !comment.name().isEmpty()) this.name = Text.translatable(comment.name());
         }
         public void setValue(Object value) {
             if (this.field.getType() != List.class) { this.value = value;
@@ -73,7 +80,19 @@ public abstract class MidnightConfig {
             else try { return ((List<?>) this.value).get(this.listIndex).toString(); } catch (Exception ignored) {return "";}
         }
         public void updateFieldValue() {
-            try { this.field.set(null, this.value); } catch (IllegalAccessException ignored) {}
+            try { if (this.field.get(null) != value) updateConditions(tempValue);
+                this.field.set(null, this.value);
+            } catch (IllegalAccessException ignored) {}
+        }
+        @SuppressWarnings("ConstantValue") //pertains to requiredModLoaded
+        public void updateConditions(String newTempValue) {
+            for (EntryInfo info : entries) {
+                boolean prevConditionState = info.conditionsMet;
+                if (info.condition != null && ((info.condition.requiredOption().contains(":") ? "" : info.modid + ":") + info.condition.requiredOption()).equals(this.modid + ":" + this.fieldName))
+                    info.conditionsMet = Objects.equals(info.condition.requiredValue(), newTempValue);
+                if (info.condition != null && !info.condition.requiredModId().isEmpty() && !PlatformFunctions.isModLoaded(info.condition.requiredModId())) info.conditionsMet = false;
+                if (prevConditionState != info.conditionsMet) reloadScreen = true;
+            }
         }
         public <T> void writeList(int index, T value) {
             var list = (List<T>) this.value;
@@ -105,6 +124,7 @@ public abstract class MidnightConfig {
 
         for (EntryInfo info : entries) if (info.field != null && info.entry != null) {
             try { info.value = info.field.get(null); info.tempValue = info.toTemporaryValue();
+                info.updateConditions(info.tempValue);
             } catch (IllegalAccessException ignored) {}
         }
     }
@@ -113,7 +133,7 @@ public abstract class MidnightConfig {
         configClass.put(modid, config);
 
         for (Field field : config.getFields()) {
-            EntryInfo info = new EntryInfo(field);
+            EntryInfo info = new EntryInfo(field, modid);
             if ((field.isAnnotationPresent(Entry.class) || field.isAnnotationPresent(Comment.class)) && !field.isAnnotationPresent(Server.class) && !field.isAnnotationPresent(Hidden.class) && PlatformFunctions.isClientEnv())
                 initClient(modid, field, info);
             if (field.isAnnotationPresent(Entry.class))
@@ -122,19 +142,10 @@ public abstract class MidnightConfig {
         }
         loadValuesFromJson(modid);
     }
-    @SuppressWarnings("ConstantValue") //pertains to requiredModLoaded
     @Environment(EnvType.CLIENT)
     private static void initClient(String modid, Field field, EntryInfo info) {
-        info.dataType = getUnderlyingType(field);
-        Entry e = info.entry; Comment c = info.comment;
-        info.modid = modid;
-        boolean requiredModLoaded = true;
-
+        Entry e = info.entry;
         if (e != null) {
-            if (!e.requiredMod().isEmpty()) requiredModLoaded = PlatformFunctions.isModLoaded(e.requiredMod());
-
-            if (!requiredModLoaded) return;
-            if (!e.name().isEmpty()) info.name = Text.translatable(e.name());
             if (info.dataType == int.class) textField(info, Integer::parseInt, INTEGER_ONLY, (int) e.min(), (int) e.max(), true);
             else if (info.dataType == float.class) textField(info, Float::parseFloat, DECIMAL_ONLY, (float) e.min(), (float) e.max(), false);
             else if (info.dataType == double.class) textField(info, Double::parseDouble, DECIMAL_ONLY, e.min(), e.max(), false);
@@ -154,10 +165,9 @@ public abstract class MidnightConfig {
                     int index = values.indexOf(info.value) + 1;
                     info.value = values.get(index >= values.size() ? 0 : index); button.setMessage(func.apply(info.value));
                 }, func);
-        }} else if (c != null) {
-            if (!c.requiredMod().isEmpty()) requiredModLoaded = PlatformFunctions.isModLoaded(c.requiredMod());
+            }
         }
-        if (requiredModLoaded) entries.add(info);
+        entries.add(info);
     }
     public static Class<?> getUnderlyingType(Field field) {
         Class<?> rawType = field.getType();
@@ -259,12 +269,12 @@ public abstract class MidnightConfig {
             super.tick();
             if (prevTab != null && prevTab != tabManager.getCurrentTab()) {
                 prevTab = tabManager.getCurrentTab();
-                this.list.clear(); fillList();
-                list.setScrollY(0);
+                updateList(); list.setScrollY(0);
             }
             scrollProgress = list.getScrollY();
             for (EntryInfo info : entries) info.updateFieldValue();
             updateButtons();
+            if (reloadScreen) { updateList(); reloadScreen = false; }
         }
         public void updateButtons() {
             if (this.list != null) {
@@ -307,14 +317,18 @@ public abstract class MidnightConfig {
             this.addSelectableChild(this.list); fillList();
             if (tabs.size() > 1) list.renderHeaderSeparator = false;
         }
+        public void updateList() {
+            this.list.clear(); fillList();
+        }
         public void fillList() {
             for (EntryInfo info : entries) {
+                if (!info.conditionsMet && info.condition != null && !info.condition.visibleButLocked()) continue;
                 if (info.modid.equals(modid) && (info.tab == null || info.tab == tabManager.getCurrentTab())) {
                     Text name = Objects.requireNonNullElseGet(info.name, () -> Text.translatable(translationPrefix + info.fieldName));
                     TextIconButtonWidget resetButton = TextIconButtonWidget.builder(Text.translatable("controls.reset"), (button -> {
                         info.value = info.defaultValue; info.listIndex = 0;
                         info.tempValue = info.toTemporaryValue();
-                        list.clear(); fillList();
+                        updateList();
                     }), true).texture(Identifier.of("midnightlib","icon/reset"), 12, 12).dimension(20, 20).build();
                     resetButton.setPosition(width - 205 + 150 + 25, 0);
 
@@ -348,7 +362,7 @@ public abstract class MidnightConfig {
                                 if (info.listIndex > values.size()) info.listIndex = 0;
                                 info.tempValue = info.toTemporaryValue();
                                 if (info.listIndex == values.size()) info.tempValue = "";
-                                list.clear(); fillList();
+                                updateList();
                             })).dimensions(width - 185, 0, 20, 20).build();
                         }
                         if (e.isColor()) {
@@ -357,7 +371,7 @@ public abstract class MidnightConfig {
                                         Color newColor = JColorChooser.showDialog(null, Text.translatable("midnightconfig.colorChooser.title").getString(), Color.decode(!Objects.equals(info.tempValue, "") ? info.tempValue : "#FFFFFF"));
                                         if (newColor != null) {
                                             info.setValue("#" + Integer.toHexString(newColor.getRGB()).substring(2));
-                                            list.clear(); fillList();
+                                            updateList();
                                         }
                                     }).start()
                             ).dimensions(width - 185, 0, 20, 20).build();
@@ -375,13 +389,14 @@ public abstract class MidnightConfig {
                                                     Text.translatable(translationPrefix + info.fieldName + ".fileFilter").getString(), e.fileExtensions()));
                                         if (fileChooser.showDialog(null, null) == JFileChooser.APPROVE_OPTION) {
                                             info.setValue(fileChooser.getSelectedFile().getAbsolutePath());
-                                            list.clear(); fillList();
+                                            updateList();
                                         }
                                     }).start(), true
                             ).texture(Identifier.of("midnightlib", "icon/explorer"), 12, 12).dimension(20, 20).build();
                             explorerButton.setPosition(width - 185, 0);
                             info.actionButton = explorerButton;
                         }
+                        if (!info.conditionsMet) widget.active = false;
                         List<ClickableWidget> widgets = Lists.newArrayList(widget, resetButton);
                         if (info.actionButton != null) {
                             if (IS_SYSTEM_MAC) info.actionButton.active = false;
@@ -516,7 +531,7 @@ public abstract class MidnightConfig {
         boolean isSlider() default false;
         int precision() default 100;
         String category() default "default";
-        String requiredMod() default "";
+        @Deprecated String requiredMod() default "";
     }
 
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Client {}
@@ -536,6 +551,25 @@ public abstract class MidnightConfig {
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Comment {
         boolean centered() default false;
         String category() default "default";
-        String requiredMod() default "";
+        String name() default "";
+        @Deprecated String requiredMod() default "";
+    }
+    /**
+     * Condition Annotation<br>
+     * - <b>{@link Condition#requiredModId()}</b>: The id of a mod that is required to be loaded.<br>
+     * - <b>{@link Condition#requiredOption()}</b>: The {@link Field} which will be used to check the condition. Can also access options of other MidnightLib mods ("modid:optionName").<br>
+     * - <b>{@link Condition#requiredValue()}</b>: The value that {@link Condition#requiredOption()} should be set to for the condition to be met.<br>
+     * - <b>{@link Condition#visibleButLocked()}</b>: The behaviour to take when {@link Condition#requiredModId} is not loaded
+     *   or {@link Condition#requiredOption()} returns a value that is not {@link Condition#requiredValue()}.<br>
+     *   <code>true</code> – Option is visible, but not editable<br>
+     *   <code>false</code> – Option is completely hidden
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface Condition {
+        String requiredModId() default "";
+        String requiredOption() default "";
+        String requiredValue() default "true";
+        boolean visibleButLocked() default false;
     }
 }

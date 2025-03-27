@@ -17,6 +17,7 @@ public class MidnightConfigExample extends MidnightConfig {
     public static final String SLIDERS = "sliders";
     public static final String LISTS = "lists";
     public static final String FILES = "files";
+    public static final String CONDITIONS = "conditions";
 
     @Comment(category = TEXT) public static Comment text1;                       // Comments are rendered like an option without a button and are excluded from the config file
     @Comment(category = TEXT, centered = true) public static Comment text2;      // Centered comments are the same as normal ones - just centered!
@@ -68,6 +69,33 @@ public class MidnightConfigExample extends MidnightConfig {
             fileChooserType = JFileChooser.OPEN_DIALOG,
             name = "I am a mf file/directory list!")
     public static List<String> fileOrDirectoryList = new ArrayList<>(); // Yes, that's right – you can even have lists of files/directories
+
+    @Condition(requiredModId = "midnightlib") // Conditional options are here!
+    @Entry(category = CONDITIONS, name="Turn me on!")
+    public static boolean turnMeOn = false;
+    @Condition(requiredOption = "modid:turnMeOn", visibleButLocked = true)
+    @Entry(category = CONDITIONS, name="Turn me off!")
+    public static Boolean turnMeOff = true;
+    @Condition(requiredOption = "modid:turnMeOff", requiredValue = "false")
+    @Entry(category = CONDITIONS, name="Which is the best modloader?")
+    public static String bestModloader = "";
+    @Condition(requiredOption = "bestModloader", requiredValue = "Forge")
+    @Comment(category = CONDITIONS, name="❌ You have bad taste :(", centered = true) // Don't take this too seriously btw :)
+    public static Comment answerForge;   // Comments can also be conditional!
+    @Condition(requiredOption = "bestModloader", requiredValue = "NeoForge")
+    @Comment(category = CONDITIONS, name="⛏ Not quite, but it's alright!", centered = true)
+    public static Comment answerNeoforge;
+    @Condition(requiredOption = "bestModloader", requiredValue = "Fabric")
+    @Comment(category = CONDITIONS, name="⭐ Correct! Fabric (and Quilt) are the best!", centered = true)
+    public static Comment answerFabric;
+    @Condition(requiredOption = "bestModloader", requiredValue = "Quilt")
+    @Comment(category = CONDITIONS, name="⭐ Correct! Quilt (and Fabric) are the best!", centered = true)
+    public static Comment answerQuilt;
+
+    @Condition(requiredOption = "midnightlib:config_screen_list", requiredValue = "FALSE") // Access options of other mods that are also using MidnightLib
+    @Comment(category = CONDITIONS) public static Comment spaceracer;
+    @Condition(requiredOption = "midnightlib:config_screen_list", requiredValue = "FALSE")
+    @Comment(category = CONDITIONS, name="You disabled MidnightLib's config screen list. Why? :(", centered = true)  public static Comment why;
 
     public static int imposter = 16777215; // - Entries without an @Entry or @Comment annotation are ignored
 }

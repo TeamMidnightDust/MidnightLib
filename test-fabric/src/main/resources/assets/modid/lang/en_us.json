@@ -20,5 +20,6 @@
   "modid.midnightconfig.category.text": "Text",
   "modid.midnightconfig.category.sliders": "Sliders",
   "modid.midnightconfig.category.lists": "Lists",
-  "modid.midnightconfig.category.files": "Files"
+  "modid.midnightconfig.category.files": "Files",
+  "modid.midnightconfig.category.conditions": "Quiz"
 }
