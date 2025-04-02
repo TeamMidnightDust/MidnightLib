@@ -163,7 +163,9 @@ public abstract class MidnightConfig {
                 };
                 info.function = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
                     int index = values.indexOf(info.value) + 1;
-                    info.value = values.get(index >= values.size() ? 0 : index); button.setMessage(func.apply(info.value));
+                    //info.value = values.get(index >= values.size() ? 0 : index); button.setMessage(func.apply(info.value));
+                    info.setValue(values.get(index >= values.size() ? 0 : index));
+                    button.setMessage(func.apply(info.value));
                 }, func);
             }
         }
