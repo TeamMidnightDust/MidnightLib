@@ -14,12 +14,13 @@ import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Style; import net.minecraft.text.Text;
 import net.minecraft.util.Formatting; import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*; import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.Color;
 import java.io.IOException;
-import java.lang.annotation.ElementType; import java.lang.annotation.Retention; import java.lang.annotation.RetentionPolicy; import java.lang.annotation.Target;
+import java.lang.annotation.*;
 import java.lang.reflect.Field; import java.lang.reflect.Modifier; import java.lang.reflect.ParameterizedType;
 import java.nio.file.Files; import java.nio.file.Path;
 import java.util.*;
@@ -45,7 +46,8 @@ public abstract class MidnightConfig {
     public static class EntryInfo {
         public Entry entry;
         public Comment comment;
-        public Condition condition;
+//        @ApiStatus.Obsolete public Condition condition;
+        public Condition[] conditions;
         public final Field field;
         public final Class<?> dataType;
         public final String modid, fieldName;
@@ -61,8 +63,13 @@ public abstract class MidnightConfig {
         public EntryInfo(Field field, String modid) {
             this.field = field; this.modid = modid;
             if (field != null) {
-                this.fieldName = field.getName(); this.dataType = getUnderlyingType(field);
-                this.entry = field.getAnnotation(Entry.class); this.comment = field.getAnnotation(Comment.class); this.condition = field.getAnnotation(Condition.class);
+                this.fieldName = field.getName();
+                this.dataType = getUnderlyingType(field);
+                this.entry = field.getAnnotation(Entry.class);
+                this.comment = field.getAnnotation(Comment.class);
+                // TODO: use multiple annotations
+//                this.condition = field.getAnnotation(Condition.class);
+                this.conditions = field.getAnnotationsByType(Condition.class);
             } else {
                 this.fieldName = ""; this.dataType = null;
             }
@@ -80,19 +87,30 @@ public abstract class MidnightConfig {
             else try { return ((List<?>) this.value).get(this.listIndex).toString(); } catch (Exception ignored) {return "";}
         }
         public void updateFieldValue() {
-            try { if (this.field.get(null) != value) updateConditions(tempValue);
+            try {
+                if (this.field.get(null) != value) entries.forEach(EntryInfo::updateConditions);
                 this.field.set(null, this.value);
             } catch (IllegalAccessException ignored) {}
         }
         @SuppressWarnings("ConstantValue") //pertains to requiredModLoaded
-        public void updateConditions(String newTempValue) {
-            for (EntryInfo info : entries) {
-                boolean prevConditionState = info.conditionsMet;
-                if (info.condition != null && ((info.condition.requiredOption().contains(":") ? "" : info.modid + ":") + info.condition.requiredOption()).equals(this.modid + ":" + this.fieldName))
-                    info.conditionsMet = Objects.equals(info.condition.requiredValue(), newTempValue);
-                if (info.condition != null && !info.condition.requiredModId().isEmpty() && !PlatformFunctions.isModLoaded(info.condition.requiredModId())) info.conditionsMet = false;
-                if (prevConditionState != info.conditionsMet) reloadScreen = true;
+        public void updateConditions() {
+            boolean prevConditionState = this.conditionsMet;
+            if (this.conditions.length > 0) this.conditionsMet = true;    // reset conditions
+            for (Condition condition : this.conditions) {
+                // TODO: redefine entries as a HashMap<modid:fieldName, EntryInfo> to optimize complexity
+                for (EntryInfo info : entries) {
+                    if (((condition.requiredOption().contains(":") ? "" : (this.modid + ":")) + condition.requiredOption()).equals(info.modid + ":" + info.fieldName)) {
+                        this.conditionsMet &= info.tempValue.equals(condition.requiredValue());
+//                        System.out.println(this.modid + ":" + this.fieldName + "#" + condition.requiredOption() + ": " + condition.requiredValue() + " " + info.tempValue);
+                    }
+                    if (!condition.requiredModId().isEmpty() && !PlatformFunctions.isModLoaded(condition.requiredModId())) {
+                        this.conditionsMet = false;
+                    }
+                    if (!this.conditionsMet) break;
+                }
+                if (!this.conditionsMet) break;
             }
+            if (prevConditionState != this.conditionsMet) reloadScreen = true;
         }
         public <T> void writeList(int index, T value) {
             var list = (List<T>) this.value;
@@ -124,7 +142,7 @@ public abstract class MidnightConfig {
 
         for (EntryInfo info : entries) if (info.field != null && info.entry != null) {
             try { info.value = info.field.get(null); info.tempValue = info.toTemporaryValue();
-                info.updateConditions(info.tempValue);
+                info.updateConditions();
             } catch (IllegalAccessException ignored) {}
         }
     }
@@ -324,7 +342,14 @@ public abstract class MidnightConfig {
         }
         public void fillList() {
             for (EntryInfo info : entries) {
-                if (!info.conditionsMet && info.condition != null && !info.condition.visibleButLocked()) continue;
+//                if (!info.conditionsMet && info.condition != null && !info.condition.visibleButLocked()) continue;
+                if (!info.conditionsMet) {
+                    boolean visibleButLocked = false;
+                    for (Condition condition : info.conditions) {
+                        visibleButLocked |= condition.visibleButLocked();
+                    }
+                    if (!visibleButLocked) continue;
+                }
                 if (info.modid.equals(modid) && (info.tab == null || info.tab == tabManager.getCurrentTab())) {
                     Text name = Objects.requireNonNullElseGet(info.name, () -> Text.translatable(translationPrefix + info.fieldName));
                     TextIconButtonWidget resetButton = TextIconButtonWidget.builder(Text.translatable("controls.reset"), (button -> {
@@ -567,11 +592,18 @@ public abstract class MidnightConfig {
      *   <code>false</code> – Option is completely hidden
      */
     @Retention(RetentionPolicy.RUNTIME)
+    @Repeatable(Conditions.class)
     @Target(ElementType.FIELD)
     public @interface Condition {
         String requiredModId() default "";
         String requiredOption() default "";
         String requiredValue() default "true";
         boolean visibleButLocked() default false;
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface Conditions {
+        Condition[] value();
     }
 }
