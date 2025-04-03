@@ -14,7 +14,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Style; import net.minecraft.text.Text;
 import net.minecraft.util.Formatting; import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*; import javax.swing.filechooser.FileNameExtensionFilter;
@@ -40,7 +39,9 @@ public abstract class MidnightConfig {
     private static final Pattern DECIMAL_ONLY = Pattern.compile("-?(\\d+\\.?\\d*|\\d*\\.?\\d+|\\.)");
     private static final Pattern HEXADECIMAL_ONLY = Pattern.compile("(-?[#0-9a-fA-F]*)");
 
-    private static final List<EntryInfo> entries = new ArrayList<>();
+//    private static final List<EntryInfo> entries = new ArrayList<>();
+    private static final Hashtable<String, EntryInfo> entries = new Hashtable<>();    // modid:fieldName -> EntryInfo
+    private static final List<String> entryOrder = Lists.newArrayList();              // ordered list of entries
     private static boolean reloadScreen = false;
 
     public static class EntryInfo {
@@ -86,7 +87,7 @@ public abstract class MidnightConfig {
         }
         public void updateFieldValue() {
             try {
-                if (this.field.get(null) != value) entries.forEach(EntryInfo::updateConditions);
+                if (this.field.get(null) != value) entries.values().forEach(EntryInfo::updateConditions);
                 this.field.set(null, this.value);
             } catch (IllegalAccessException ignored) {}
         }
@@ -95,16 +96,12 @@ public abstract class MidnightConfig {
             boolean prevConditionState = this.conditionsMet;
             if (this.conditions.length > 0) this.conditionsMet = true;    // reset conditions
             for (Condition condition : this.conditions) {
-                // TODO: redefine entries as a HashMap<modid:fieldName, EntryInfo> to optimize complexity
-                for (EntryInfo info : entries) {
-                    if (((condition.requiredOption().contains(":") ? "" : (this.modid + ":")) + condition.requiredOption()).equals(info.modid + ":" + info.fieldName)) {
-                        this.conditionsMet &= info.tempValue.equals(condition.requiredValue());
-//                        System.out.println(this.modid + ":" + this.fieldName + "#" + condition.requiredOption() + ": " + condition.requiredValue() + " " + info.tempValue);
-                    }
-                    if (!condition.requiredModId().isEmpty() && !PlatformFunctions.isModLoaded(condition.requiredModId())) {
-                        this.conditionsMet = false;
-                    }
-                    if (!this.conditionsMet) break;
+                if (!condition.requiredModId().isEmpty() && !PlatformFunctions.isModLoaded(condition.requiredModId())) {
+                    this.conditionsMet = false;
+                }
+                String requiredOption = condition.requiredOption().contains(":") ? condition.requiredOption() : (this.modid + ":" + condition.requiredOption());
+                if (entries.get(requiredOption) instanceof EntryInfo info) {
+                    this.conditionsMet &= condition.requiredValue().equals(info.tempValue);
                 }
                 if (!this.conditionsMet) break;
             }
@@ -130,19 +127,21 @@ public abstract class MidnightConfig {
 
     @SuppressWarnings("unused") // Utility for mod authors
     public static @Nullable Object getDefaultValue(String modid, String entry) {
-        for (EntryInfo e : entries) {
-            if (modid.equals(e.modid) && entry.equals(e.field.getName())) return e.defaultValue;
-        } return null;
+        String key = modid + ":" + entry;
+        return entries.containsKey(key) ? entries.get(key).defaultValue : null;
     }
     public static void loadValuesFromJson(String modid) {
         try { gson.fromJson(Files.newBufferedReader(path), configClass.get(modid)); }
         catch (Exception e) { write(modid); }
-
-        for (EntryInfo info : entries) if (info.field != null && info.entry != null) {
-            try { info.value = info.field.get(null); info.tempValue = info.toTemporaryValue();
-                info.updateConditions();
-            } catch (IllegalAccessException ignored) {}
-        }
+        entries.values().forEach(info -> {
+            if (info.field != null && info.entry != null) {
+                try {
+                    info.value = info.field.get(null);
+                    info.tempValue = info.toTemporaryValue();
+                    info.updateConditions();
+                } catch (IllegalAccessException ignored) {}
+            }
+        });
     }
     public static void init(String modid, Class<? extends MidnightConfig> config) {
         path = PlatformFunctions.getConfigDirectory().resolve(modid + ".json");
@@ -161,6 +160,7 @@ public abstract class MidnightConfig {
     @Environment(EnvType.CLIENT)
     private static void initClient(String modid, Field field, EntryInfo info) {
         Entry e = info.entry;
+        String key = modid + ":" + field.getName();
         if (e != null) {
             if (info.dataType == int.class) textField(info, Integer::parseInt, INTEGER_ONLY, (int) e.min(), (int) e.max(), true);
             else if (info.dataType == float.class) textField(info, Float::parseFloat, DECIMAL_ONLY, (float) e.min(), (float) e.max(), false);
@@ -185,7 +185,8 @@ public abstract class MidnightConfig {
                 }, func);
             }
         }
-        entries.add(info);
+        entries.put(key, info);
+        entryOrder.add(key);
     }
     public static Class<?> getUnderlyingType(Field field) {
         Class<?> rawType = field.getType();
@@ -218,7 +219,7 @@ public abstract class MidnightConfig {
             info.tempValue = s;
             t.setEditableColor(inLimits? 0xFFFFFFFF : 0xFFFF7777);
             info.inLimits = inLimits;
-            b.active = entries.stream().allMatch(e -> e.inLimits);
+            b.active = entries.values().stream().allMatch(e -> e.inLimits);
 
             if (inLimits) {
                 if (info.dataType == Identifier.class) info.setValue(Identifier.tryParse(s));
@@ -255,17 +256,18 @@ public abstract class MidnightConfig {
             this.parent = parent; this.modid = modid;
             this.translationPrefix = modid + ".midnightconfig.";
             loadValuesFromJson(modid);
-
-            for (EntryInfo e : entries) if (e.modid.equals(modid)) {
-                String tabId = e.entry != null ? e.entry.category() : e.comment.category();
-                String name = translationPrefix + "category." + tabId;
-                if (!I18n.hasTranslation(name) && tabId.equals("default"))
-                    name = translationPrefix + "title";
-                if (!tabs.containsKey(name)) {
-                    Tab tab = new GridScreenTab(Text.translatable(name));
-                    e.tab = tab; tabs.put(name, tab);
-                } else e.tab = tabs.get(name);
-            }
+            entryOrder.stream().map(entries::get).forEach(info -> {
+                if (info.modid.equals(modid)) {
+                    String tabId = info.entry != null ? info.entry.category() : info.comment.category();
+                    String name = translationPrefix + "category." + tabId;
+                    if (!I18n.hasTranslation(name) && tabId.equals("default"))
+                        name = translationPrefix + "title";
+                    if (!tabs.containsKey(name)) {
+                        Tab tab = new GridScreenTab(Text.translatable(name));
+                        info.tab = tab; tabs.put(name, tab);
+                    } else info.tab = tabs.get(name);
+                }
+            });
             tabNavigation = TabNavigationWidget.builder(tabManager, this.width).tabs(tabs.values().toArray(new Tab[0])).build();
             tabNavigation.selectTab(0, false);
             tabNavigation.init();
@@ -290,7 +292,7 @@ public abstract class MidnightConfig {
                 updateList(); list.setScrollY(0);
             }
             scrollProgress = list.getScrollY();
-            for (EntryInfo info : entries) info.updateFieldValue();
+            for (EntryInfo info : entries.values()) info.updateFieldValue();
             updateButtons();
             if (reloadScreen) { updateList(); reloadScreen = false; }
         }
@@ -314,7 +316,7 @@ public abstract class MidnightConfig {
             Objects.requireNonNull(client).setScreen(parent);
         }
         private void cleanup() {
-            entries.forEach(info -> {
+            entries.values().forEach(info -> {
                 info.error = null; info.value = null; info.tempValue = null; info.actionButton = null; info.listIndex = 0; info.tab = null; info.inLimits = true;
             });
         }
@@ -326,7 +328,7 @@ public abstract class MidnightConfig {
 
             this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, button -> this.close()).dimensions(this.width / 2 - 154, this.height - 26, 150, 20).build());
             done = this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
-                for (EntryInfo info : entries) if (info.modid.equals(modid)) info.updateFieldValue();
+                for (EntryInfo info : entries.values()) if (info.modid.equals(modid)) info.updateFieldValue();
                 write(modid); cleanup();
                 Objects.requireNonNull(client).setScreen(parent);
             }).dimensions(this.width / 2 + 4, this.height - 26, 150, 20).build());
@@ -339,8 +341,7 @@ public abstract class MidnightConfig {
             this.list.clear(); fillList();
         }
         public void fillList() {
-            for (EntryInfo info : entries) {
-//                if (!info.conditionsMet && info.condition != null && !info.condition.visibleButLocked()) continue;
+            for (EntryInfo info : entryOrder.stream().map(entries::get).toList()) {
                 if (!info.conditionsMet) {
                     boolean visibleButLocked = false;
                     for (Condition condition : info.conditions) {
