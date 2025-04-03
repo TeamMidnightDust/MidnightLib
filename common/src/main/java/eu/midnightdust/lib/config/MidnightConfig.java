@@ -67,8 +67,6 @@ public abstract class MidnightConfig {
                 this.dataType = getUnderlyingType(field);
                 this.entry = field.getAnnotation(Entry.class);
                 this.comment = field.getAnnotation(Comment.class);
-                // TODO: use multiple annotations
-//                this.condition = field.getAnnotation(Condition.class);
                 this.conditions = field.getAnnotationsByType(Condition.class);
             } else {
                 this.fieldName = ""; this.dataType = null;

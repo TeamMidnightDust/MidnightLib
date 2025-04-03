@@ -10,7 +10,7 @@ import java.util.List;
 
 /** Every option in a MidnightConfig class has to be public and static, so we can access it from other classes.
  * The config class also has to extend MidnightConfig*/
-
+@SuppressWarnings("unused")
 public class MidnightConfigExample extends MidnightConfig {
     public static final String TEXT = "text";
     public static final String NUMBERS = "numbers";
