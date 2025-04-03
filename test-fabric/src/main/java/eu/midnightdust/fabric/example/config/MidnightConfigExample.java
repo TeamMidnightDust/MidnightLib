@@ -18,6 +18,7 @@ public class MidnightConfigExample extends MidnightConfig {
     public static final String LISTS = "lists";
     public static final String FILES = "files";
     public static final String CONDITIONS = "conditions";
+    public static final String MULTI_CONDITIONS = "multiConditions";
 
     @Comment(category = TEXT) public static Comment text1;                       // Comments are rendered like an option without a button and are excluded from the config file
     @Comment(category = TEXT, centered = true) public static Comment text2;      // Centered comments are the same as normal ones - just centered!
@@ -27,9 +28,9 @@ public class MidnightConfigExample extends MidnightConfig {
     @Entry(category = TEXT) public static String name = "Hello World!";          // Example for a string option, which is in a category!
     @Entry(category = TEXT, width = 7, min = 7, isColor = true, name = "I am a color!") public static String titleColor = "#ffffff"; // The isColor property adds a color chooser for a hexadecimal color
     @Entry(category = TEXT, idMode = 0) public static Identifier id = Identifier.ofVanilla("diamond");          // Example for an identifier with matching items displayed next to it!
-    @Entry(category = TEXT) public static TestEnum testEnum = TestEnum.FABRIC;   // Example for an enum option
-    public enum TestEnum {                               // Enums allow the user to cycle through predefined options
-        QUILT, FABRIC, FORGE
+    @Entry(category = TEXT) public static ModPlatform modPlatform = ModPlatform.FABRIC;   // Example for an enum option
+    public enum ModPlatform {                               // Enums allow the user to cycle through predefined options
+        QUILT, FABRIC, FORGE, NEOFORGE, VANILLA
     }
     @Entry(category = NUMBERS) public static int fabric = 16777215;                 // Example for an int option
     @Entry(category = NUMBERS) public static double world = 1.4D;                   // Example for a double option
@@ -74,7 +75,7 @@ public class MidnightConfigExample extends MidnightConfig {
     @Entry(category = CONDITIONS, name="Turn me on!")
     public static boolean turnMeOn = false;
     @Condition(requiredOption = "modid:turnMeOn", visibleButLocked = true)
-    @Entry(category = CONDITIONS, name="Turn me off!")
+    @Entry(category = CONDITIONS, name="Turn me off (locked if modid:turnMeOn is false)!")
     public static Boolean turnMeOff = true;
     @Condition(requiredOption = "modid:turnMeOff", requiredValue = "false")
     @Entry(category = CONDITIONS, name="Which is the best modloader?")
@@ -96,6 +97,35 @@ public class MidnightConfigExample extends MidnightConfig {
     @Comment(category = CONDITIONS) public static Comment spaceracer;
     @Condition(requiredOption = "midnightlib:config_screen_list", requiredValue = "FALSE")
     @Comment(category = CONDITIONS, name="You disabled MidnightLib's config screen list. Why? :(", centered = true)  public static Comment why;
+
+
+    // Multi-Conditions are also supported!
+    public enum Arch {X86, X86_64, AARCH64, RISCV64}
+    public enum OS {WINDOWS, MAC, LINUX}
+    @Entry(category = MULTI_CONDITIONS, name = "Arch") public static Arch myArch = Arch.X86;
+    @Entry(category = MULTI_CONDITIONS, name = "OS") public static OS myOS = OS.WINDOWS;
+    @Entry(category = MULTI_CONDITIONS, name = "Mod Platform") public static ModPlatform myPlatform = ModPlatform.FABRIC;
+
+    @Condition(requiredOption = "modid:myArch", requiredValue = "X86_64")
+    @Condition(requiredOption = "modid:myOS", requiredValue = "WINDOWS")
+    @Condition(requiredOption = "modid:myPlatform", requiredValue = "FABRIC")
+    @Comment(category = MULTI_CONDITIONS, name = "MidnightLib can be used on Windows x86_64 with Fabric!", centered = true) public static Comment x86_64_windows_fabric;
+
+    @Condition(requiredOption = "modid:myArch", requiredValue = "X86_64")
+    @Condition(requiredOption = "modid:myOS", requiredValue = "LINUX")
+    @Condition(requiredOption = "modid:myPlatform", requiredValue = "FABRIC")
+    @Comment(category = MULTI_CONDITIONS, name = "MidnightLib can be used on Linux x86_64 with Fabric!", centered = true) public static Comment x86_64_linux_fabric;
+
+    @Condition(requiredOption = "modid:myArch", requiredValue = "X86_64")
+    @Condition(requiredOption = "modid:myOS", requiredValue = "WINDOWS")
+    @Condition(requiredOption = "modid:myPlatform", requiredValue = "NEOFORGE")
+    @Comment(category = MULTI_CONDITIONS, name = "MidnightLib can be used on Windows x86_64 with NeoForge!", centered = true) public static Comment x86_64_windows_neoforge;
+
+    @Condition(requiredOption = "modid:myArch", requiredValue = "X86_64")
+    @Condition(requiredOption = "modid:myOS", requiredValue = "LINUX")
+    @Condition(requiredOption = "modid:myPlatform", requiredValue = "NEOFORGE")
+    @Comment(category = MULTI_CONDITIONS, name = "MidnightLib can be used on Linux x86_64 with NeoForge!", centered = true) public static Comment x86_64_linux_neoforge;
+
 
     public static int imposter = 16777215; // - Entries without an @Entry or @Comment annotation are ignored
 }
