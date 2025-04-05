@@ -174,7 +174,6 @@ public abstract class MidnightConfig {
                 };
                 info.function = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
                     int index = values.indexOf(info.value) + 1;
-                    //info.value = values.get(index >= values.size() ? 0 : index); button.setMessage(func.apply(info.value));
                     info.setValue(values.get(index >= values.size() ? 0 : index));
                     button.setMessage(func.apply(info.value));
                 }, func);
@@ -250,7 +249,7 @@ public abstract class MidnightConfig {
             this.parent = parent; this.modid = modid;
             this.translationPrefix = modid + ".midnightconfig.";
             loadValuesFromJson(modid);
-            entries.forEach((id, info) -> {
+            entries.values().forEach(info -> {
                 if (info.modid.equals(modid)) {
                     String tabId = info.entry != null ? info.entry.category() : info.comment.category();
                     String name = translationPrefix + "category." + tabId;
@@ -335,7 +334,7 @@ public abstract class MidnightConfig {
             this.list.clear(); fillList();
         }
         public void fillList() {
-            for (EntryInfo info : entries.sequencedValues()) {
+            for (EntryInfo info : entries.values()) {
                 if (!info.conditionsMet) {
                     boolean visibleButLocked = false;
                     for (Condition condition : info.conditions) {
