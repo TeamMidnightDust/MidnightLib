@@ -18,7 +18,6 @@ public class MidnightConfigExample extends MidnightConfig {
     public static final String LISTS = "lists";
     public static final String FILES = "files";
     public static final String CONDITIONS = "conditions";
-    public static final String MULTI_CONDITIONS = "multiConditions";
 
     @Comment(category = TEXT) public static Comment text1;                       // Comments are rendered like an option without a button and are excluded from the config file
     @Comment(category = TEXT, centered = true) public static Comment text2;      // Centered comments are the same as normal ones - just centered!
@@ -77,18 +76,27 @@ public class MidnightConfigExample extends MidnightConfig {
     @Condition(requiredOption = "modid:turnMeOn", visibleButLocked = true)
     @Entry(category = CONDITIONS, name="Turn me off (locked if modid:turnMeOn is false)!")
     public static Boolean turnMeOff = true;
+    @Condition(requiredOption = "turnMeOn") // You can also use multiple conditions for the same entry
     @Condition(requiredOption = "modid:turnMeOff", requiredValue = "false")
     @Entry(category = CONDITIONS, name="Which is the best modloader?")
     public static String bestModloader = "";
+    @Condition(requiredOption = "turnMeOn")
+    @Condition(requiredOption = "turnMeOff", requiredValue = "false")
     @Condition(requiredOption = "bestModloader", requiredValue = "Forge")
     @Comment(category = CONDITIONS, name="❌ You have bad taste :(", centered = true) // Don't take this too seriously btw :)
     public static Comment answerForge;   // Comments can also be conditional!
+    @Condition(requiredOption = "turnMeOn")
+    @Condition(requiredOption = "turnMeOff", requiredValue = "false")
     @Condition(requiredOption = "bestModloader", requiredValue = "NeoForge")
     @Comment(category = CONDITIONS, name="⛏ Not quite, but it's alright!", centered = true)
     public static Comment answerNeoforge;
+    @Condition(requiredOption = "turnMeOn")
+    @Condition(requiredOption = "turnMeOff", requiredValue = "false")
     @Condition(requiredOption = "bestModloader", requiredValue = "Fabric")
     @Comment(category = CONDITIONS, name="⭐ Correct! Fabric (and Quilt) are the best!", centered = true)
     public static Comment answerFabric;
+    @Condition(requiredOption = "turnMeOn")
+    @Condition(requiredOption = "turnMeOff", requiredValue = "false")
     @Condition(requiredOption = "bestModloader", requiredValue = "Quilt")
     @Comment(category = CONDITIONS, name="⭐ Correct! Quilt (and Fabric) are the best!", centered = true)
     public static Comment answerQuilt;
@@ -97,35 +105,6 @@ public class MidnightConfigExample extends MidnightConfig {
     @Comment(category = CONDITIONS) public static Comment spaceracer;
     @Condition(requiredOption = "midnightlib:config_screen_list", requiredValue = "FALSE")
     @Comment(category = CONDITIONS, name="You disabled MidnightLib's config screen list. Why? :(", centered = true)  public static Comment why;
-
-
-    // Multi-Conditions are also supported!
-    public enum Arch {X86, X86_64, AARCH64, RISCV64}
-    public enum OS {WINDOWS, MAC, LINUX}
-    @Entry(category = MULTI_CONDITIONS, name = "Arch") public static Arch myArch = Arch.X86;
-    @Entry(category = MULTI_CONDITIONS, name = "OS") public static OS myOS = OS.WINDOWS;
-    @Entry(category = MULTI_CONDITIONS, name = "Mod Platform") public static ModPlatform myPlatform = ModPlatform.FABRIC;
-
-    @Condition(requiredOption = "modid:myArch", requiredValue = "X86_64")
-    @Condition(requiredOption = "modid:myOS", requiredValue = "WINDOWS")
-    @Condition(requiredOption = "modid:myPlatform", requiredValue = "FABRIC")
-    @Comment(category = MULTI_CONDITIONS, name = "MidnightLib can be used on Windows x86_64 with Fabric!", centered = true) public static Comment x86_64_windows_fabric;
-
-    @Condition(requiredOption = "modid:myArch", requiredValue = "X86_64")
-    @Condition(requiredOption = "modid:myOS", requiredValue = "LINUX")
-    @Condition(requiredOption = "modid:myPlatform", requiredValue = "FABRIC")
-    @Comment(category = MULTI_CONDITIONS, name = "MidnightLib can be used on Linux x86_64 with Fabric!", centered = true) public static Comment x86_64_linux_fabric;
-
-    @Condition(requiredOption = "modid:myArch", requiredValue = "X86_64")
-    @Condition(requiredOption = "modid:myOS", requiredValue = "WINDOWS")
-    @Condition(requiredOption = "modid:myPlatform", requiredValue = "NEOFORGE")
-    @Comment(category = MULTI_CONDITIONS, name = "MidnightLib can be used on Windows x86_64 with NeoForge!", centered = true) public static Comment x86_64_windows_neoforge;
-
-    @Condition(requiredOption = "modid:myArch", requiredValue = "X86_64")
-    @Condition(requiredOption = "modid:myOS", requiredValue = "LINUX")
-    @Condition(requiredOption = "modid:myPlatform", requiredValue = "NEOFORGE")
-    @Comment(category = MULTI_CONDITIONS, name = "MidnightLib can be used on Linux x86_64 with NeoForge!", centered = true) public static Comment x86_64_linux_neoforge;
-
 
     public static int imposter = 16777215; // - Entries without an @Entry or @Comment annotation are ignored
 }
