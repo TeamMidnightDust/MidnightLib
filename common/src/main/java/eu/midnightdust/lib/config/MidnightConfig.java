@@ -39,15 +39,12 @@ public abstract class MidnightConfig {
     private static final Pattern DECIMAL_ONLY = Pattern.compile("-?(\\d+\\.?\\d*|\\d*\\.?\\d+|\\.)");
     private static final Pattern HEXADECIMAL_ONLY = Pattern.compile("(-?[#0-9a-fA-F]*)");
 
-//    private static final List<EntryInfo> entries = new ArrayList<>();
-    private static final Hashtable<String, EntryInfo> entries = new Hashtable<>();    // modid:fieldName -> EntryInfo
-    private static final List<String> entryOrder = Lists.newArrayList();              // ordered list of entries
+    private static final LinkedHashMap<String, EntryInfo> entries = new LinkedHashMap<>();    // modid:fieldName -> EntryInfo
     private static boolean reloadScreen = false;
 
     public static class EntryInfo {
         public Entry entry;
         public Comment comment;
-//        @ApiStatus.Obsolete public Condition condition;
         public Condition[] conditions;
         public final Field field;
         public final Class<?> dataType;
@@ -96,13 +93,11 @@ public abstract class MidnightConfig {
             boolean prevConditionState = this.conditionsMet;
             if (this.conditions.length > 0) this.conditionsMet = true;    // reset conditions
             for (Condition condition : this.conditions) {
-                if (!condition.requiredModId().isEmpty() && !PlatformFunctions.isModLoaded(condition.requiredModId())) {
+                if (!condition.requiredModId().isEmpty() && !PlatformFunctions.isModLoaded(condition.requiredModId()))
                     this.conditionsMet = false;
-                }
                 String requiredOption = condition.requiredOption().contains(":") ? condition.requiredOption() : (this.modid + ":" + condition.requiredOption());
-                if (entries.get(requiredOption) instanceof EntryInfo info) {
+                if (entries.get(requiredOption) instanceof EntryInfo info)
                     this.conditionsMet &= condition.requiredValue().equals(info.tempValue);
-                }
                 if (!this.conditionsMet) break;
             }
             if (prevConditionState != this.conditionsMet) reloadScreen = true;
@@ -186,7 +181,6 @@ public abstract class MidnightConfig {
             }
         }
         entries.put(key, info);
-        entryOrder.add(key);
     }
     public static Class<?> getUnderlyingType(Field field) {
         Class<?> rawType = field.getType();
@@ -256,7 +250,7 @@ public abstract class MidnightConfig {
             this.parent = parent; this.modid = modid;
             this.translationPrefix = modid + ".midnightconfig.";
             loadValuesFromJson(modid);
-            entryOrder.stream().map(entries::get).forEach(info -> {
+            entries.forEach((id, info) -> {
                 if (info.modid.equals(modid)) {
                     String tabId = info.entry != null ? info.entry.category() : info.comment.category();
                     String name = translationPrefix + "category." + tabId;
@@ -341,7 +335,7 @@ public abstract class MidnightConfig {
             this.list.clear(); fillList();
         }
         public void fillList() {
-            for (EntryInfo info : entryOrder.stream().map(entries::get).toList()) {
+            for (EntryInfo info : entries.sequencedValues()) {
                 if (!info.conditionsMet) {
                     boolean visibleButLocked = false;
                     for (Condition condition : info.conditions) {
