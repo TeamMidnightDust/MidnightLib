@@ -10,7 +10,7 @@ import java.util.List;
 
 /** Every option in a MidnightConfig class has to be public and static, so we can access it from other classes.
  * The config class also has to extend MidnightConfig*/
-
+@SuppressWarnings("unused")
 public class MidnightConfigExample extends MidnightConfig {
     public static final String TEXT = "text";
     public static final String NUMBERS = "numbers";
@@ -27,9 +27,9 @@ public class MidnightConfigExample extends MidnightConfig {
     @Entry(category = TEXT) public static String name = "Hello World!";          // Example for a string option, which is in a category!
     @Entry(category = TEXT, width = 7, min = 7, isColor = true, name = "I am a color!") public static String titleColor = "#ffffff"; // The isColor property adds a color chooser for a hexadecimal color
     @Entry(category = TEXT, idMode = 0) public static Identifier id = Identifier.ofVanilla("diamond");          // Example for an identifier with matching items displayed next to it!
-    @Entry(category = TEXT) public static TestEnum testEnum = TestEnum.FABRIC;   // Example for an enum option
-    public enum TestEnum {                               // Enums allow the user to cycle through predefined options
-        QUILT, FABRIC, FORGE
+    @Entry(category = TEXT) public static ModPlatform modPlatform = ModPlatform.FABRIC;   // Example for an enum option
+    public enum ModPlatform {                               // Enums allow the user to cycle through predefined options
+        QUILT, FABRIC, FORGE, NEOFORGE, VANILLA
     }
     @Entry(category = NUMBERS) public static int fabric = 16777215;                 // Example for an int option
     @Entry(category = NUMBERS) public static double world = 1.4D;                   // Example for a double option
@@ -74,20 +74,29 @@ public class MidnightConfigExample extends MidnightConfig {
     @Entry(category = CONDITIONS, name="Turn me on!")
     public static boolean turnMeOn = false;
     @Condition(requiredOption = "modid:turnMeOn", visibleButLocked = true)
-    @Entry(category = CONDITIONS, name="Turn me off!")
+    @Entry(category = CONDITIONS, name="Turn me off (locked if modid:turnMeOn is false)!")
     public static Boolean turnMeOff = true;
+    @Condition(requiredOption = "turnMeOn") // You can also use multiple conditions for the same entry
     @Condition(requiredOption = "modid:turnMeOff", requiredValue = "false")
     @Entry(category = CONDITIONS, name="Which is the best modloader?")
     public static String bestModloader = "";
+    @Condition(requiredOption = "turnMeOn")
+    @Condition(requiredOption = "turnMeOff", requiredValue = "false")
     @Condition(requiredOption = "bestModloader", requiredValue = "Forge")
     @Comment(category = CONDITIONS, name="❌ You have bad taste :(", centered = true) // Don't take this too seriously btw :)
     public static Comment answerForge;   // Comments can also be conditional!
+    @Condition(requiredOption = "turnMeOn")
+    @Condition(requiredOption = "turnMeOff", requiredValue = "false")
     @Condition(requiredOption = "bestModloader", requiredValue = "NeoForge")
     @Comment(category = CONDITIONS, name="⛏ Not quite, but it's alright!", centered = true)
     public static Comment answerNeoforge;
+    @Condition(requiredOption = "turnMeOn")
+    @Condition(requiredOption = "turnMeOff", requiredValue = "false")
     @Condition(requiredOption = "bestModloader", requiredValue = "Fabric")
     @Comment(category = CONDITIONS, name="⭐ Correct! Fabric (and Quilt) are the best!", centered = true)
     public static Comment answerFabric;
+    @Condition(requiredOption = "turnMeOn")
+    @Condition(requiredOption = "turnMeOff", requiredValue = "false")
     @Condition(requiredOption = "bestModloader", requiredValue = "Quilt")
     @Comment(category = CONDITIONS, name="⭐ Correct! Quilt (and Fabric) are the best!", centered = true)
     public static Comment answerQuilt;
