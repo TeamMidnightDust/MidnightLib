@@ -82,12 +82,22 @@ public abstract class MidnightConfig {
             if (this.field.getType() != List.class) return this.value.toString();
             else try { return ((List<?>) this.value).get(this.listIndex).toString(); } catch (Exception ignored) {return "";}
         }
-        public void updateFieldValue() {
+
+        /**
+         * Alter the value from {@link EntryInfo} to the Config class which extends {@link MidnightConfig}
+         * If you only modify the value in {@link EntryInfo#value}, but not write it to the field {@link EntryInfo#field} of the Config class,
+         * then the value will not be saved, and it will not change when you reopen the config screen.
+         * So you should call this method to write the value to the field {@link EntryInfo#field} of the Config class.
+         * This method will be called when you click the <b>Done</b> button in the config screen.
+         * @see MidnightConfigScreen#init()
+         * */
+        public void alterFieldsByInfo() {     // TODO original name: `updateFieldValue`
             try {
                 if (this.field.get(null) != value) entries.values().forEach(EntryInfo::updateConditions);
                 this.field.set(null, this.value);
             } catch (IllegalAccessException ignored) {}
         }
+
         @SuppressWarnings("ConstantValue") //pertains to requiredModLoaded
         public void updateConditions() {
             boolean prevConditionState = this.conditionsMet;
@@ -164,7 +174,9 @@ public abstract class MidnightConfig {
             else if (info.dataType == boolean.class) {
                 Function<Object, Text> func = value -> Text.translatable((Boolean) value ? "gui.yes" : "gui.no").formatted((Boolean) value ? Formatting.GREEN : Formatting.RED);
                 info.function = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
-                    info.setValue(!(Boolean) info.value); button.setMessage(func.apply(info.value));
+                    info.setValue(!(Boolean) info.value);
+                    button.setMessage(func.apply(info.value));
+                    entries.values().forEach(EntryInfo::updateConditions);   // TODO: update conditions when the value changes
                 }, func);
             } else if (info.dataType.isEnum()) {
                 List<?> values = Arrays.asList(field.getType().getEnumConstants());
@@ -176,6 +188,7 @@ public abstract class MidnightConfig {
                     int index = values.indexOf(info.value) + 1;
                     info.setValue(values.get(index >= values.size() ? 0 : index));
                     button.setMessage(func.apply(info.value));
+                    entries.values().forEach(EntryInfo::updateConditions);   // TODO: update conditions when the value changes
                 }, func);
             }
         }
@@ -225,6 +238,7 @@ public abstract class MidnightConfig {
                 try { info.actionButton.setMessage(Text.literal("⬛").setStyle(Style.EMPTY.withColor(Color.decode(info.tempValue).getRGB())));
                 } catch (Exception ignored) {}
             }
+            entries.values().forEach(EntryInfo::updateConditions);   // TODO: update conditions when the value changes
             return true;
         };
     }
@@ -285,7 +299,9 @@ public abstract class MidnightConfig {
                 updateList(); list.setScrollY(0);
             }
             scrollProgress = list.getScrollY();
-            for (EntryInfo info : entries.values()) info.updateFieldValue();
+            // TODO: don't alter the fields of the Config class automatically every tick.
+            // only the user presses the `Done` button to alter the fields of the Config class.
+//            for (EntryInfo info : entries.values()) info.alterFieldsByInfo();
             updateButtons();
             if (reloadScreen) { updateList(); reloadScreen = false; }
         }
@@ -305,14 +321,16 @@ public abstract class MidnightConfig {
         }
         @Override
         public void close() {
-            loadValuesFromJson(modid); cleanup();
+//            loadValuesFromJson(modid);  // TODO: It is meaningless to call `loadValuesFromJson()`
+            // cleanup();    // TODO: I think it is incorrect to call `cleanup()` because it is unreasonable to reset the `EntryInfo` objects in `entries`.
             Objects.requireNonNull(client).setScreen(parent);
         }
-        private void cleanup() {
-            entries.values().forEach(info -> {
-                info.error = null; info.value = null; info.tempValue = null; info.actionButton = null; info.listIndex = 0; info.tab = null; info.inLimits = true;
-            });
-        }
+//        TODO: What the reason to define this method? I don't think it should be defined and called.
+//        private void cleanup() {
+//            entries.values().forEach(info -> {
+//                info.error = null; info.value = null; info.tempValue = null; info.actionButton = null; info.listIndex = 0; info.tab = null; info.inLimits = true;
+//            });
+//        }
         @Override
         public void init() {
             super.init();
@@ -321,8 +339,9 @@ public abstract class MidnightConfig {
 
             this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, button -> this.close()).dimensions(this.width / 2 - 154, this.height - 26, 150, 20).build());
             done = this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
-                for (EntryInfo info : entries.values()) if (info.modid.equals(modid)) info.updateFieldValue();
-                write(modid); cleanup();
+                for (EntryInfo info : entries.values()) if (info.modid.equals(modid)) info.alterFieldsByInfo();
+                write(modid);
+                //cleanup();   // TODO: same as above, don't call `cleanup()`
                 Objects.requireNonNull(client).setScreen(parent);
             }).dimensions(this.width / 2 + 4, this.height - 26, 150, 20).build());
 
