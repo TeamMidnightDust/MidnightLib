@@ -74,7 +74,7 @@ public class MidnightConfigExample extends MidnightConfig {
     @Entry(category = CONDITIONS, name="Turn me on!")
     public static boolean turnMeOn = false;
     @Condition(requiredOption = "modid:turnMeOn", visibleButLocked = true)
-    @Entry(category = CONDITIONS, name="Turn me off (locked if modid:turnMeOn is false)!")
+    @Entry(category = CONDITIONS, name="Turn me off (locked)!")
     public static Boolean turnMeOff = true;
     @Condition(requiredOption = "turnMeOn") // You can also use multiple conditions for the same entry
     @Condition(requiredOption = "modid:turnMeOff", requiredValue = "false")
@@ -100,6 +100,12 @@ public class MidnightConfigExample extends MidnightConfig {
     @Condition(requiredOption = "bestModloader", requiredValue = "Quilt")
     @Comment(category = CONDITIONS, name="⭐ Correct! Quilt (and Fabric) are the best!", centered = true)
     public static Comment answerQuilt;
+
+    @Entry(category = CONDITIONS, name="Enter any prime number below 10")
+    public static int primeNumber = 0;
+    @Comment(category = CONDITIONS, name="Correct!")
+    @Condition(requiredOption = "primeNumber", requiredValue = {"2", "3", "5", "7"})
+    public static Comment answerPrime;
 
     @Condition(requiredOption = "midnightlib:config_screen_list", requiredValue = "FALSE") // Access options of other mods that are also using MidnightLib
     @Comment(category = CONDITIONS) public static Comment spaceracer;
