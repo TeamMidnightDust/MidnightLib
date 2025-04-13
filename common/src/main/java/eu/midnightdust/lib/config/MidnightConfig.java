@@ -74,12 +74,12 @@ public abstract class MidnightConfig {
         }
         public void setValue(Object value) {
             if (this.field.getType() != List.class) { this.value = value;
-                this.tempValue = value.toString();
+                this.tempValue = value == null ? "" : value.toString();   // fix bug+: illegal Identifier cannot input character
             } else { writeList(this.listIndex, value);
                 this.tempValue = toTemporaryValue(); }
         }
         public String toTemporaryValue() {
-            if (this.field.getType() != List.class) return this.value.toString();
+            if (this.field.getType() != List.class) return this.value == null ? "" : this.value.toString();  // fix bug+: illegal Identifier cannot input character
             else try { return ((List<?>) this.value).get(this.listIndex).toString(); } catch (Exception ignored) {return "";}
         }
         public void updateFieldValue() {
