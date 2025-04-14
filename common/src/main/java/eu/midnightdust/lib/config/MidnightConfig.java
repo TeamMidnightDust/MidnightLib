@@ -66,20 +66,18 @@ public abstract class MidnightConfig {
                 this.entry = field.getAnnotation(Entry.class);
                 this.comment = field.getAnnotation(Comment.class);
                 this.conditions = field.getAnnotationsByType(Condition.class);
-            } else {
-                this.fieldName = ""; this.dataType = null;
-            }
+            } else { this.fieldName = ""; this.dataType = null; }
             if (entry != null && !entry.name().isEmpty()) this.name = Text.translatable(entry.name());
             else if (comment != null && !comment.name().isEmpty()) this.name = Text.translatable(comment.name());
         }
         public void setValue(Object value) {
             if (this.field.getType() != List.class) { this.value = value;
-                this.tempValue = value == null ? "" : value.toString();   // fix bug+: illegal Identifier cannot input character
+                this.tempValue = value.toString();
             } else { writeList(this.listIndex, value);
                 this.tempValue = toTemporaryValue(); }
         }
         public String toTemporaryValue() {
-            if (this.field.getType() != List.class) return this.value == null ? "" : this.value.toString();  // fix bug+: illegal Identifier cannot input character
+            if (this.field.getType() != List.class) return this.value.toString();
             else try { return ((List<?>) this.value).get(this.listIndex).toString(); } catch (Exception ignored) {return "";}
         }
         public void updateFieldValue() {
@@ -197,7 +195,8 @@ public abstract class MidnightConfig {
         boolean isNumber = pattern != null;
         info.function = (BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) (t, b) -> s -> {
             s = s.trim();
-            if (!(s.isEmpty() || !isNumber || pattern.matcher(s).matches())) return false;
+            if (!(s.isEmpty() || !isNumber || pattern.matcher(s).matches()) ||
+                    (info.dataType == Identifier.class && Identifier.validate(s).isError())) return false;
 
             Number value = 0; boolean inLimits = false; info.error = null;
             if (!(isNumber && s.isEmpty()) && !s.equals("-") && !s.equals(".")) {
@@ -215,11 +214,7 @@ public abstract class MidnightConfig {
             b.active = entries.values().stream().allMatch(e -> e.inLimits);
 
             if (inLimits) {
-                if (info.dataType == Identifier.class) {     // avoid the crash due to Identifier syntax not legitimate
-                    Identifier id = Identifier.tryParse(s);
-                    if (id == null) return false;
-                    info.setValue(id);
-                }
+                if (info.dataType == Identifier.class) info.setValue(Identifier.tryParse(s));
                 else info.setValue(isNumber ? value : s);
             }
 
