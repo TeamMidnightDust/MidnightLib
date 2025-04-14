@@ -162,7 +162,10 @@ public abstract class MidnightConfig {
             else if (info.dataType == double.class) textField(info, Double::parseDouble, DECIMAL_ONLY, e.min(), e.max(), false);
             else if (info.dataType == String.class || info.dataType == Identifier.class) textField(info, String::length, null, Math.min(e.min(), 0), Math.max(e.max(), 1), true);
             else if (info.dataType == boolean.class) {
-                info.function = (CheckboxWidget.Callback) (ch, b) -> info.setValue(b);
+                Function<Object, Text> func = value -> Text.translatable((Boolean) value ? "gui.yes" : "gui.no").formatted((Boolean) value ? Formatting.GREEN : Formatting.RED);
+                info.function = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
+                    info.setValue(!(Boolean) info.value); button.setMessage(func.apply(info.value));
+                }, func);
             } else if (info.dataType.isEnum()) {
                 List<?> values = Arrays.asList(field.getType().getEnumConstants());
                 Function<Object, Text> func = value -> {
@@ -355,11 +358,10 @@ public abstract class MidnightConfig {
                     if (info.function != null) {
                         ClickableWidget widget;
                         Entry e = info.entry;
-                        if (info.dataType == boolean.class) {
-                            widget = CheckboxWidget.builder(Text.empty(), textRenderer).pos(width - 185, 0).callback((CheckboxWidget.Callback) info.function).checked((boolean) info.value).build();
-                        } else if (info.dataType.isEnum()) {
+                        if (info.function instanceof Map.Entry) {
                             var values = (Map.Entry<ButtonWidget.PressAction, Function<Object, Text>>) info.function;
-                            values.setValue(value -> Text.translatable(translationPrefix + "enum." + info.dataType.getSimpleName() + "." + info.value.toString()));
+                            if (info.dataType.isEnum())
+                                values.setValue(value -> Text.translatable(translationPrefix + "enum." + info.dataType.getSimpleName() + "." + info.value.toString()));
                             widget = ButtonWidget.builder(values.getValue().apply(info.value), values.getKey()).dimensions(width - 185, 0, 150, 20).tooltip(getTooltip(info, true)).build();
                         } else if (e.isSlider())
                             widget = new MidnightSliderWidget(width - 185, 0, 150, 20, Text.of(info.tempValue), (Double.parseDouble(info.tempValue) - e.min()) / (e.max() - e.min()), info);
