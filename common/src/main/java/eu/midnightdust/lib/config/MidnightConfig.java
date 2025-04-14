@@ -74,12 +74,12 @@ public abstract class MidnightConfig {
         }
         public void setValue(Object value) {
             if (this.field.getType() != List.class) { this.value = value;
-                this.tempValue = value.toString();
+                this.tempValue = value == null ? "" : value.toString();   // fix bug+: illegal Identifier cannot input character
             } else { writeList(this.listIndex, value);
                 this.tempValue = toTemporaryValue(); }
         }
         public String toTemporaryValue() {
-            if (this.field.getType() != List.class) return this.value.toString();
+            if (this.field.getType() != List.class) return this.value == null ? "" : this.value.toString();  // fix bug+: illegal Identifier cannot input character
             else try { return ((List<?>) this.value).get(this.listIndex).toString(); } catch (Exception ignored) {return "";}
         }
         public void updateFieldValue() {
@@ -97,7 +97,7 @@ public abstract class MidnightConfig {
                     this.conditionsMet = false;
                 String requiredOption = condition.requiredOption().contains(":") ? condition.requiredOption() : (this.modid + ":" + condition.requiredOption());
                 if (entries.get(requiredOption) instanceof EntryInfo info)
-                    this.conditionsMet &= condition.requiredValue().equals(info.tempValue);
+                    this.conditionsMet &= List.of(condition.requiredValue()).contains(info.tempValue);
                 if (!this.conditionsMet) break;
             }
             if (prevConditionState != this.conditionsMet) reloadScreen = true;
@@ -215,7 +215,11 @@ public abstract class MidnightConfig {
             b.active = entries.values().stream().allMatch(e -> e.inLimits);
 
             if (inLimits) {
-                if (info.dataType == Identifier.class) info.setValue(Identifier.tryParse(s));
+                if (info.dataType == Identifier.class) {     // avoid the crash due to Identifier syntax not legitimate
+                    Identifier id = Identifier.tryParse(s);
+                    if (id == null) return false;
+                    info.setValue(id);
+                }
                 else info.setValue(isNumber ? value : s);
             }
 
@@ -296,7 +300,7 @@ public abstract class MidnightConfig {
                         if (entry.buttons.get(0) instanceof ClickableWidget widget)
                             if (widget.isFocused() || widget.isHovered()) widget.setTooltip(getTooltip(entry.info, true));
                         if (entry.buttons.get(1) instanceof ButtonWidget button)
-                            button.active = !Objects.equals(entry.info.value.toString(), entry.info.defaultValue.toString());
+                            button.active = !Objects.equals(String.valueOf(entry.info.value), String.valueOf(entry.info.defaultValue));
         }}}}
         @Override
         public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
@@ -354,17 +358,15 @@ public abstract class MidnightConfig {
                     if (info.function != null) {
                         ClickableWidget widget;
                         Entry e = info.entry;
-
                         if (info.function instanceof Map.Entry) { // Enums & booleans
                             var values = (Map.Entry<ButtonWidget.PressAction, Function<Object, Text>>) info.function;
                             if (info.dataType.isEnum())
                                 values.setValue(value -> Text.translatable(translationPrefix + "enum." + info.dataType.getSimpleName() + "." + info.value.toString()));
                             widget = ButtonWidget.builder(values.getValue().apply(info.value), values.getKey()).dimensions(width - 185, 0, 150, 20).tooltip(getTooltip(info, true)).build();
-                        }
-                        else if (e.isSlider())
+                        } else if (e.isSlider())
                             widget = new MidnightSliderWidget(width - 185, 0, 150, 20, Text.of(info.tempValue), (Double.parseDouble(info.tempValue) - e.min()) / (e.max() - e.min()), info);
-                        else widget = new TextFieldWidget(textRenderer, width - 185, 0, 150, 20, Text.empty());
-
+                        else
+                            widget = new TextFieldWidget(textRenderer, width - 185, 0, 150, 20, Text.empty());
                         if (widget instanceof TextFieldWidget textField) {
                             textField.setMaxLength(e.width()); textField.setText(info.tempValue);
                             Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.function).apply(textField, done);
@@ -589,7 +591,7 @@ public abstract class MidnightConfig {
     public @interface Condition {
         String requiredModId() default "";
         String requiredOption() default "";
-        String requiredValue() default "true";
+        String[] requiredValue() default {"true"};
         boolean visibleButLocked() default false;
     }
 
