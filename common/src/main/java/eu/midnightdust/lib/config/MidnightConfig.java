@@ -218,7 +218,7 @@ public abstract class MidnightConfig {
                 if (info.dataType == Identifier.class) {     // avoid the crash due to Identifier syntax not legitimate
                     Identifier id = Identifier.tryParse(s);
                     if (id == null) return false;
-                    info.setValue(Identifier.tryParse(s));
+                    info.setValue(id);
                 }
                 else info.setValue(isNumber ? value : s);
             }
@@ -358,7 +358,7 @@ public abstract class MidnightConfig {
                     if (info.function != null) {
                         ClickableWidget widget;
                         Entry e = info.entry;
-                        if (info.function instanceof Map.Entry) {
+                        if (info.function instanceof Map.Entry) { // Enums & booleans
                             var values = (Map.Entry<ButtonWidget.PressAction, Function<Object, Text>>) info.function;
                             if (info.dataType.isEnum())
                                 values.setValue(value -> Text.translatable(translationPrefix + "enum." + info.dataType.getSimpleName() + "." + info.value.toString()));
