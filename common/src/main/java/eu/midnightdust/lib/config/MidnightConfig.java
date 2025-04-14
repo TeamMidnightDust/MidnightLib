@@ -162,6 +162,9 @@ public abstract class MidnightConfig {
             else if (info.dataType == boolean.class) {
                 Function<Object, Text> func = value -> Text.translatable((Boolean) value ? "gui.yes" : "gui.no").formatted((Boolean) value ? Formatting.GREEN : Formatting.RED);
                 info.function = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
+                    if (info.actionButton instanceof CheckboxWidget checkbox && checkbox.isChecked() == (Boolean) info.value) {
+                        checkbox.onPress(); return;
+                    }
                     info.setValue(!(Boolean) info.value); button.setMessage(func.apply(info.value));
                 }, func);
             } else if (info.dataType.isEnum()) {
@@ -358,10 +361,10 @@ public abstract class MidnightConfig {
                             if (info.dataType.isEnum())
                                 values.setValue(value -> Text.translatable(translationPrefix + "enum." + info.dataType.getSimpleName() + "." + info.value.toString()));
                             widget = ButtonWidget.builder(values.getValue().apply(info.value), values.getKey()).dimensions(width - 185, 0, 150, 20).tooltip(getTooltip(info, true)).build();
+                            if (info.dataType == boolean.class) info.actionButton = CheckboxWidget.builder(Text.empty(), textRenderer).callback((checkbox, checked) -> values.getKey().onPress((ButtonWidget) widget)).checked((Boolean) info.value).pos(widget.getX(), 1).build();
                         } else if (e.isSlider())
                             widget = new MidnightSliderWidget(width - 185, 0, 150, 20, Text.of(info.tempValue), (Double.parseDouble(info.tempValue) - e.min()) / (e.max() - e.min()), info);
-                        else
-                            widget = new TextFieldWidget(textRenderer, width - 185, 0, 150, 20, Text.empty());
+                        else widget = new TextFieldWidget(textRenderer, width - 185, 0, 150, 20, Text.empty());
                         if (widget instanceof TextFieldWidget textField) {
                             textField.setMaxLength(e.width()); textField.setText(info.tempValue);
                             Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.function).apply(textField, done);
@@ -471,7 +474,7 @@ public abstract class MidnightConfig {
             }
         }
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            buttons.forEach(b -> { b.setY(y); b.render(context, mouseX, mouseY, tickDelta);});
+            buttons.forEach(b -> { b.setY(y + (b instanceof CheckboxWidget ? 1 : 0)); b.render(context, mouseX, mouseY, tickDelta);});
             if (title != null) {
                 title.setY(y + 9);
                 title.renderWidget(context, mouseX, mouseY, tickDelta);
