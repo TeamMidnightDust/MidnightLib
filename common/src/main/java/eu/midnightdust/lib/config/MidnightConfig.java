@@ -298,7 +298,7 @@ public abstract class MidnightConfig {
                         if (entry.buttons.get(0) instanceof ClickableWidget widget)
                             if (widget.isFocused() || widget.isHovered()) widget.setTooltip(getTooltip(entry.info, true));
                         if (entry.buttons.get(1) instanceof ButtonWidget button)
-                            button.active = !Objects.equals(String.valueOf(entry.info.value), String.valueOf(entry.info.defaultValue));
+                            button.active = !Objects.equals(String.valueOf(entry.info.value), String.valueOf(entry.info.defaultValue)) && entry.info.conditionsMet;
         }}}}
         @Override
         public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
@@ -415,7 +415,6 @@ public abstract class MidnightConfig {
                             explorerButton.setPosition(width - 185, 0);
                             info.actionButton = explorerButton;
                         }
-                        if (!info.conditionsMet) widget.active = false;
                         List<ClickableWidget> widgets = Lists.newArrayList(widget, resetButton);
                         if (info.actionButton != null) {
                             if (IS_SYSTEM_MAC) info.actionButton.active = false;
@@ -426,6 +425,7 @@ public abstract class MidnightConfig {
                             widget.setWidth(widget.getWidth() - 22); widget.setX(widget.getX() + 22);
                             widgets.add(cycleButton);
                         }
+                        if (!info.conditionsMet) widgets.forEach(w -> w.active = false);
                         this.list.addButton(widgets, name, info);
                     } else this.list.addButton(List.of(), name, info);
                 } list.setScrollY(scrollProgress);
