@@ -5,7 +5,9 @@ import com.google.gson.*; import com.google.gson.stream.*;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import net.fabricmc.api.EnvType; import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient; import net.minecraft.client.font.TextRenderer; import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element; import net.minecraft.client.gui.Selectable; import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.Element; import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.gui.screen.ConfirmLinkScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tab.GridScreenTab; import net.minecraft.client.gui.tab.Tab; import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.tooltip.Tooltip; import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.render.RenderLayer;
@@ -14,6 +16,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Style; import net.minecraft.text.Text;
 import net.minecraft.util.Formatting; import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*; import javax.swing.filechooser.FileNameExtensionFilter;
@@ -488,6 +491,20 @@ public abstract class MidnightConfig {
                 }
             }
         }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            boolean result = super.mouseClicked(mouseX, mouseY, button);
+            if (this.info != null && this.info.comment != null && !this.info.comment.url().isBlank()) {
+                Screen parent = MinecraftClient.getInstance().currentScreen;
+                MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen((confirm)->{
+                    if (confirm) Util.getOperatingSystem().open(this.info.comment.url());
+                    MinecraftClient.getInstance().setScreen(parent);
+                }, this.info.comment.url(), true));
+            }
+            return result;
+        }
+
         public List<? extends Element> children() {return Lists.newArrayList(buttons);}
         public List<? extends Selectable> selectableChildren() {return Lists.newArrayList(buttons);}
     }
@@ -567,11 +584,19 @@ public abstract class MidnightConfig {
      */
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Hidden {}
 
+    /**
+     * Comment Annotation<br>
+     * - <b>{@link Comment#centered()}</b>: If the comment should be centered (default: false)<br>
+     * - <b>{@link Comment#category()}</b>: The category of the comment in the config screen (default
+     * "default")<br>
+     * - <b>{@link Comment#name()}</b>: The name of the comment in the config screen (default: "")<br>
+     * - <b>{@link Comment#url()}</b>: The url of the comment in the config screen, empty or blank means no url (default: "")<br>
+     * */
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Comment {
         boolean centered() default false;
         String category() default "default";
         String name() default "";
-        @Deprecated String requiredMod() default "";
+        String url() default "";
     }
     /**
      * Condition Annotation<br>
