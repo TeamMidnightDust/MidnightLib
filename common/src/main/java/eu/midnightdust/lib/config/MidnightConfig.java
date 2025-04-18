@@ -494,15 +494,9 @@ public abstract class MidnightConfig {
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            boolean result = super.mouseClicked(mouseX, mouseY, button);
-            if (this.info != null && this.info.comment != null && !this.info.comment.url().isBlank()) {
-                Screen parent = MinecraftClient.getInstance().currentScreen;
-                MinecraftClient.getInstance().setScreen(new ConfirmLinkScreen((confirm)->{
-                    if (confirm) Util.getOperatingSystem().open(this.info.comment.url());
-                    MinecraftClient.getInstance().setScreen(parent);
-                }, this.info.comment.url(), true));
-            }
-            return result;
+            if (this.info != null && this.info.comment != null && !this.info.comment.url().isBlank())
+                ConfirmLinkScreen.open(MinecraftClient.getInstance().currentScreen, this.info.comment.url(), true);
+            return super.mouseClicked(mouseX, mouseY, button);
         }
 
         public List<? extends Element> children() {return Lists.newArrayList(buttons);}
@@ -597,6 +591,7 @@ public abstract class MidnightConfig {
         String category() default "default";
         String name() default "";
         String url() default "";
+        @Deprecated String requiredMod() default "";
     }
     /**
      * Condition Annotation<br>
