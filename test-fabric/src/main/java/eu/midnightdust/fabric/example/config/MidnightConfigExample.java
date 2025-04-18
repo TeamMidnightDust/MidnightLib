@@ -10,7 +10,7 @@ import java.util.List;
 
 /** Every option in a MidnightConfig class has to be public and static, so we can access it from other classes.
  * The config class also has to extend MidnightConfig*/
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "DefaultAnnotationParam"})
 public class MidnightConfigExample extends MidnightConfig {
     public static final String TEXT = "text";
     public static final String NUMBERS = "numbers";
@@ -31,6 +31,8 @@ public class MidnightConfigExample extends MidnightConfig {
     public enum ModPlatform {                               // Enums allow the user to cycle through predefined options
         QUILT, FABRIC, FORGE, NEOFORGE, VANILLA
     }
+    @Comment(category = TEXT, name = "§nMidnightLib Wiki", centered = true, url = "https://www.midnightdust.eu/wiki/midnightlib/") public static Comment wiki; // Example for a comment with a url
+
     @Entry(category = NUMBERS) public static int fabric = 16777215;                 // Example for an int option
     @Entry(category = NUMBERS) public static double world = 1.4D;                   // Example for a double option
     @Entry(category = NUMBERS, min=69,max=420) public static int hello = 420;   // - The entered number has to be larger than 69 and smaller than 420
