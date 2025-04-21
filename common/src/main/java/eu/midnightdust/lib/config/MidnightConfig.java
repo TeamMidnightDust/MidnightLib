@@ -6,8 +6,7 @@ import eu.midnightdust.lib.util.PlatformFunctions;
 import net.fabricmc.api.EnvType; import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient; import net.minecraft.client.font.TextRenderer; import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element; import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.screen.ConfirmLinkScreen;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ConfirmLinkScreen; import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tab.GridScreenTab; import net.minecraft.client.gui.tab.Tab; import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.tooltip.Tooltip; import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.render.RenderLayer;
@@ -16,7 +15,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Style; import net.minecraft.text.Text;
 import net.minecraft.util.Formatting; import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*; import javax.swing.filechooser.FileNameExtensionFilter;
