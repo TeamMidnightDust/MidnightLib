@@ -530,7 +530,7 @@ public abstract class MidnightConfig {
      * - <b>width</b>: The maximum character length of the {@link String}, {@link Identifier} or String/Identifier {@link List<>} field<br>
      * - <b>min</b>: The minimum value of the <code>int</code>, <code>float</code> or <code>double</code> field<br>
      * - <b>max</b>: The maximum value of the <code>int</code>, <code>float</code> or <code>double</code> field<br>
-     * - <b>name</b>: The name of the field in the config screen<br>
+     * - <b>name</b>: Will be used instead of the default translation key, if not empty<br>
      * - <b>selectionMode</b>: The selection mode of the file picker button for {@link String} fields,
      *   -1 for none, {@link JFileChooser#FILES_ONLY} for files, {@link JFileChooser#DIRECTORIES_ONLY} for directories,
      *   {@link JFileChooser#FILES_AND_DIRECTORIES} for both (default: -1). Remember to set the translation key
@@ -580,11 +580,10 @@ public abstract class MidnightConfig {
 
     /**
      * Comment Annotation<br>
-     * - <b>{@link Comment#centered()}</b>: If the comment should be centered (default: false)<br>
-     * - <b>{@link Comment#category()}</b>: The category of the comment in the config screen (default
-     * "default")<br>
-     * - <b>{@link Comment#name()}</b>: The name of the comment in the config screen (default: "")<br>
-     * - <b>{@link Comment#url()}</b>: The url of the comment in the config screen, empty or blank means no url (default: "")<br>
+     * - <b>{@link Comment#centered()}</b>: If the comment should be centered<br>
+     * - <b>{@link Comment#category()}</b>: The category of the comment in the config screen<br>
+     * - <b>{@link Comment#name()}</b>: Will be used instead of the default translation key, if not empty<br>
+     * - <b>{@link Comment#url()}</b>: The url of the comment should link to in the config screen (none if left empty)<br>
      * */
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Comment {
         boolean centered() default false;
