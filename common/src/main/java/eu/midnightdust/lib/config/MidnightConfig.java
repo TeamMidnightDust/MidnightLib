@@ -5,7 +5,8 @@ import com.google.gson.*; import com.google.gson.stream.*;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import net.fabricmc.api.EnvType; import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient; import net.minecraft.client.font.TextRenderer; import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element; import net.minecraft.client.gui.Selectable; import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.Element; import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.gui.screen.ConfirmLinkScreen; import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tab.GridScreenTab; import net.minecraft.client.gui.tab.Tab; import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.tooltip.Tooltip; import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.render.RenderLayer;
@@ -66,9 +67,7 @@ public abstract class MidnightConfig {
                 this.entry = field.getAnnotation(Entry.class);
                 this.comment = field.getAnnotation(Comment.class);
                 this.conditions = field.getAnnotationsByType(Condition.class);
-            } else {
-                this.fieldName = ""; this.dataType = null;
-            }
+            } else { this.fieldName = ""; this.dataType = null; }
             if (entry != null && !entry.name().isEmpty()) this.name = Text.translatable(entry.name());
             else if (comment != null && !comment.name().isEmpty()) this.name = Text.translatable(comment.name());
         }
@@ -97,7 +96,7 @@ public abstract class MidnightConfig {
                     this.conditionsMet = false;
                 String requiredOption = condition.requiredOption().contains(":") ? condition.requiredOption() : (this.modid + ":" + condition.requiredOption());
                 if (entries.get(requiredOption) instanceof EntryInfo info)
-                    this.conditionsMet &= condition.requiredValue().equals(info.tempValue);
+                    this.conditionsMet &= List.of(condition.requiredValue()).contains(info.tempValue);
                 if (!this.conditionsMet) break;
             }
             if (prevConditionState != this.conditionsMet) reloadScreen = true;
@@ -164,6 +163,9 @@ public abstract class MidnightConfig {
             else if (info.dataType == boolean.class) {
                 Function<Object, Text> func = value -> Text.translatable((Boolean) value ? "gui.yes" : "gui.no").formatted((Boolean) value ? Formatting.GREEN : Formatting.RED);
                 info.function = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
+                    if (info.actionButton instanceof CheckboxWidget checkbox && checkbox.isChecked() == (Boolean) info.value) {
+                        checkbox.onPress(); return;
+                    }
                     info.setValue(!(Boolean) info.value); button.setMessage(func.apply(info.value));
                 }, func);
             } else if (info.dataType.isEnum()) {
@@ -197,7 +199,8 @@ public abstract class MidnightConfig {
         boolean isNumber = pattern != null;
         info.function = (BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) (t, b) -> s -> {
             s = s.trim();
-            if (!(s.isEmpty() || !isNumber || pattern.matcher(s).matches())) return false;
+            if (!(s.isEmpty() || !isNumber || pattern.matcher(s).matches()) ||
+                    (info.dataType == Identifier.class && Identifier.validate(s).isError())) return false;
 
             Number value = 0; boolean inLimits = false; info.error = null;
             if (!(isNumber && s.isEmpty()) && !s.equals("-") && !s.equals(".")) {
@@ -296,7 +299,7 @@ public abstract class MidnightConfig {
                         if (entry.buttons.get(0) instanceof ClickableWidget widget)
                             if (widget.isFocused() || widget.isHovered()) widget.setTooltip(getTooltip(entry.info, true));
                         if (entry.buttons.get(1) instanceof ButtonWidget button)
-                            button.active = !Objects.equals(entry.info.value.toString(), entry.info.defaultValue.toString());
+                            button.active = !Objects.equals(String.valueOf(entry.info.value), String.valueOf(entry.info.defaultValue)) && entry.info.conditionsMet;
         }}}}
         @Override
         public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
@@ -354,17 +357,15 @@ public abstract class MidnightConfig {
                     if (info.function != null) {
                         ClickableWidget widget;
                         Entry e = info.entry;
-
                         if (info.function instanceof Map.Entry) { // Enums & booleans
                             var values = (Map.Entry<ButtonWidget.PressAction, Function<Object, Text>>) info.function;
                             if (info.dataType.isEnum())
                                 values.setValue(value -> Text.translatable(translationPrefix + "enum." + info.dataType.getSimpleName() + "." + info.value.toString()));
                             widget = ButtonWidget.builder(values.getValue().apply(info.value), values.getKey()).dimensions(width - 185, 0, 150, 20).tooltip(getTooltip(info, true)).build();
-                        }
-                        else if (e.isSlider())
+                            if (info.dataType == boolean.class) info.actionButton = CheckboxWidget.builder(Text.empty(), textRenderer).callback((checkbox, checked) -> values.getKey().onPress((ButtonWidget) widget)).checked((Boolean) info.value).pos(widget.getX(), 1).build();
+                        } else if (e.isSlider())
                             widget = new MidnightSliderWidget(width - 185, 0, 150, 20, Text.of(info.tempValue), (Double.parseDouble(info.tempValue) - e.min()) / (e.max() - e.min()), info);
                         else widget = new TextFieldWidget(textRenderer, width - 185, 0, 150, 20, Text.empty());
-
                         if (widget instanceof TextFieldWidget textField) {
                             textField.setMaxLength(e.width()); textField.setText(info.tempValue);
                             Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.function).apply(textField, done);
@@ -415,7 +416,6 @@ public abstract class MidnightConfig {
                             explorerButton.setPosition(width - 185, 0);
                             info.actionButton = explorerButton;
                         }
-                        if (!info.conditionsMet) widget.active = false;
                         List<ClickableWidget> widgets = Lists.newArrayList(widget, resetButton);
                         if (info.actionButton != null) {
                             if (IS_SYSTEM_MAC) info.actionButton.active = false;
@@ -426,6 +426,7 @@ public abstract class MidnightConfig {
                             widget.setWidth(widget.getWidth() - 22); widget.setX(widget.getX() + 22);
                             widgets.add(cycleButton);
                         }
+                        if (!info.conditionsMet) widgets.forEach(w -> w.active = false);
                         this.list.addButton(widgets, name, info);
                     } else this.list.addButton(List.of(), name, info);
                 } list.setScrollY(scrollProgress);
@@ -474,7 +475,7 @@ public abstract class MidnightConfig {
             }
         }
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            buttons.forEach(b -> { b.setY(y); b.render(context, mouseX, mouseY, tickDelta);});
+            buttons.forEach(b -> { b.setY(y + (b instanceof CheckboxWidget ? 1 : 0)); b.render(context, mouseX, mouseY, tickDelta);});
             if (title != null) {
                 title.setY(y + 9);
                 title.renderWidget(context, mouseX, mouseY, tickDelta);
@@ -488,6 +489,14 @@ public abstract class MidnightConfig {
                 }
             }
         }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (this.info != null && this.info.comment != null && !this.info.comment.url().isBlank())
+                ConfirmLinkScreen.open(MinecraftClient.getInstance().currentScreen, this.info.comment.url(), true);
+            return super.mouseClicked(mouseX, mouseY, button);
+        }
+
         public List<? extends Element> children() {return Lists.newArrayList(buttons);}
         public List<? extends Selectable> selectableChildren() {return Lists.newArrayList(buttons);}
     }
@@ -519,7 +528,7 @@ public abstract class MidnightConfig {
      * - <b>width</b>: The maximum character length of the {@link String}, {@link Identifier} or String/Identifier {@link List<>} field<br>
      * - <b>min</b>: The minimum value of the <code>int</code>, <code>float</code> or <code>double</code> field<br>
      * - <b>max</b>: The maximum value of the <code>int</code>, <code>float</code> or <code>double</code> field<br>
-     * - <b>name</b>: The name of the field in the config screen<br>
+     * - <b>name</b>: Will be used instead of the default translation key, if not empty<br>
      * - <b>selectionMode</b>: The selection mode of the file picker button for {@link String} fields,
      *   -1 for none, {@link JFileChooser#FILES_ONLY} for files, {@link JFileChooser#DIRECTORIES_ONLY} for directories,
      *   {@link JFileChooser#FILES_AND_DIRECTORIES} for both (default: -1). Remember to set the translation key
@@ -567,10 +576,18 @@ public abstract class MidnightConfig {
      */
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Hidden {}
 
+    /**
+     * Comment Annotation<br>
+     * - <b>{@link Comment#centered()}</b>: If the comment should be centered<br>
+     * - <b>{@link Comment#category()}</b>: The category of the comment in the config screen<br>
+     * - <b>{@link Comment#name()}</b>: Will be used instead of the default translation key, if not empty<br>
+     * - <b>{@link Comment#url()}</b>: The url of the comment should link to in the config screen (none if left empty)<br>
+     * */
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.FIELD) public @interface Comment {
         boolean centered() default false;
         String category() default "default";
         String name() default "";
+        String url() default "";
         @Deprecated String requiredMod() default "";
     }
     /**
@@ -589,7 +606,7 @@ public abstract class MidnightConfig {
     public @interface Condition {
         String requiredModId() default "";
         String requiredOption() default "";
-        String requiredValue() default "true";
+        String[] requiredValue() default {"true"};
         boolean visibleButLocked() default false;
     }
 

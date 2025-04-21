@@ -10,7 +10,7 @@ import java.util.List;
 
 /** Every option in a MidnightConfig class has to be public and static, so we can access it from other classes.
  * The config class also has to extend MidnightConfig*/
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "DefaultAnnotationParam"})
 public class MidnightConfigExample extends MidnightConfig {
     public static final String TEXT = "text";
     public static final String NUMBERS = "numbers";
@@ -31,6 +31,8 @@ public class MidnightConfigExample extends MidnightConfig {
     public enum ModPlatform {                               // Enums allow the user to cycle through predefined options
         QUILT, FABRIC, FORGE, NEOFORGE, VANILLA
     }
+    @Comment(category = TEXT, name = "§nMidnightLib Wiki", centered = true, url = "https://www.midnightdust.eu/wiki/midnightlib/") public static Comment wiki; // Example for a comment with a url
+
     @Entry(category = NUMBERS) public static int fabric = 16777215;                 // Example for an int option
     @Entry(category = NUMBERS) public static double world = 1.4D;                   // Example for a double option
     @Entry(category = NUMBERS, min=69,max=420) public static int hello = 420;   // - The entered number has to be larger than 69 and smaller than 420
@@ -74,7 +76,7 @@ public class MidnightConfigExample extends MidnightConfig {
     @Entry(category = CONDITIONS, name="Turn me on!")
     public static boolean turnMeOn = false;
     @Condition(requiredOption = "modid:turnMeOn", visibleButLocked = true)
-    @Entry(category = CONDITIONS, name="Turn me off (locked if modid:turnMeOn is false)!")
+    @Entry(category = CONDITIONS, name="Turn me off (locked)!")
     public static Boolean turnMeOff = true;
     @Condition(requiredOption = "turnMeOn") // You can also use multiple conditions for the same entry
     @Condition(requiredOption = "modid:turnMeOff", requiredValue = "false")
@@ -100,6 +102,12 @@ public class MidnightConfigExample extends MidnightConfig {
     @Condition(requiredOption = "bestModloader", requiredValue = "Quilt")
     @Comment(category = CONDITIONS, name="⭐ Correct! Quilt (and Fabric) are the best!", centered = true)
     public static Comment answerQuilt;
+
+    @Entry(category = CONDITIONS, name="Enter any prime number below 10")
+    public static int primeNumber = 0;
+    @Comment(category = CONDITIONS, name="Correct!")
+    @Condition(requiredOption = "primeNumber", requiredValue = {"2", "3", "5", "7"})
+    public static Comment answerPrime;
 
     @Condition(requiredOption = "midnightlib:config_screen_list", requiredValue = "FALSE") // Access options of other mods that are also using MidnightLib
     @Comment(category = CONDITIONS) public static Comment spaceracer;
