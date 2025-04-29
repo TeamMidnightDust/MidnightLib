@@ -1,0 +1,13 @@
+{
+	"midnightlib.overview.title": "Resumen de MidnightConfig",
+	"midnightlib.midnightconfig.title": "Configuración de MidnightLib",
+	"midnightlib.midnightconfig.config_screen_list": "Habilitar lista de pantallas de configuración",
+	"midnightlib.midnightconfig.enum.ConfigButton.TRUE": "§aSí",
+	"midnightlib.midnightconfig.enum.ConfigButton.FALSE": "§cNo",
+	"midnightlib.midnightconfig.enum.ConfigButton.MODMENU": "§bModMenu",
+	"midnightlib.modrinth": "Modrinth",
+	"midnightlib.curseforge": "CurseForge",
+	"midnightlib.wiki": "Wiki",
+	"modmenu.summaryTranslation.midnightlib": "Librería común para facilitar la configuración.",
+	"midnightconfig.colorChooser.title": "Elegí un color"
+}
