@@ -24,5 +24,6 @@
   "modid.midnightconfig.category.lists": "Lists",
   "modid.midnightconfig.category.files": "Files",
   "modid.midnightconfig.category.conditions": "Quiz",
+  "modid.midnightconfig.category.extras": "Extras",
   "modid.midnightconfig.category.multiConditions": "Multi-Conditions"
 }
