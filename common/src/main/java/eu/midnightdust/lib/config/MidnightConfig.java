@@ -344,6 +344,7 @@ public abstract class MidnightConfig {
         public void fillList() {
             MidnightConfig.getClass(modid).onTabInit(prevTab.getTitle().getContent() instanceof TranslatableTextContent translatable ? translatable.getKey().replace("%s.midnightconfig.category.".formatted(modid), "") : prevTab.getTitle().toString(), list, this);
             for (EntryInfo info : entries.values()) {
+                info.updateConditions();
                 if (!info.conditionsMet) {
                     boolean visibleButLocked = false;
                     for (Condition condition : info.conditions) {
