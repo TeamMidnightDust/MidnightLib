@@ -14,6 +14,7 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Style; import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Formatting; import net.minecraft.util.Identifier;
 import net.minecraft.util.TranslatableOption;
 import org.jetbrains.annotations.Nullable;
@@ -107,6 +108,10 @@ public abstract class MidnightConfig {
             if (index >= list.size()) list.add(value);
             else list.set(index, value);
         }
+        public Tooltip getTooltip(boolean isButton) {
+            String key = this.modid + ".midnightconfig."+this.fieldName+(!isButton ? ".label" : "" )+".tooltip";
+            return Tooltip.of(isButton && this.error != null ? this.error : I18n.hasTranslation(key) ? Text.translatable(key) : Text.empty());
+        }
     }
 
     public static final Map<String, Class<? extends MidnightConfig>> configClass = new HashMap<>();
@@ -120,11 +125,6 @@ public abstract class MidnightConfig {
                 public Identifier read(JsonReader in) throws IOException { return Identifier.of(in.nextString()); }
             }).setPrettyPrinting().create();
 
-    @SuppressWarnings("unused") // Utility for mod authors
-    public static @Nullable Object getDefaultValue(String modid, String entry) {
-        String key = modid + ":" + entry;
-        return entries.containsKey(key) ? entries.get(key).defaultValue : null;
-    }
     public static void loadValuesFromJson(String modid) {
         try { gson.fromJson(Files.newBufferedReader(path), configClass.get(modid)); }
         catch (Exception e) { write(modid); }
@@ -188,10 +188,6 @@ public abstract class MidnightConfig {
         try { return (Class<?>) rawType.getField("TYPE").get(null); // Tries to get primitive types from non-primitives (e.g. Boolean -> boolean)
         } catch (NoSuchFieldException | IllegalAccessException ignored) { return rawType; }
     }
-    public static Tooltip getTooltip(EntryInfo info, boolean isButton) {
-        String key = info.modid + ".midnightconfig."+info.fieldName+(!isButton ? ".label" : "" )+".tooltip";
-        return Tooltip.of(isButton && info.error != null ? info.error : I18n.hasTranslation(key) ? Text.translatable(key) : Text.empty());
-    }
 
     private static Text getEnumTranslatableText(Object value, String modid, EntryInfo info) {
         if (value instanceof TranslatableOption translatableOption) {
@@ -216,7 +212,7 @@ public abstract class MidnightConfig {
                 info.error = inLimits? null : Text.literal(value.doubleValue() < min ?
                         "§cMinimum " + (isNumber? "value" : "length") + (cast? " is " + (int)min : " is " + min) :
                         "§cMaximum " + (isNumber? "value" : "length") + (cast? " is " + (int)max : " is " + max)).formatted(Formatting.RED);
-                t.setTooltip(getTooltip(info, true));
+                t.setTooltip(info.getTooltip(true));
             }
 
             info.tempValue = s;
@@ -248,6 +244,15 @@ public abstract class MidnightConfig {
               Files.write(path, gson.toJson(getClass(modid)).getBytes());
         } catch (Exception e) { e.fillInStackTrace(); }
     }
+
+    @SuppressWarnings("unused") // Utility for mod authors
+    public static @Nullable Object getDefaultValue(String modid, String entry) {
+        String key = modid + ":" + entry;
+        return entries.containsKey(key) ? entries.get(key).defaultValue : null;
+    }
+
+    public void onTabInit(String tabName, MidnightConfigListWidget list, MidnightConfigScreen screen) {}
+
     @Environment(EnvType.CLIENT)
     public static Screen getScreen(Screen parent, String modid) {
         return new MidnightConfigScreen(parent, modid);
@@ -302,9 +307,9 @@ public abstract class MidnightConfig {
         public void updateButtons() {
             if (this.list != null) {
                 for (ButtonEntry entry : this.list.children()) {
-                    if (entry.buttons != null && entry.buttons.size() > 1) {
+                    if (entry.buttons != null && entry.buttons.size() > 1 && entry.info.field != null) {
                         if (entry.buttons.get(0) instanceof ClickableWidget widget)
-                            if (widget.isFocused() || widget.isHovered()) widget.setTooltip(getTooltip(entry.info, true));
+                            if (widget.isFocused() || widget.isHovered()) widget.setTooltip(entry.info.getTooltip(true));
                         if (entry.buttons.get(1) instanceof ButtonWidget button)
                             button.active = !Objects.equals(String.valueOf(entry.info.value), String.valueOf(entry.info.defaultValue)) && entry.info.conditionsMet;
         }}}}
@@ -344,7 +349,9 @@ public abstract class MidnightConfig {
             this.list.clear(); fillList();
         }
         public void fillList() {
+            MidnightConfig.getClass(modid).onTabInit(prevTab.getTitle().getContent() instanceof TranslatableTextContent translatable ? translatable.getKey().replace("%s.midnightconfig.category.".formatted(modid), "") : prevTab.getTitle().toString(), list, this);
             for (EntryInfo info : entries.values()) {
+                info.updateConditions();
                 if (!info.conditionsMet) {
                     boolean visibleButLocked = false;
                     for (Condition condition : info.conditions) {
@@ -369,7 +376,7 @@ public abstract class MidnightConfig {
                             if (info.dataType.isEnum()) {
                                 values.setValue(value -> getEnumTranslatableText(value, modid, info));
                             }
-                            widget = ButtonWidget.builder(values.getValue().apply(info.value), values.getKey()).dimensions(width - 185, 0, 150, 20).tooltip(getTooltip(info, true)).build();
+                            widget = ButtonWidget.builder(values.getValue().apply(info.value), values.getKey()).dimensions(width - 185, 0, 150, 20).tooltip(info.getTooltip(true)).build();
                             if (info.dataType == boolean.class) info.actionButton = CheckboxWidget.builder(Text.empty(), textRenderer).callback((checkbox, checked) -> values.getKey().onPress((ButtonWidget) widget)).checked((Boolean) info.value).pos(widget.getX(), 1).build();
                         } else if (e.isSlider())
                             widget = new MidnightSliderWidget(width - 185, 0, 150, 20, Text.of(info.tempValue), (Double.parseDouble(info.tempValue) - e.min()) / (e.max() - e.min()), info);
@@ -379,7 +386,7 @@ public abstract class MidnightConfig {
                             Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.function).apply(textField, done);
                             textField.setTextPredicate(processor);
                         }
-                        widget.setTooltip(getTooltip(info, true));
+                        widget.setTooltip(info.getTooltip(true));
 
                         ButtonWidget cycleButton = null;
                         if (info.field.getType() == List.class) {
@@ -478,14 +485,14 @@ public abstract class MidnightConfig {
 
             if (text != null && (!text.getString().contains("spacer") || !buttons.isEmpty())) {
                 title = new MultilineTextWidget((centered) ? (scaledWidth / 2 - (textRenderer.getWidth(text) / 2)) : 12, 0, Text.of(text), textRenderer);
-                if (info != null) title.setTooltip(getTooltip(info, false));
+                if (info != null) title.setTooltip(info.getTooltip(false));
                 title.setMaxWidth(buttons.size() > 1 ? buttons.get(1).getX() - 24 : scaledWidth - 24);
             }
         }
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             buttons.forEach(b -> { b.setY(y + (b instanceof CheckboxWidget ? 1 : 0)); b.render(context, mouseX, mouseY, tickDelta);});
             if (title != null) {
-                title.setY(y + 9);
+                title.setY(y+5);
                 title.renderWidget(context, mouseX, mouseY, tickDelta);
 
                 boolean tooltipVisible = mouseX >= title.getX() && mouseX < title.getWidth() + title.getX() && mouseY >= title.getY() && mouseY < title.getHeight() + title.getY();

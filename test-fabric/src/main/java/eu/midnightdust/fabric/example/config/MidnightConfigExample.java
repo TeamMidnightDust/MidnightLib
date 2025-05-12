@@ -1,16 +1,19 @@
 package eu.midnightdust.fabric.example.config;
 
 import com.google.common.collect.Lists;
+import eu.midnightdust.fabric.example.MidnightLibExtras;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TranslatableOption;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /** Every option in a MidnightConfig class has to be public and static, so we can access it from other classes.
  * The config class also has to extend MidnightConfig*/
@@ -22,6 +25,7 @@ public class MidnightConfigExample extends MidnightConfig {
     public static final String LISTS = "lists";
     public static final String FILES = "files";
     public static final String CONDITIONS = "conditions";
+    public static final String EXTRAS = "extras";
 
     @Comment(category = TEXT) public static Comment text1;                       // Comments are rendered like an option without a button and are excluded from the config file
     @Comment(category = TEXT, centered = true) public static Comment text2;      // Centered comments are the same as normal ones - just centered!
@@ -150,4 +154,16 @@ public class MidnightConfigExample extends MidnightConfig {
     @Comment(category = CONDITIONS, name="You disabled MidnightLib's config screen list. Why? :(", centered = true)  public static Comment why;
 
     public static int imposter = 16777215; // - Entries without an @Entry or @Comment annotation are ignored
+
+    @Condition(requiredModId = "thismoddoesnotexist")
+    @Comment(category = EXTRAS) public static Comment iAmJustADummy; // We only have this to initialize an empty tab for the keybinds below
+
+    @Override
+    public void onTabInit(String tabName, MidnightConfigListWidget list, MidnightConfigScreen screen) {
+        if (Objects.equals(tabName, EXTRAS)) {
+            MidnightLibExtras.KeybindButton.add(MinecraftClient.getInstance().options.advancementsKey, list, screen);
+            MidnightLibExtras.KeybindButton.add(MinecraftClient.getInstance().options.dropKey, list, screen);
+        }
+    }
+
 }
