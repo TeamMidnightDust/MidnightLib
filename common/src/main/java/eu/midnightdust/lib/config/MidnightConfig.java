@@ -483,7 +483,7 @@ public abstract class MidnightConfig {
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             buttons.forEach(b -> { b.setY(y + (b instanceof CheckboxWidget ? 1 : 0)); b.render(context, mouseX, mouseY, tickDelta);});
             if (title != null) {
-                title.setY(y + 9);
+                title.setY(y+5);
                 title.renderWidget(context, mouseX, mouseY, tickDelta);
 
                 boolean tooltipVisible = mouseX >= title.getX() && mouseX < title.getWidth() + title.getX() && mouseY >= title.getY() && mouseY < title.getHeight() + title.getY();
