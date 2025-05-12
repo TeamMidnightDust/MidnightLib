@@ -16,6 +16,7 @@
   "modid.midnightconfig.enum.ModPlatform.QUILT":"Quilt",
   "modid.midnightconfig.enum.ModPlatform.NEOFORGE":"NeoForge",
   "modid.midnightconfig.enum.ModPlatform.VANILLA":"Vanilla",
+  "modid.midnightconfig.graphicsSteps":"I am an enum with TranslatableOption!",
   "modid.midnightconfig.myFileOrDirectory.fileChooser": "Select an image or directory",
   "modid.midnightconfig.myFileOrDirectory.fileFilter": "Supported Images (.png, .jpg, .jpeg)",
   "modid.midnightconfig.category.numbers": "Numbers",

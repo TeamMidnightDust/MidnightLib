@@ -16,6 +16,7 @@ import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Style; import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Formatting; import net.minecraft.util.Identifier;
+import net.minecraft.util.TranslatableOption;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*; import javax.swing.filechooser.FileNameExtensionFilter;
@@ -170,10 +171,7 @@ public abstract class MidnightConfig {
                 }, func);
             } else if (info.dataType.isEnum()) {
                 List<?> values = Arrays.asList(field.getType().getEnumConstants());
-                Function<Object, Text> func = value -> {
-                    String translationKey = modid + ".midnightconfig.enum." + info.dataType.getSimpleName() + "." + info.toTemporaryValue();
-                    return I18n.hasTranslation(translationKey) ? Text.translatable(translationKey) : Text.literal(info.toTemporaryValue());
-                };
+                Function<Object, Text> func = value -> getEnumTranslatableText(value, modid, info);
                 info.function = new AbstractMap.SimpleEntry<ButtonWidget.PressAction, Function<Object, Text>>(button -> {
                     int index = values.indexOf(info.value) + 1;
                     info.setValue(values.get(index >= values.size() ? 0 : index));
@@ -189,6 +187,15 @@ public abstract class MidnightConfig {
             rawType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
         try { return (Class<?>) rawType.getField("TYPE").get(null); // Tries to get primitive types from non-primitives (e.g. Boolean -> boolean)
         } catch (NoSuchFieldException | IllegalAccessException ignored) { return rawType; }
+    }
+
+    private static Text getEnumTranslatableText(Object value, String modid, EntryInfo info) {
+        if (value instanceof TranslatableOption translatableOption) {
+            return translatableOption.getText();
+        }
+
+        String translationKey = modid + ".midnightconfig.enum." + info.dataType.getSimpleName() + "." + info.toTemporaryValue();
+        return I18n.hasTranslation(translationKey) ? Text.translatable(translationKey) : Text.literal(info.toTemporaryValue());
     }
 
     private static void textField(EntryInfo info, Function<String,Number> f, Pattern pattern, double min, double max, boolean cast) {
@@ -366,8 +373,9 @@ public abstract class MidnightConfig {
                         Entry e = info.entry;
                         if (info.function instanceof Map.Entry) { // Enums & booleans
                             var values = (Map.Entry<ButtonWidget.PressAction, Function<Object, Text>>) info.function;
-                            if (info.dataType.isEnum())
-                                values.setValue(value -> Text.translatable(translationPrefix + "enum." + info.dataType.getSimpleName() + "." + info.value.toString()));
+                            if (info.dataType.isEnum()) {
+                                values.setValue(value -> getEnumTranslatableText(value, modid, info));
+                            }
                             widget = ButtonWidget.builder(values.getValue().apply(info.value), values.getKey()).dimensions(width - 185, 0, 150, 20).tooltip(info.getTooltip(true)).build();
                             if (info.dataType == boolean.class) info.actionButton = CheckboxWidget.builder(Text.empty(), textRenderer).callback((checkbox, checked) -> values.getKey().onPress((ButtonWidget) widget)).checked((Boolean) info.value).pos(widget.getX(), 1).build();
                         } else if (e.isSlider())

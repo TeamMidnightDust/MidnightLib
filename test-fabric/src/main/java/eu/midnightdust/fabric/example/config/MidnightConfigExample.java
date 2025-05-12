@@ -3,8 +3,12 @@ package eu.midnightdust.fabric.example.config;
 import com.google.common.collect.Lists;
 import eu.midnightdust.fabric.example.MidnightLibExtras;
 import eu.midnightdust.lib.config.MidnightConfig;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.TranslatableOption;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -35,6 +39,37 @@ public class MidnightConfigExample extends MidnightConfig {
     public enum ModPlatform {                               // Enums allow the user to cycle through predefined options
         QUILT, FABRIC, FORGE, NEOFORGE, VANILLA
     }
+    @Entry(category = TEXT) public static GraphicsSteps graphicsSteps = GraphicsSteps.FABULOUS;   // Example for an enum option with TranslatableOption
+    public enum GraphicsSteps implements TranslatableOption {
+        FAST(0, "options.graphics.fast"),
+        FANCY(1, "options.graphics.fancy"),
+        FABULOUS(2, "options.graphics.fabulous");
+
+        private final int id;
+        private final String translationKey;
+
+        GraphicsSteps(int id, String translationKey) {
+            this.id = id;
+            this.translationKey = translationKey;
+        }
+
+        @Override
+        public Text getText() {
+            MutableText mutableText = Text.translatable(this.getTranslationKey());
+            return this == GraphicsSteps.FABULOUS ? mutableText.formatted(Formatting.ITALIC).formatted(Formatting.AQUA) : mutableText;
+        }
+
+        @Override
+        public int getId() {
+            return this.id;
+        }
+
+        @Override
+        public String getTranslationKey() {
+            return this.translationKey;
+        }
+    }
+
     @Comment(category = TEXT, name = "§nMidnightLib Wiki", centered = true, url = "https://www.midnightdust.eu/wiki/midnightlib/") public static Comment wiki; // Example for a comment with a url
 
     @Entry(category = NUMBERS) public static int fabric = 16777215;                 // Example for an int option
