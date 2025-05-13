@@ -187,11 +187,9 @@ public abstract class MidnightConfig {
     }
 
     private static Text getEnumTranslatableText(Object value, String modid, EntryInfo info) {
-        if (value instanceof TranslatableOption translatableOption) {
-            return translatableOption.getText();
-        }
+        if (value instanceof TranslatableOption translatableOption) return translatableOption.getText();
 
-        String translationKey = modid + ".midnightconfig.enum." + info.dataType.getSimpleName() + "." + info.toTemporaryValue();
+        String translationKey = "%s.midnightconfig.enum.%s.%s".formatted(modid, info.dataType.getSimpleName(), info.toTemporaryValue());
         return I18n.hasTranslation(translationKey) ? Text.translatable(translationKey) : Text.literal(info.toTemporaryValue());
     }
 
@@ -257,7 +255,7 @@ public abstract class MidnightConfig {
     @Environment(EnvType.CLIENT)
     public static class MidnightConfigScreen extends Screen {
         protected MidnightConfigScreen(Screen parent, String modid) {
-            super(Text.translatable(modid + ".midnightconfig." + "title"));
+            super(Text.translatable(modid + ".midnightconfig.title"));
             this.parent = parent; this.modid = modid;
             this.translationPrefix = modid + ".midnightconfig.";
             loadValuesFromJson(modid);

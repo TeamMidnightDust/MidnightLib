@@ -40,35 +40,6 @@ public class MidnightConfigExample extends MidnightConfig {
         QUILT, FABRIC, FORGE, NEOFORGE, VANILLA
     }
     @Entry(category = TEXT) public static GraphicsSteps graphicsSteps = GraphicsSteps.FABULOUS;   // Example for an enum option with TranslatableOption
-    public enum GraphicsSteps implements TranslatableOption {
-        FAST(0, "options.graphics.fast"),
-        FANCY(1, "options.graphics.fancy"),
-        FABULOUS(2, "options.graphics.fabulous");
-
-        private final int id;
-        private final String translationKey;
-
-        GraphicsSteps(int id, String translationKey) {
-            this.id = id;
-            this.translationKey = translationKey;
-        }
-
-        @Override
-        public Text getText() {
-            MutableText mutableText = Text.translatable(this.getTranslationKey());
-            return this == GraphicsSteps.FABULOUS ? mutableText.formatted(Formatting.ITALIC).formatted(Formatting.AQUA) : mutableText;
-        }
-
-        @Override
-        public int getId() {
-            return this.id;
-        }
-
-        @Override
-        public String getTranslationKey() {
-            return this.translationKey;
-        }
-    }
 
     @Comment(category = TEXT, name = "§nMidnightLib Wiki", centered = true, url = "https://www.midnightdust.eu/wiki/midnightlib/") public static Comment wiki; // Example for a comment with a url
 
@@ -154,6 +125,36 @@ public class MidnightConfigExample extends MidnightConfig {
     @Comment(category = CONDITIONS, name="You disabled MidnightLib's config screen list. Why? :(", centered = true)  public static Comment why;
 
     public static int imposter = 16777215; // - Entries without an @Entry or @Comment annotation are ignored
+
+    public enum GraphicsSteps implements TranslatableOption {
+        FAST(0, "options.graphics.fast"),
+        FANCY(1, "options.graphics.fancy"),
+        FABULOUS(2, "options.graphics.fabulous");
+
+        private final int id;
+        private final String translationKey;
+
+        GraphicsSteps(int id, String translationKey) {
+            this.id = id;
+            this.translationKey = translationKey;
+        }
+
+        @Override
+        public Text getText() {
+            MutableText mutableText = Text.translatable(this.getTranslationKey());
+            return this == GraphicsSteps.FABULOUS ? mutableText.formatted(Formatting.ITALIC).formatted(Formatting.AQUA) : mutableText;
+        }
+
+        @Override
+        public int getId() {
+            return this.id;
+        }
+
+        @Override
+        public String getTranslationKey() {
+            return this.translationKey;
+        }
+    }
 
     @Condition(requiredModId = "thismoddoesnotexist")
     @Comment(category = EXTRAS) public static Comment iAmJustADummy; // We only have this to initialize an empty tab for the keybinds below
