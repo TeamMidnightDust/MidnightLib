@@ -4,7 +4,9 @@ import com.google.common.collect.Lists;
 import com.google.gson.*; import com.google.gson.stream.*;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import net.fabricmc.api.EnvType; import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient; import net.minecraft.client.font.TextRenderer; import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.MinecraftClient; import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element; import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen; import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tab.GridScreenTab; import net.minecraft.client.gui.tab.Tab; import net.minecraft.client.gui.tab.TabManager;
@@ -13,6 +15,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenTexts;
+import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Style; import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Formatting; import net.minecraft.util.Identifier;
@@ -458,7 +461,7 @@ public abstract class MidnightConfig {
         @Override
         protected void drawHeaderAndFooterSeparators(DrawContext context) {
             if (renderHeaderSeparator) super.drawHeaderAndFooterSeparators(context);
-            else context.drawTexture(RenderLayer::getGuiTextured, this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE, this.getX(), this.getBottom(), 0, 0, this.getWidth(), 2, 32, 2);
+            else context.drawTexture(RenderPipelines.GUI_TEXTURED, this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE, this.getX(), this.getBottom(), 0, 0, this.getWidth(), 2, 32, 2);
         }
         public void addButton(List<ClickableWidget> buttons, Text text, EntryInfo info) { this.addEntry(new ButtonEntry(buttons, text, info)); }
         public void clear() { this.clearEntries(); }
@@ -479,6 +482,7 @@ public abstract class MidnightConfig {
 
             if (text != null && (!text.getString().contains("spacer") || !buttons.isEmpty())) {
                 title = new MultilineTextWidget((centered) ? (scaledWidth / 2 - (textRenderer.getWidth(text) / 2)) : 12, 0, Text.of(text), textRenderer);
+                title.setCentered(centered);
                 if (info != null) title.setTooltip(info.getTooltip(false));
                 title.setMaxWidth(buttons.size() > 1 ? buttons.get(1).getX() - 24 : scaledWidth - 24);
             }
@@ -487,10 +491,7 @@ public abstract class MidnightConfig {
             buttons.forEach(b -> { b.setY(y); b.render(context, mouseX, mouseY, tickDelta);});
             if (title != null) {
                 title.setY(y+5);
-                title.renderWidget(context, mouseX, mouseY, tickDelta);
-
-                boolean tooltipVisible = mouseX >= title.getX() && mouseX < title.getWidth() + title.getX() && mouseY >= title.getY() && mouseY < title.getHeight() + title.getY();
-                if (tooltipVisible && title.getTooltip() != null) context.drawOrderedTooltip(textRenderer, title.getTooltip().getLines(MinecraftClient.getInstance()), mouseX, mouseY);
+                title.render(context, mouseX, mouseY, tickDelta);
 
                 if (info.entry != null && !this.buttons.isEmpty() && this.buttons.getFirst() instanceof ClickableWidget widget) {
                     int idMode = this.info.entry.idMode();
