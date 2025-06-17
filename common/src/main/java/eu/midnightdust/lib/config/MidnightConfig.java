@@ -484,7 +484,7 @@ public abstract class MidnightConfig {
                 title = new MultilineTextWidget((centered) ? (scaledWidth / 2 - (textRenderer.getWidth(text) / 2)) : 12, 0, Text.of(text), textRenderer);
                 title.setCentered(centered);
                 if (info != null) title.setTooltip(info.getTooltip(false));
-                title.setMaxWidth(buttons.size() > 1 ? buttons.get(1).getX() - 24 : scaledWidth - 24);
+                title.setMaxWidth(!buttons.isEmpty() ? buttons.get(buttons.size() > 2 ? buttons.size()-1 : 0).getX() - 16 : scaledWidth - 24);
             }
         }
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
