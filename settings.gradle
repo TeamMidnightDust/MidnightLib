@@ -10,8 +10,8 @@ pluginManagement {
 include("common")
 include("fabric")
 include("test-fabric")
-//include("neoforge")
-//include("test-neoforge")
+include("neoforge")
+include("test-neoforge")
 //include("quilt")
 
 rootProject.name = "midnightlib"
