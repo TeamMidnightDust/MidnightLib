@@ -2,10 +2,10 @@ package eu.midnightdust.lib.config;
 
 import com.google.common.collect.Lists;
 import com.google.gson.*; import com.google.gson.stream.*;
+import com.mojang.blaze3d.systems.RenderSystem;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import net.fabricmc.api.EnvType; import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient; import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element; import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen; import net.minecraft.client.gui.screen.Screen;
@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*; import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.Color;
-import java.io.IOException;
 import java.lang.annotation.*;
 import java.lang.reflect.Field; import java.lang.reflect.Modifier; import java.lang.reflect.ParameterizedType;
 import java.nio.file.Files; import java.nio.file.Path;
@@ -121,10 +120,7 @@ public abstract class MidnightConfig {
     private static final Gson gson = new GsonBuilder()
             .excludeFieldsWithModifiers(Modifier.TRANSIENT).excludeFieldsWithModifiers(Modifier.PRIVATE)
             .addSerializationExclusionStrategy(new NonEntryExclusionStrategy())
-            .registerTypeAdapter(Identifier.class, new TypeAdapter<Identifier>() {
-                public void write(JsonWriter out, Identifier id) throws IOException { out.value(id.toString()); }
-                public Identifier read(JsonReader in) throws IOException { return Identifier.of(in.nextString()); }
-            }).setPrettyPrinting().create();
+            .registerTypeAdapter(Identifier.class, new Identifier.Serializer()).setPrettyPrinting().create();
 
     public static void loadValuesFromJson(String modid) {
         try { gson.fromJson(Files.newBufferedReader(path), configClass.get(modid)); }
@@ -481,7 +477,7 @@ public abstract class MidnightConfig {
             int scaledWidth = MinecraftClient.getInstance().getWindow().getScaledWidth();
 
             if (text != null && (!text.getString().contains("spacer") || !buttons.isEmpty())) {
-                title = new MultilineTextWidget((centered) ? (scaledWidth / 2 - (textRenderer.getWidth(text) / 2)) : 12, 0, Text.of(text), textRenderer);
+                title = new MultilineTextWidget((centered) ? (scaledWidth / 2 - (textRenderer.getWidth(text) / 2)) : 12, 0, text, textRenderer);
                 title.setCentered(centered);
                 if (info != null) title.setTooltip(info.getTooltip(false));
                 title.setMaxWidth(!buttons.isEmpty() ? buttons.get(buttons.size() > 2 ? buttons.size()-1 : 0).getX() - 16 : scaledWidth - 24);
@@ -492,6 +488,8 @@ public abstract class MidnightConfig {
             if (title != null) {
                 title.setY(y+5);
                 title.render(context, mouseX, mouseY, tickDelta);
+                boolean tooltipVisible = mouseX >= title.getX() && mouseX < title.getWidth() + title.getX() && mouseY >= title.getY() && mouseY < title.getHeight() + title.getY();
+                if (tooltipVisible && title.getTooltip() != null) context.drawOrderedTooltip(textRenderer, title.getTooltip().getLines(MinecraftClient.getInstance()), mouseX, mouseY);
 
                 if (info.entry != null && !this.buttons.isEmpty() && this.buttons.getFirst() instanceof ClickableWidget widget) {
                     int idMode = this.info.entry.idMode();
