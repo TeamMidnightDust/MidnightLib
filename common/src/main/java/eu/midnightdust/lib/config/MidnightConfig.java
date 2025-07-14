@@ -293,9 +293,9 @@ public abstract class MidnightConfig {
             super.tick();
             if (prevTab != null && prevTab != tabManager.getCurrentTab()) {
                 prevTab = tabManager.getCurrentTab();
-                updateList(); list.setScrollY(0);
+                updateList(); list.setScrollAmount(0);
             }
-            scrollProgress = list.getScrollY();
+            scrollProgress = list.getScrollAmount();
             for (EntryInfo info : entries.values()) info.updateFieldValue();
             updateButtons();
             if (reloadScreen) { updateList(); reloadScreen = false; }
@@ -439,7 +439,7 @@ public abstract class MidnightConfig {
                         if (!info.conditionsMet) widgets.forEach(w -> w.active = false);
                         this.list.addButton(widgets, name, info);
                     } else this.list.addButton(List.of(), name, info);
-                } list.setScrollY(scrollProgress);
+                } list.setScrollAmount(scrollProgress);
                 updateButtons();
             }
         }
@@ -459,7 +459,9 @@ public abstract class MidnightConfig {
         @Override
         protected void drawHeaderAndFooterSeparators(DrawContext context) {
             if (renderHeaderSeparator) super.drawHeaderAndFooterSeparators(context);
-            else context.drawTexture(RenderPipelines.GUI_TEXTURED, this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE, this.getX(), this.getBottom(), 0, 0, this.getWidth(), 2, 32, 2);
+            else { RenderSystem.enableBlend();
+                context.drawTexture(this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE, this.getX(), this.getBottom(), 0.0F, 0.0F, this.getWidth(), 2, 32, 2);
+                RenderSystem.disableBlend(); }
         }
         public void addButton(List<ClickableWidget> buttons, Text text, EntryInfo info) { this.addEntry(new ButtonEntry(buttons, text, info)); }
         public void clear() { this.clearEntries(); }
