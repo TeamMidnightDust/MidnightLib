@@ -1,0 +1,8 @@
+{
+	"midnightlib.overview.title": "Visión general de MidnightConfig",
+	"midnightlib.midnightconfig.title": "Configuración de MidnightLib",
+	"midnightlib.midnightconfig.config_screen_list": "Habilitar lista de pantallas de configuración",
+	"midnightlib.midnightconfig.enum.ConfigButton.TRUE": "§aSí",
+	"modmenu.summaryTranslation.midnightlib": "Librería común para facilitar la configuración.",
+	"midnightconfig.colorChooser.title": "Elegí un color"
+}
