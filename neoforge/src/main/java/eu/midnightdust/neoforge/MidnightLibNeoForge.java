@@ -26,7 +26,7 @@ public class MidnightLibNeoForge {
         if (FMLEnvironment.dist == Dist.CLIENT) MidnightLib.onInitializeClient();
     }
 
-    @EventBusSubscriber(modid = "midnightlib", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = "midnightlib", value = Dist.CLIENT)
     public static class MidnightLibBusEvents {
         @SubscribeEvent
         public static void onPostInit(FMLClientSetupEvent event) {
