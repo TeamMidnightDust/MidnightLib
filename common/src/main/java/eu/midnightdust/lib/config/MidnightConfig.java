@@ -32,6 +32,26 @@ import java.util.regex.Pattern;
 
 import static net.minecraft.client.MinecraftClient.IS_SYSTEM_MAC;
 
+
+/* FIXME:
+ *  hi martin :wave:
+ *  before anythinge else:
+ *  DON'T ANNOY YOURSELF WITH THIS
+ *  BACKPORT UNLESS YOU REALLY DON'T HAVE
+ *  ANYTHING BETTER TO DO!!!!!
+ *  i don't wish to waste your time in any capacity,
+ *  and this backport is going to be a *huge* mess,
+ *  as you surely know
+ *  so please!! take it easy!
+ *  much love <3
+ *  .
+ *  this being your codebase, i'm guessing
+ *  (moreso hoping) you'll know what's in need
+ *  of fixing given the rendering changes between
+ *  1.20 & 1.21
+ *  gave it my best shot but... got completely lost.
+ */
+
 /** MidnightConfig by Martin "Motschen" Prokoph
  *  Single class config library - feel free to copy!
  *  Based on <a href="https://github.com/Minenash/TinyConfig">...</a>
