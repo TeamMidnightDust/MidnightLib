@@ -1,3 +1,4 @@
+/*
 plugins {
     id 'com.github.johnrengelman.shadow'
     id "me.shedaniel.unified-publishing"
@@ -106,3 +107,4 @@ unifiedPublishing {
         }
     }
 }
+*/
