@@ -65,7 +65,7 @@ components.java {
     }
 }
 
-unifiedPublishing {
+/*unifiedPublishing {
     project {
         displayName = "MidnightLib $rootProject.version - Fabric $project.minecraft_version"
         releaseType = "$project.release_type"
@@ -85,7 +85,7 @@ unifiedPublishing {
             curseforge {
                 token = CURSEFORGE_TOKEN
                 id = rootProject.curseforge_id
-                gameVersions.addAll "Java 21", project.minecraft_version
+                gameVersions.addAll "Java 17", project.minecraft_version
                 if (project.supported_versions != "") gameVersions.addAll project.supported_versions
             }
         }
@@ -101,4 +101,4 @@ unifiedPublishing {
             }
         }
     }
-}
+}*/

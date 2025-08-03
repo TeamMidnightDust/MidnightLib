@@ -3,7 +3,7 @@ import groovy.json.JsonOutput
 
 plugins {
     id "architectury-plugin" version "3.4-SNAPSHOT"
-    id "dev.architectury.loom" version "1.7-SNAPSHOT" apply false
+    id "dev.architectury.loom" version "1.10-SNAPSHOT" apply false
     id "me.shedaniel.unified-publishing" version "0.1.+" apply false
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
 }
@@ -20,7 +20,7 @@ subprojects {
         // The following line declares the yarn mappings you may select this one as well.
         mappings loom.layered {
             it.mappings("net.fabricmc:yarn:$rootProject.yarn_mappings:v2")
-            it.mappings("dev.architectury:yarn-mappings-patch-neoforge:$rootProject.yarn_mappings_patch_neoforge_version")
+            // it.mappings("dev.architectury:yarn-mappings-patch-neoforge:$rootProject.yarn_mappings_patch_neoforge_version")
         }
     }
 }
@@ -44,7 +44,7 @@ allprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
-        options.release = 21
+        options.release = 17
     }
     ext {
         releaseChangelog = {

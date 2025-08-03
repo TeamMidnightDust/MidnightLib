@@ -4,18 +4,16 @@ import eu.midnightdust.core.MidnightLib;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.*;
 import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
-import static eu.midnightdust.lib.config.MidnightConfig.MidnightConfigListWidget;
+import net.minecraft.text.*;
+import java.util.*;
 
 @Environment(EnvType.CLIENT)
 public class MidnightConfigOverviewScreen extends Screen {
@@ -25,26 +23,64 @@ public class MidnightConfigOverviewScreen extends Screen {
         this.parent = parent;
     }
     private final Screen parent;
-    private MidnightConfigListWidget list;
+    private MidnightOverviewListWidget list;
 
     @Override
     protected void init() {
-        this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> Objects.requireNonNull(client).setScreen(parent)).dimensions(this.width / 2 - 100, this.height - 26, 200, 20).build());
+        this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> Objects.requireNonNull(client).setScreen(parent)).dimensions(this.width / 2 - 100, this.height - 28, 200, 20).build());
 
-        this.addSelectableChild(this.list = new MidnightConfigListWidget(this.client, this.width, this.height - 57, 24, 25));
+        this.list = new MidnightOverviewListWidget(this.client, this.width, this.height, 32, this.height - 32, 25);
+        if (this.client != null && this.client.world != null) this.list.setRenderBackground(false);
+        this.addSelectableChild(this.list);
         List<String> sortedMods = new ArrayList<>(MidnightConfig.configClass.keySet());
         Collections.sort(sortedMods);
         sortedMods.forEach((modid) -> {
             if (!MidnightLib.hiddenMods.contains(modid)) {
-                list.addButton(List.of(ButtonWidget.builder(Text.translatable(modid +".midnightconfig.title"), (button) ->
-                        Objects.requireNonNull(client).setScreen(MidnightConfig.getScreen(this, modid))).dimensions(this.width / 2 - 125, this.height - 28, 250, 20).build()), null, null);
-        }});
+                list.addButton(ButtonWidget.builder(Text.translatable(modid +".midnightconfig.title"), (button) ->
+                        Objects.requireNonNull(client).setScreen(MidnightConfig.getScreen(this,modid))).dimensions(this.width / 2 - 125, this.height - 28, 250, 20).build());
+            }
+        });
         super.init();
     }
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+        this.renderBackground(context);
         this.list.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 10, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 15, 0xFFFFFF);
+        super.render(context, mouseX, mouseY, delta);
+    }
+    @Environment(EnvType.CLIENT)
+    public static class MidnightOverviewListWidget extends ElementListWidget<OverviewButtonEntry> {
+        TextRenderer textRenderer;
+
+        public MidnightOverviewListWidget(MinecraftClient minecraftClient, int i, int j, int k, int l, int m) {
+            super(minecraftClient, i, j, k, l, m);
+            this.centerListVertically = false;
+            textRenderer = minecraftClient.textRenderer;
+        }
+        @Override
+        public int getScrollbarPositionX() {return this.width-7;}
+
+        public void addButton(ClickableWidget button) {
+            this.addEntry(OverviewButtonEntry.create(button));
+        }
+        @Override
+        public int getRowWidth() { return 400; }
+    }
+    public static class OverviewButtonEntry extends ElementListWidget.Entry<OverviewButtonEntry> {
+        private final ClickableWidget button;
+        private final List<ClickableWidget> buttonList = new ArrayList<>();
+
+        private OverviewButtonEntry(ClickableWidget button) {
+            this.button = button;
+            this.buttonList.add(button);
+        }
+        public static OverviewButtonEntry create(ClickableWidget button) {return new OverviewButtonEntry(button);}
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            button.setY(y);
+            button.render(context, mouseX, mouseY, tickDelta);
+        }
+        public List<? extends Element> children() {return buttonList;}
+        public List<? extends Selectable> selectableChildren() {return buttonList;}
     }
 }
