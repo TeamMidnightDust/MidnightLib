@@ -6,7 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.TextIconButtonWidget;
+import net.minecraft.client.gui.widget.IconButtonWidget;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.MutableText;
@@ -26,10 +26,13 @@ public class MidnightLibExtras {
 
         public static void add(KeyBinding binding, MidnightConfig.MidnightConfigListWidget list, MidnightConfig.MidnightConfigScreen screen) {
             KeybindButton editButton = new KeybindButton(screen.width - 185, 0, 150, 20, binding);
-            TextIconButtonWidget resetButton = TextIconButtonWidget.builder(Text.translatable("controls.reset"), (button -> {
-                binding.setBoundKey(binding.getDefaultKey());
-                screen.updateList();
-            }), true).texture(Identifier.of("midnightlib","icon/reset"), 12, 12).dimension(20, 20).build();
+            IconButtonWidget resetButton = IconButtonWidget.builder(
+                    Text.translatable("controls.reset"),
+                    Identifier.of("midnightlib", "icon/reset"),
+                    (button -> {
+                        binding.setBoundKey(binding.getDefaultKey());
+                        screen.updateList();
+                    })).textureSize(12, 12).iconSize(20, 20).build();
             resetButton.setPosition(screen.width - 205 + 150 + 25, 0);
             editButton.resetButton = resetButton;
             editButton.updateMessage(false);
@@ -40,6 +43,7 @@ public class MidnightLibExtras {
 
         private final KeyBinding binding;
         private @Nullable ClickableWidget resetButton;
+
         public KeybindButton(int x, int y, int width, int height, KeyBinding binding) {
             super(x, y, width, height, binding.getBoundKeyLocalizedText(), (button) -> {
                 ((KeybindButton) button).updateMessage(true);
@@ -48,6 +52,7 @@ public class MidnightLibExtras {
             this.binding = binding;
             updateMessage(false);
         }
+
         @Override
         public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
             if (focusedButton == this) {
@@ -67,12 +72,13 @@ public class MidnightLibExtras {
         public void updateMessage(boolean focused) {
             boolean hasConflicts = false;
             MutableText conflictingBindings = Text.empty();
-            if (focused) this.setMessage(Text.literal("> ").append(this.binding.getBoundKeyLocalizedText().copy().formatted(Formatting.WHITE, Formatting.UNDERLINE)).append(" <").formatted(Formatting.YELLOW));
+            if (focused)
+                this.setMessage(Text.literal("> ").append(this.binding.getBoundKeyLocalizedText().copy().formatted(Formatting.WHITE, Formatting.UNDERLINE)).append(" <").formatted(Formatting.YELLOW));
             else {
                 this.setMessage(this.binding.getBoundKeyLocalizedText());
 
                 if (!this.binding.isUnbound()) {
-                    for(KeyBinding keyBinding : MinecraftClient.getInstance().options.allKeys) {
+                    for (KeyBinding keyBinding : MinecraftClient.getInstance().options.allKeys) {
                         if (keyBinding != this.binding && this.binding.equals(keyBinding)) {
                             if (hasConflicts) conflictingBindings.append(", ");
 
