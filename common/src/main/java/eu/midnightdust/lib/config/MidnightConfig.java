@@ -1,8 +1,7 @@
 package eu.midnightdust.lib.config;
 
 import com.google.common.collect.Lists;
-import com.google.gson.*; import com.google.gson.stream.*;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.google.gson.*;
 import com.mojang.serialization.DataResult;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import net.fabricmc.api.EnvType; import net.fabricmc.api.Environment;
@@ -380,13 +379,14 @@ public abstract class MidnightConfig {
                             Text.translatable("controls.reset"),
                             Identifier.of("midnightlib","icon/reset.png"),
                             (button -> {
-                        info.value = info.defaultValue; info.listIndex = 0;
-                        info.tempValue = info.toTemporaryValue();
-                        updateList();
-                    }))
-//                            .iconSize(12, 12)
-                            .textureSize(12, 12)
+                                info.value = info.defaultValue; info.listIndex = 0;
+                                info.tempValue = info.toTemporaryValue();
+                                updateList();
+                            }))
+                            .textureSize(20, 20)
+                            .iconSize(14, 14)
                             .build();
+                    resetButton.setWidth(20);
                     resetButton.setPosition(width - 205 + 150 + 25, 0);
 
                     if (info.function != null) {
