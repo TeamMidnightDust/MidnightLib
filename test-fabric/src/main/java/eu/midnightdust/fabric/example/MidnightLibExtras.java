@@ -28,7 +28,7 @@ public class MidnightLibExtras {
             KeybindButton editButton = new KeybindButton(screen.width - 185, 0, 150, 20, binding);
             IconButtonWidget resetButton = IconButtonWidget.builder(
                     Text.translatable("controls.reset"),
-                    Identifier.of("midnightlib", "icon/reset"),
+                    Identifier.of("midnightlib", "icon/reset.png"),
                     (button -> {
                         binding.setBoundKey(binding.getDefaultKey());
                         screen.updateList();

@@ -357,9 +357,8 @@ public abstract class MidnightConfig {
                 Objects.requireNonNull(client).setScreen(parent);
             }).dimensions(this.width / 2 + 4, this.height - 26, 150, 20).build());
 
-            this.list = new MidnightConfigListWidget(this.client, this.width, this.height, this.height - 57, 24, 25);
+            this.list = new MidnightConfigListWidget(this.client, this.width, 0, this.height - 57, 25);
             this.addSelectableChild(this.list); fillList();
-            if (tabs.size() > 1) list.renderHeaderSeparator = false;
         }
         public void updateList() {
             this.list.clear(); fillList();
@@ -377,11 +376,17 @@ public abstract class MidnightConfig {
                 }
                 if (info.modid.equals(modid) && (info.tab == null || info.tab == tabManager.getCurrentTab())) {
                     Text name = Objects.requireNonNullElseGet(info.name, () -> Text.translatable(translationPrefix + info.fieldName));
-                    IconButtonWidget resetButton = IconButtonWidget.builder(Text.translatable("controls.reset"), Identifier.of("midnightlib","icon/reset"), (button -> {
+                    IconButtonWidget resetButton = IconButtonWidget.builder(
+                            Text.translatable("controls.reset"),
+                            Identifier.of("midnightlib","icon/reset.png"),
+                            (button -> {
                         info.value = info.defaultValue; info.listIndex = 0;
                         info.tempValue = info.toTemporaryValue();
                         updateList();
-                    }) ).build();
+                    }))
+//                            .iconSize(12, 12)
+                            .textureSize(12, 12)
+                            .build();
                     resetButton.setPosition(width - 205 + 150 + 25, 0);
 
                     if (info.function != null) {
@@ -429,7 +434,7 @@ public abstract class MidnightConfig {
                             } catch (Exception ignored) {}
                             info.actionButton = colorButton;
                         } else if (e.selectionMode() > -1) {
-                            ButtonWidget explorerButton = IconButtonWidget.builder(Text.empty(), Identifier.of("midnightlib", "icon/explorer"),
+                            ButtonWidget explorerButton = IconButtonWidget.builder(Text.empty(), Identifier.of("midnightlib", "icon/explorer.png"),
                                     button -> new Thread(() -> {
                                         JFileChooser fileChooser = new JFileChooser(info.tempValue);
                                         fileChooser.setFileSelectionMode(e.selectionMode()); fileChooser.setDialogType(e.fileChooserType());
@@ -464,17 +469,19 @@ public abstract class MidnightConfig {
             }
         }
         @Override
+
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-            super.render(context, mouseX, mouseY, delta);
+            this.renderBackground(context);
             this.list.render(context, mouseX, mouseY, delta);
-            if (tabs.size() < 2) context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 10, 0xFFFFFFFF);
+            if (tabs.size() < 2) context.drawCenteredTextWithShadow(textRenderer, title, width / 2, 15, 0xFFFFFFFF);
+            super.render(context, mouseX, mouseY, delta);
         }
     }
     @Environment(EnvType.CLIENT)
     public static class MidnightConfigListWidget extends ElementListWidget<ButtonEntry> {
-        public boolean renderHeaderSeparator = true;
-        public MidnightConfigListWidget(MinecraftClient client, int width, int height, int yStart, int y, int itemHeight) { super(client, width, height, yStart, y, itemHeight); }
-        @Override public int getScrollbarPositionX() { return this.width -7; }
+        public MidnightConfigListWidget(MinecraftClient client, int width, int height, int y, int itemHeight)
+        { super(client, width, height, 30, y, itemHeight); }
+        @Override public int getScrollbarPositionX() { return this.width - 7; }
 
         /*
         @Override
@@ -485,6 +492,7 @@ public abstract class MidnightConfig {
                 RenderSystem.disableBlend(); }
         }
         */
+
         public void addButton(List<ClickableWidget> buttons, Text text, EntryInfo info) { this.addEntry(new ButtonEntry(buttons, text, info)); }
         public void clear() { this.clearEntries(); }
         @Override public int getRowWidth() { return 10000; }
