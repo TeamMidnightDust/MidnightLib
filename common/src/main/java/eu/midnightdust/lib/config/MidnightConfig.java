@@ -32,8 +32,7 @@ import java.util.regex.Pattern;
 import static net.minecraft.client.MinecraftClient.IS_SYSTEM_MAC;
 
 // FIXME:
-//  - misshaped reset buttons
-//  - identifier fields are uneditable, and crash on pasting
+//  - cannot vertically align TextFieldWidgets
 
 /** MidnightConfig by Martin "Motschen" Prokoph
  *  Single class config library - feel free to copy!
