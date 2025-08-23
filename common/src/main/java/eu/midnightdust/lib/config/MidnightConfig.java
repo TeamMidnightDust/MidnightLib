@@ -201,7 +201,7 @@ public abstract class MidnightConfig {
         info.function = (BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) (t, b) -> s -> {
             s = s.trim();
             if (!(s.isEmpty() || !isNumber || pattern.matcher(s).matches()) ||
-                    (info.dataType == Identifier.class && Identifier.validate(s).equals(DataResult.success(new Identifier(s))))) return false; // inline substitution for "isError"
+                    (info.dataType == Identifier.class && !Identifier.isValid(s))) return false; // inline substitution for "isError"
             Number value = 0; boolean inLimits = false; info.error = null;
             if (!(isNumber && s.isEmpty()) && !s.equals("-") && !s.equals(".")) {
                 try { value = f.apply(s); } catch(NumberFormatException e){ return false; }
@@ -367,8 +367,9 @@ public abstract class MidnightConfig {
                                 info.tempValue = info.toTemporaryValue();
                                 updateList();
                             }))
-                            .textureSize(20, 20)
-                            .iconSize(20, 20)
+                            .textureSize(12, 12)
+                            .xyOffset(0, 4)
+                            .iconSize(12, 12)
                             .build();
                     resetButton.setWidth(20);
                     resetButton.setPosition(width - 205 + 150 + 25, 0);
@@ -384,7 +385,15 @@ public abstract class MidnightConfig {
                             widget = ButtonWidget.builder(values.getValue().apply(info.value), values.getKey()).dimensions(width - 185, 0, 150, 20).tooltip(info.getTooltip(true)).build();
                         } else if (e.isSlider())
                             widget = new MidnightSliderWidget(width - 185, 0, 150, 20, Text.of(info.tempValue), (Double.parseDouble(info.tempValue) - e.min()) / (e.max() - e.min()), info);
-                        else widget = new TextFieldWidget(textRenderer, width - 185, 0, 150, 20, Text.empty());
+
+                        /* low priority
+                        *  FIXME: line up the textField with buttons
+                        *   it seems like the widget has 1px padding all around it,
+                        *   so the correct height would be 18px as opposed to 20px
+                        *   however! it seems to be impossible to move the textfield
+                        *   whatsoever...   */
+
+                        else widget = new TextFieldWidget(textRenderer, width - 185 + 1 /* accounts for padding */, 1 /* SHOULD account for padding */, 148, 20 /* change to 18 if/once the y param starts working */, Text.empty());
                         if (widget instanceof TextFieldWidget textField) {
                             textField.setMaxLength(e.width()); textField.setText(info.tempValue);
                             Predicate<String> processor = ((BiFunction<TextFieldWidget, ButtonWidget, Predicate<String>>) info.function).apply(textField, done);
@@ -431,7 +440,13 @@ public abstract class MidnightConfig {
                                             updateList();
                                         }
                                     }).start()
-                            ).build();
+                                    )
+                            .textureSize(12, 12)
+                            .xyOffset(0, 4)
+                            .iconSize(12, 12)
+                            .build();
+
+                            explorerButton.setWidth(20);
                             explorerButton.setPosition(width - 185, 0);
                             info.actionButton = explorerButton;
                         }
@@ -466,16 +481,6 @@ public abstract class MidnightConfig {
         public MidnightConfigListWidget(MinecraftClient client, int width, int height, int y, int itemHeight)
         { super(client, width, height, 30, y, itemHeight); }
         @Override public int getScrollbarPositionX() { return this.width - 7; }
-
-        /*
-        @Override
-        protected void drawHeaderAndFooterSeparators(DrawContext context) {
-            if (renderHeaderSeparator) super.drawHeaderAndFooterSeparators(context);
-            else { RenderSystem.enableBlend();
-                context.drawTexture(this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE, this.getX(), this.getBottom(), 0.0F, 0.0F, this.getWidth(), 2, 32, 2);
-                RenderSystem.disableBlend(); }
-        }
-        */
 
         public void addButton(List<ClickableWidget> buttons, Text text, EntryInfo info) { this.addEntry(new ButtonEntry(buttons, text, info)); }
         public void clear() { this.clearEntries(); }
