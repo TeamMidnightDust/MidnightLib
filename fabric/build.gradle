@@ -65,7 +65,7 @@ components.java {
     }
 }
 
-/*unifiedPublishing {
+unifiedPublishing {
     project {
         displayName = "MidnightLib $rootProject.version - Fabric $project.minecraft_version"
         releaseType = "$project.release_type"
@@ -101,4 +101,4 @@ components.java {
             }
         }
     }
-}*/
+}

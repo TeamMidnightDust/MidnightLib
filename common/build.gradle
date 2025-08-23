@@ -5,8 +5,8 @@ architectury {
 dependencies {
     // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
     // Do NOT use other classes from fabric loader
-//    implementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
-    modImplementation "net.fabricmc:fabric-loader:0.16.13" //FIXME: Using the same floader version doesn't let you access it..? architectury moment
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+
 }
 
 publishing {
