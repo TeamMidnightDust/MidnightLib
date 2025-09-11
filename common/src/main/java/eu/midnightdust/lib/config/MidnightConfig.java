@@ -132,7 +132,7 @@ public abstract class MidnightConfig {
         entries.values().forEach(info -> {
             if (info.field != null && info.entry != null) {
                 try {
-                    info.value = info.field.get(null);
+                    info.value = info.field.get(null) == null ? info.defaultValue : info.field.get(null);
                     info.tempValue = info.toTemporaryValue();
                     info.updateConditions();
                 } catch (IllegalAccessException ignored) {}

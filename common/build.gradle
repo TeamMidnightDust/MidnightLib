@@ -1,3 +1,7 @@
+plugins {
+    id 'java'
+}
+
 architectury {
     common(rootProject.enabled_platforms.split(","))
 }
@@ -20,4 +24,17 @@ publishing {
     repositories {
         // Add repositories to publish to here.
     }
+}
+
+configurations {
+    testOutput.extendsFrom(testImplementation)
+}
+
+tasks.register('testJar', Jar) {
+    from sourceSets.test.output
+    archiveClassifier = 'tests'
+}
+
+artifacts {
+    testOutput testJar
 }

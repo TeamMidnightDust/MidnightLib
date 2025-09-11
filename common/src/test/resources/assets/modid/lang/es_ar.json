@@ -16,7 +16,6 @@
   "modid.midnightconfig.enum.ModPlatform.QUILT": "Quilt",
   "modid.midnightconfig.enum.ModPlatform.NEOFORGE": "NeoForge",
   "modid.midnightconfig.enum.ModPlatform.VANILLA": "Vanilla",
-  "modid.midnightconfig.graphicsSteps": "Soy una enumeración con opción traducible!",
   "modid.midnightconfig.myFileOrDirectory.fileChooser": "Seleccioná una imagen o carpeta",
   "modid.midnightconfig.myFileOrDirectory.fileFilter": "Imágenes compatibles (.png, .jpg, .jpeg)",
   "modid.midnightconfig.category.numbers": "Números",
@@ -25,6 +24,5 @@
   "modid.midnightconfig.category.lists": "Listas",
   "modid.midnightconfig.category.files": "Archivos",
   "modid.midnightconfig.category.conditions": "Cuestionario",
-  "modid.midnightconfig.category.extras": "Extras",
   "modid.midnightconfig.category.multiConditions": "Condiciones múltiples"
 }
