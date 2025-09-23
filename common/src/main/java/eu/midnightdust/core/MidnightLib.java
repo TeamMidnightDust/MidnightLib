@@ -5,6 +5,7 @@ import eu.midnightdust.lib.config.AutoCommand;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,8 +14,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.minecraft.client.MinecraftClient.IS_SYSTEM_MAC;
-
 public class MidnightLib {
     public static List<String> hiddenMods = new ArrayList<>();
     public static final String MOD_ID = "midnightlib";
@@ -22,7 +21,7 @@ public class MidnightLib {
 
     @Environment(EnvType.CLIENT)
     public static void onInitializeClient() {
-        try { if (!IS_SYSTEM_MAC) {
+        try { if (Util.getOperatingSystem() != Util.OperatingSystem.OSX) {
             System.setProperty("java.awt.headless", "false");
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }} catch (Exception | Error e) { LOGGER.error("Error setting system look and feel", e); }

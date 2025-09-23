@@ -7,6 +7,7 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextIconButtonWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.MutableText;
@@ -35,7 +36,7 @@ public class MidnightLibExtras {
             editButton.updateMessage(false);
             MidnightConfig.EntryInfo info = new MidnightConfig.EntryInfo(null, screen.modid);
 
-            list.addButton(Lists.newArrayList(editButton, resetButton), Text.translatable(binding.getTranslationKey()), info);
+            list.addButton(Lists.newArrayList(editButton, resetButton), Text.translatable(binding.getId()), info);
         }
 
         private final KeyBinding binding;
@@ -44,24 +45,24 @@ public class MidnightLibExtras {
             super(x, y, width, height, binding.getBoundKeyLocalizedText(), (button) -> {
                 ((KeybindButton) button).updateMessage(true);
                 focusedButton = button;
-            }, (textSupplier) -> binding.isUnbound() ? Text.translatable("narrator.controls.unbound", binding.getTranslationKey()) : Text.translatable("narrator.controls.bound", binding.getTranslationKey(), textSupplier.get()));
+            }, (textSupplier) -> binding.isUnbound() ? Text.translatable("narrator.controls.unbound", binding.getId()) : Text.translatable("narrator.controls.bound", binding.getId(), textSupplier.get()));
             this.binding = binding;
             updateMessage(false);
         }
         @Override
-        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        public boolean keyPressed(KeyInput input) {
             if (focusedButton == this) {
-                if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+                if (input.key() == GLFW.GLFW_KEY_ESCAPE) {
                     this.binding.setBoundKey(InputUtil.UNKNOWN_KEY);
                 } else {
-                    this.binding.setBoundKey(InputUtil.fromKeyCode(keyCode, scanCode));
+                    this.binding.setBoundKey(InputUtil.fromKeyCode(input));
                 }
                 updateMessage(false);
 
                 focusedButton = null;
                 return true;
             }
-            return super.keyPressed(keyCode, scanCode, modifiers);
+            return super.keyPressed(input);
         }
 
         public void updateMessage(boolean focused) {
@@ -77,7 +78,7 @@ public class MidnightLibExtras {
                             if (hasConflicts) conflictingBindings.append(", ");
 
                             hasConflicts = true;
-                            conflictingBindings.append(Text.translatable(keyBinding.getTranslationKey()));
+                            conflictingBindings.append(Text.translatable(keyBinding.getId()));
                         }
                     }
                 }

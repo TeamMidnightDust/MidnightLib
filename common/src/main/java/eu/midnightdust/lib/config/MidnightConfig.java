@@ -6,18 +6,19 @@ import eu.midnightdust.lib.util.PlatformFunctions;
 import net.fabricmc.api.EnvType; import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient; import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element; import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen; import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tab.GridScreenTab; import net.minecraft.client.gui.tab.Tab; import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.tooltip.Tooltip; import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Style; import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
-import net.minecraft.util.Formatting; import net.minecraft.util.Identifier;
-import net.minecraft.util.TranslatableOption;
+import net.minecraft.util.*;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*; import javax.swing.filechooser.FileNameExtensionFilter;
@@ -29,8 +30,6 @@ import java.nio.file.Files; import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiFunction; import java.util.function.Function; import java.util.function.Predicate;
 import java.util.regex.Pattern;
-
-import static net.minecraft.client.MinecraftClient.IS_SYSTEM_MAC;
 
 /** MidnightConfig by Martin "Motschen" Prokoph
  *  Single class config library - feel free to copy!
@@ -310,9 +309,8 @@ public abstract class MidnightConfig {
                             button.active = !Objects.equals(String.valueOf(entry.info.value), String.valueOf(entry.info.defaultValue)) && entry.info.conditionsMet;
         }}}}
         @Override
-        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-            if (this.tabNavigation.trySwitchTabsWithKey(keyCode)) return true;
-            return super.keyPressed(keyCode, scanCode, modifiers);
+        public boolean keyPressed(KeyInput input) {
+            return this.tabNavigation.keyPressed(input) || super.keyPressed(input);
         }
         @Override
         public void close() {
@@ -428,7 +426,7 @@ public abstract class MidnightConfig {
                         }
                         List<ClickableWidget> widgets = Lists.newArrayList(widget, resetButton);
                         if (info.actionButton != null) {
-                            if (IS_SYSTEM_MAC) info.actionButton.active = false;
+                            if (Util.getOperatingSystem() != Util.OperatingSystem.OSX) info.actionButton.active = false;
                             widget.setWidth(widget.getWidth() - 22); widget.setX(widget.getX() + 22);
                             widgets.add(info.actionButton);
                         } if (cycleButton != null) {
@@ -485,24 +483,24 @@ public abstract class MidnightConfig {
                 title.setMaxWidth(!buttons.isEmpty() ? buttons.get(buttons.size() > 2 ? buttons.size()-1 : 0).getX() - 16 : scaledWidth - 24);
             }
         }
-        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            buttons.forEach(b -> { b.setY(y); b.render(context, mouseX, mouseY, tickDelta);});
+        public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            buttons.forEach(b -> { b.setY(this.getY()); b.render(context, mouseX, mouseY, tickDelta);});
             if (title != null) {
-                title.setY(y+5);
+                title.setY(this.getY()+5);
                 title.render(context, mouseX, mouseY, tickDelta);
 
                 if (info.entry != null && !this.buttons.isEmpty() && this.buttons.getFirst() instanceof ClickableWidget widget) {
                     int idMode = this.info.entry.idMode();
-                    if (idMode != -1) context.drawItem(idMode == 0 ? Registries.ITEM.get(Identifier.tryParse(this.info.tempValue)).getDefaultStack() : Registries.BLOCK.get(Identifier.tryParse(this.info.tempValue)).asItem().getDefaultStack(), widget.getX() + widget.getWidth() - 18, y + 2);
+                    if (idMode != -1) context.drawItem(idMode == 0 ? Registries.ITEM.get(Identifier.tryParse(this.info.tempValue)).getDefaultStack() : Registries.BLOCK.get(Identifier.tryParse(this.info.tempValue)).asItem().getDefaultStack(), widget.getX() + widget.getWidth() - 18, this.getY() + 2);
                 }
             }
         }
 
         @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        public boolean mouseClicked(Click click, boolean doubled) {
             if (this.info != null && this.info.comment != null && !this.info.comment.url().isBlank())
                 ConfirmLinkScreen.open(MinecraftClient.getInstance().currentScreen, this.info.comment.url(), true);
-            return super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(click, doubled);
         }
 
         public List<? extends Element> children() {return Lists.newArrayList(buttons);}
