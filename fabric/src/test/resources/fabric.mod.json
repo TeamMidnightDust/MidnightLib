@@ -1,10 +1,10 @@
 {
     "schemaVersion": 1,
-    "id": "midnightlib-example",
+    "id": "modid",
     "version": "${version}",
 
-    "name": "MidnightLib Example",
-    "description": "Wow, you can do so much.",
+    "name": "MidnightLib Test Mod",
+    "description": "Example Mod for Team MidnightDust's mods.",
     "authors": [ "MidnightDust" ],
 
     "license": "CC0",
@@ -13,7 +13,7 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "eu.midnightdust.fabric.example.MLExampleFabric"
+            "eu.midnightdust.test.fabric.MLExampleFabric"
         ]
     },
     "depends": {

@@ -13,11 +13,44 @@ repositories {
 
 architectury {
     platformSetupLoomIde()
-    neoForge()
+    neoForge {
+        platformPackage = "neoforge"
+    }
+}
+
+sourceSets {
+    test {
+        compileClasspath += main.compileClasspath
+        runtimeClasspath += main.runtimeClasspath
+        java {
+            srcDirs.add('src/test/java' as File)
+        }
+        resources {
+            srcDirs.add('src/test/resources' as File)
+        }
+    }
 }
 
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
+
+    runs {
+        testClient {
+            client()
+            name = "Test Minecraft Client"
+
+            mods {
+                create('midnightlib') {
+                    sourceSet sourceSets.main
+                }
+                create('modid') {      // test mod
+                    sourceSet sourceSets.test
+                }
+            }
+            source sourceSets.test
+        }
+    }
+
 }
 
 configurations {
@@ -44,9 +77,21 @@ dependencies {
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
+
+//    testImplementation common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+    testImplementation common(project(path: ':common', configuration: 'testOutput')) { transitive false }
+    testImplementation sourceSets.main.output
 }
 
 processResources {
+    inputs.property 'version', rootProject.version
+
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand version: rootProject.version
+    }
+}
+
+processTestResources {
     inputs.property 'version', rootProject.version
 
     filesMatching('META-INF/neoforge.mods.toml') {

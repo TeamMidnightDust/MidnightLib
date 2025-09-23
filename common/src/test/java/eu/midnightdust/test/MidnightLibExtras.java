@@ -1,4 +1,4 @@
-package eu.midnightdust.fabric.example;
+package eu.midnightdust.test;
 
 import com.google.common.collect.Lists;
 import eu.midnightdust.lib.config.MidnightConfig;

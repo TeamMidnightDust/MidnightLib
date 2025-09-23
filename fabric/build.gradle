@@ -11,7 +11,27 @@ architectury {
     fabric()
 }
 
+sourceSets {
+    test {
+        compileClasspath += main.compileClasspath
+        runtimeClasspath += main.runtimeClasspath
+        java {
+            srcDirs.add('src/test/java' as File)
+        }
+        resources {
+            srcDirs.add('src/test/resources' as File)
+        }
+    }
+}
+
 loom {
+    runs {
+        testClient {
+            client()
+            configName = "Test Minecraft Client"
+            source sourceSets.test
+        }
+    }
 }
 
 configurations {
@@ -27,13 +47,23 @@ configurations {
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
-    modCompileOnly ("com.terraformersmc:modmenu:${rootProject.mod_menu_version}")
+    modCompileOnly("com.terraformersmc:modmenu:${rootProject.mod_menu_version}")
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
+
+    testImplementation common(project(path: ':common', configuration: 'testOutput'))
 }
 
 processResources {
+    inputs.property "version", rootProject.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": rootProject.version
+    }
+}
+
+processTestResources {
     inputs.property "version", rootProject.version
 
     filesMatching("fabric.mod.json") {
@@ -71,7 +101,7 @@ unifiedPublishing {
         releaseType = "$project.release_type"
         changelog = releaseChangelog()
         gameVersions = []
-        gameLoaders = ["fabric","quilt"]
+        gameLoaders = ["fabric", "quilt"]
         mainPublication remapJar
         relations {
             depends {
