@@ -32,7 +32,7 @@ public class MidnightConfigOverviewScreen extends Screen {
         this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> Objects.requireNonNull(client).setScreen(parent)).dimensions(this.width / 2 - 100, this.height - 26, 200, 20).build());
 
         this.addSelectableChild(this.list = new MidnightConfigListWidget(this.client, this.width, this.height - 57, 24, 25));
-        List<String> sortedMods = new ArrayList<>(MidnightConfig.configClass.keySet());
+        List<String> sortedMods = new ArrayList<>(MidnightConfig.configInstances.keySet());
         Collections.sort(sortedMods);
         sortedMods.forEach((modid) -> {
             if (!MidnightLib.hiddenMods.contains(modid)) {

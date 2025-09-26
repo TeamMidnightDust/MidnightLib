@@ -40,6 +40,7 @@ configurations {
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
     developmentFabric.extendsFrom common
+    archivesBaseName = rootProject.archives_base_name
     version = rootProject.mod_version + "-" + project.name + "+" + rootProject.minecraft_version
 }
 

@@ -21,15 +21,17 @@ public class MidnightLib {
 
     @Environment(EnvType.CLIENT)
     public static void onInitializeClient() {
-        try { if (Util.getOperatingSystem() != Util.OperatingSystem.OSX) {
-            System.setProperty("java.awt.headless", "false");
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        }} catch (Exception | Error e) { LOGGER.error("Error setting system look and feel", e); }
+        try {
+            if (Util.getOperatingSystem() != Util.OperatingSystem.OSX) {
+                System.setProperty("java.awt.headless", "false");
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            }
+        } catch (Exception | Error e) { LOGGER.error("Error setting system look and feel", e); }
         MidnightLibConfig.init(MOD_ID, MidnightLibConfig.class);
     }
     public static void registerAutoCommand() {
-        MidnightConfig.configClass.forEach((modid, config) -> {
-            for (Field field : config.getFields()) {
+        MidnightConfig.configInstances.forEach((modid, config) -> {
+            for (Field field : config.configClass.getFields()) {
                 if (field.isAnnotationPresent(MidnightConfig.Entry.class) && !field.isAnnotationPresent(MidnightConfig.Client.class) && !field.isAnnotationPresent(MidnightConfig.Hidden.class))
                     new AutoCommand(field, modid);
             }

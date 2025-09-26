@@ -68,6 +68,7 @@ configurations {
         canBeResolved = true
         canBeConsumed = false
     }
+    archivesBaseName = rootProject.archives_base_name
     version = rootProject.mod_version + "-" + project.name + "+" + rootProject.minecraft_version
 }
 
