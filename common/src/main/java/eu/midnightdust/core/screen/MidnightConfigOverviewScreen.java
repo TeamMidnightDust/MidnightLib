@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static eu.midnightdust.lib.config.MidnightConfig.MidnightConfigListWidget;
+import eu.midnightdust.lib.config.MidnightConfigListWidget;
 
 @Environment(EnvType.CLIENT)
 public class MidnightConfigOverviewScreen extends Screen {

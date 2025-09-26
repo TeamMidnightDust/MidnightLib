@@ -1,6 +1,8 @@
 package eu.midnightdust.test.config;
 
 import com.google.common.collect.Lists;
+import eu.midnightdust.lib.config.MidnightConfigListWidget;
+import eu.midnightdust.lib.config.MidnightConfigScreen;
 import eu.midnightdust.test.MidnightLibExtras;
 import eu.midnightdust.lib.config.MidnightConfig;
 import net.minecraft.text.MutableText;

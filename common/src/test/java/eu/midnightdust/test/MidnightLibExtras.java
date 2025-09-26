@@ -1,7 +1,9 @@
 package eu.midnightdust.test;
 
 import com.google.common.collect.Lists;
-import eu.midnightdust.lib.config.MidnightConfig;
+import eu.midnightdust.lib.config.EntryInfo;
+import eu.midnightdust.lib.config.MidnightConfigListWidget;
+import eu.midnightdust.lib.config.MidnightConfigScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -25,7 +27,7 @@ public class MidnightLibExtras {
     public static class KeybindButton extends ButtonWidget {
         public static ButtonWidget focusedButton;
 
-        public static void add(KeyBinding binding, MidnightConfig.MidnightConfigListWidget list, MidnightConfig.MidnightConfigScreen screen) {
+        public static void add(KeyBinding binding, MidnightConfigListWidget list, MidnightConfigScreen screen) {
             KeybindButton editButton = new KeybindButton(screen.width - 185, 0, 150, 20, binding);
             TextIconButtonWidget resetButton = TextIconButtonWidget.builder(Text.translatable("controls.reset"), (button -> {
                 binding.setBoundKey(binding.getDefaultKey());
@@ -34,7 +36,7 @@ public class MidnightLibExtras {
             resetButton.setPosition(screen.width - 205 + 150 + 25, 0);
             editButton.resetButton = resetButton;
             editButton.updateMessage(false);
-            MidnightConfig.EntryInfo info = new MidnightConfig.EntryInfo(null, screen.modid);
+            EntryInfo info = new EntryInfo(null, screen.modid);
 
             list.addButton(Lists.newArrayList(editButton, resetButton), Text.translatable(binding.getId()), info);
         }
