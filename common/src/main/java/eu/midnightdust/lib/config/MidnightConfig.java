@@ -74,11 +74,11 @@ public abstract class MidnightConfig {
         for (Field field : config.getFields()) {
             EntryInfo info = new EntryInfo(field, modid);
             //noinspection ConstantValue
-            if ((field.isAnnotationPresent(Entry.class) || field.isAnnotationPresent(Comment.class)) && !field.isAnnotationPresent(Server.class) && !field.isAnnotationPresent(Hidden.class) && PlatformFunctions.isClientEnv())
+            if ((field.isAnnotationPresent(Entry.class) || field.isAnnotationPresent(Comment.class))
+                    && !field.isAnnotationPresent(Server.class)
+                    && !field.isAnnotationPresent(Hidden.class)
+                    && PlatformFunctions.isClientEnv())
                 instance.addClientEntry(field, info);
-            if (field.isAnnotationPresent(Entry.class))
-                try { info.defaultValue = field.get(null);
-                } catch (IllegalAccessException ignored) {}
         }
         instance.loadValuesFromJson();
     }
@@ -105,6 +105,9 @@ public abstract class MidnightConfig {
                     button.setMessage(func.apply(info.value));
                 }, func);
             }
+
+            try { info.defaultValue = field.get(null);
+            } catch (IllegalAccessException ignored) {}
         }
         entries.put(modid + ":" + field.getName(), info);
     }
