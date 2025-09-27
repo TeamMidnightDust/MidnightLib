@@ -34,11 +34,11 @@ public class ButtonEntry extends ElementListWidget.Entry<ButtonEntry> {
         int scaledWidth = MinecraftClient.getInstance().getWindow().getScaledWidth();
 
         if (text != null && (!text.getString().contains("spacer") || !buttons.isEmpty())) {
-            title = new MultilineTextWidget((centered) ? (scaledWidth / 2 - (textRenderer.getWidth(text) / 2)) : 12, 0, Text.of(text), textRenderer);
-            title.setCentered(centered);
+            title = new MultilineTextWidget(12, 0, Text.of(text), textRenderer).setCentered(centered);
             if (info != null)
                 title.setTooltip(info.getTooltip(false));
             title.setMaxWidth(!buttons.isEmpty() ? buttons.get(buttons.size() > 2 ? buttons.size() - 1 : 0).getX() - 16 : scaledWidth - 24);
+            if (centered) title.setX(scaledWidth / 2 - (title.getWidth() / 2));
         }
     }
 
