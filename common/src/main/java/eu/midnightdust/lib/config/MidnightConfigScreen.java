@@ -34,9 +34,7 @@ public class MidnightConfigScreen extends Screen {
     public final String translationPrefix, modid;
     public final Screen parent;
     public MidnightConfigListWidget list;
-    public TabManager tabManager = new TabManager(a -> {
-    }, a -> {
-    });
+    public TabManager tabManager = new TabManager(a -> {}, a -> {});
     public Map<String, Tab> tabs = new LinkedHashMap<>();
     public Tab prevTab;
     public TabNavigationWidget tabNavigation;

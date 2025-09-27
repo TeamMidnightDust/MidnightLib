@@ -26,7 +26,7 @@ public class MidnightConfigListWidget extends ElementListWidget<ButtonEntry> {
     }
 
     @Override
-    protected void drawHeaderAndFooterSeparators(DrawContext context) {
+    public void drawHeaderAndFooterSeparators(DrawContext context) {
         if (renderHeaderSeparator)
             super.drawHeaderAndFooterSeparators(context);
         else

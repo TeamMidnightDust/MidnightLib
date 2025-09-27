@@ -73,11 +73,11 @@ public class EntryInfo {
         }
     }
 
-    @SuppressWarnings("ConstantValue") //pertains to requiredModLoaded
     public void updateConditions() {
         boolean prevConditionState = this.conditionsMet;
         if (this.conditions.length > 0) this.conditionsMet = true;    // reset conditions
         for (MidnightConfig.Condition condition : this.conditions) {
+            //noinspection ConstantValue
             if (!condition.requiredModId().isEmpty() && !PlatformFunctions.isModLoaded(condition.requiredModId()))
                 this.conditionsMet = false;
             String requiredOption = condition.requiredOption().contains(":") ? condition.requiredOption() : (this.modid + ":" + condition.requiredOption());
@@ -89,6 +89,7 @@ public class EntryInfo {
     }
 
     public <T> void writeList(int index, T value) {
+        //noinspection unchecked
         var list = (List<T>) this.value;
         if (index >= list.size())
             list.add(value);

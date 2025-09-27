@@ -29,8 +29,8 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /** MidnightConfig by Martin "Motschen" Prokoph
- *  Single class config library - feel free to copy!
- *  Based on <a href="https://github.com/Minenash/TinyConfig">...</a>
+ *  Minimalist config library - feel free to copy!
+ *  Originally based on <a href="https://github.com/Minenash/TinyConfig">...</a>
  *  Credits to Minenash */
 
 @SuppressWarnings("unchecked")
@@ -73,8 +73,9 @@ public abstract class MidnightConfig {
 
         for (Field field : config.getFields()) {
             EntryInfo info = new EntryInfo(field, modid);
+            //noinspection ConstantValue
             if ((field.isAnnotationPresent(Entry.class) || field.isAnnotationPresent(Comment.class)) && !field.isAnnotationPresent(Server.class) && !field.isAnnotationPresent(Hidden.class) && PlatformFunctions.isClientEnv())
-                instance.initClient(modid, field, info);
+                instance.addClientEntry(field, info);
             if (field.isAnnotationPresent(Entry.class))
                 try { info.defaultValue = field.get(null);
                 } catch (IllegalAccessException ignored) {}
@@ -83,10 +84,9 @@ public abstract class MidnightConfig {
     }
 
     @Environment(EnvType.CLIENT)
-    private void initClient(String modid, Field field, EntryInfo info) {
+    public void addClientEntry(Field field, EntryInfo info) {
         Entry e = info.entry;
-        String key = modid + ":" + field.getName();
-        if (e != null) {
+        if (e != null && info.dataType != null) {
             if (info.dataType == int.class) textField(info, Integer::parseInt, INTEGER_ONLY, (int) e.min(), (int) e.max(), true);
             else if (info.dataType == float.class) textField(info, Float::parseFloat, DECIMAL_ONLY, (float) e.min(), (float) e.max(), false);
             else if (info.dataType == double.class) textField(info, Double::parseDouble, DECIMAL_ONLY, e.min(), e.max(), false);
@@ -106,7 +106,7 @@ public abstract class MidnightConfig {
                 }, func);
             }
         }
-        entries.put(key, info);
+        entries.put(modid + ":" + field.getName(), info);
     }
 
     public static Class<?> getUnderlyingType(Field field) {
@@ -165,10 +165,10 @@ public abstract class MidnightConfig {
     public void loadValuesFromJson() {
         try {
             gson.fromJson(Files.newBufferedReader(getJsonFilePath()), configClass);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             write(modid);
         }
+
         entries.values().forEach(info -> {
             if (info.field != null && info.entry != null) {
                 try {
@@ -184,7 +184,12 @@ public abstract class MidnightConfig {
         configInstances.get(modid).writeChanges(modid);
     }
 
+    @Deprecated
     public void writeChanges(String modid) {
+        this.writeChanges();
+    }
+
+    public void writeChanges() {
         try {
             Path path;
             if (!Files.exists(path = getJsonFilePath()))
@@ -205,7 +210,6 @@ public abstract class MidnightConfig {
 
     // Overridable method
     public void onTabInit(String tabName, MidnightConfigListWidget list, MidnightConfigScreen screen) {
-
     }
 
     @Environment(EnvType.CLIENT)
