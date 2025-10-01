@@ -9,5 +9,8 @@
 	"midnightlib.curseforge":"CurseForge",
 	"midnightlib.wiki":"Wiki",
 	"modmenu.summaryTranslation.midnightlib": "Common Library for easy configuration.",
-	"midnightconfig.colorChooser.title": "Choose a color"
+	"midnightconfig.colorChooser.title": "Choose a color",
+    "midnightconfig.action.list_index": "Editing list at index %s",
+    "midnightconfig.action.color_chooser": "Open color chooser",
+    "midnightconfig.action.file_chooser": "Open file chooser"
 }

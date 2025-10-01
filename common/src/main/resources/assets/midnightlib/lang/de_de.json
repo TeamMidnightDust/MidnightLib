@@ -3,5 +3,8 @@
 	"midnightlib.midnightconfig.title":"MidnightLib Konfiguration",
 	"midnightlib.midnightconfig.config_screen_list":"Konfigurationsübersicht",
 	"modmenu.summaryTranslation.midnightlib": "Code-Bibliothek für einfache Konfiguration.",
-	"midnightconfig.colorChooser.title": "Wähle eine Farbe"
+	"midnightconfig.colorChooser.title": "Wähle eine Farbe",
+    "midnightconfig.action.list_index": "Bearbeite Liste an Index %s",
+    "midnightconfig.action.color_chooser": "Öffne Farbauswahl",
+    "midnightconfig.action.file_chooser": "Öffne Dateiauswahl"
 }

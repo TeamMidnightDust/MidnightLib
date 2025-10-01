@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tab.GridScreenTab;
 import net.minecraft.client.gui.tab.Tab;
 import net.minecraft.client.gui.tab.TabManager;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.resource.language.I18n;
@@ -192,7 +193,7 @@ public class MidnightConfigScreen extends Screen {
                             info.listIndex = info.listIndex != values.size() ? info.listIndex + 1 : 0;
                             info.tempValue = info.listIndex != values.size() ? info.toTemporaryValue() : "";
                             updateList();
-                        })).dimensions(width - 185, 0, 20, 20).build();
+                        })).dimensions(width - 185, 0, 20, 20).tooltip(Tooltip.of(Text.translatable("midnightconfig.action.list_index", info.listIndex))).build();
                     }
                     if (e.isColor()) {
                         ButtonWidget colorButton = ButtonWidget.builder(Text.literal("⬛"),
@@ -203,7 +204,7 @@ public class MidnightConfigScreen extends Screen {
                                         updateList();
                                     }
                                 }).start()
-                        ).dimensions(width - 185, 0, 20, 20).build();
+                        ).dimensions(width - 185, 0, 20, 20).tooltip(Tooltip.of(Text.translatable("midnightconfig.action.color_chooser"))).build();
                         try {
                             colorButton.setMessage(Text.literal("⬛").setStyle(Style.EMPTY.withColor(Color.decode(info.tempValue).getRGB())));
                         } catch (Exception ignored) {
@@ -225,6 +226,7 @@ public class MidnightConfigScreen extends Screen {
                                     }
                                 }).start(), true
                         ).texture(Identifier.of("midnightlib", "icon/explorer"), 12, 12).dimension(20, 20).build();
+                        explorerButton.setTooltip(Tooltip.of(Text.translatable("midnightconfig.action.file_chooser")));
                         explorerButton.setPosition(width - 185, 0);
                         info.actionButton = explorerButton;
                     }
