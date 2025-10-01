@@ -2,8 +2,6 @@ package eu.midnightdust.core.screen;
 
 import eu.midnightdust.core.MidnightLib;
 import eu.midnightdust.lib.config.MidnightConfig;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -17,7 +15,6 @@ import java.util.Objects;
 
 import eu.midnightdust.lib.config.MidnightConfigListWidget;
 
-@Environment(EnvType.CLIENT)
 public class MidnightConfigOverviewScreen extends Screen {
 
     public MidnightConfigOverviewScreen(Screen parent) {

@@ -22,7 +22,7 @@ public class PlatformFunctionsImpl {
         return FMLPaths.CONFIGDIR.get();
     }
     public static boolean isClientEnv() {
-        return FMLEnvironment.dist.isClient();
+        return FMLEnvironment.getDist().isClient();
     }
     public static boolean isModLoaded(String modid) {
         return ModList.get().isLoaded(modid);

@@ -23,15 +23,15 @@ public class MidnightLibNeoForge {
     public static List<LiteralArgumentBuilder<ServerCommandSource>> commands = new ArrayList<>();
 
     public MidnightLibNeoForge() {
-        if (FMLEnvironment.dist == Dist.CLIENT) MidnightLib.onInitializeClient();
+        if (FMLEnvironment.getDist() == Dist.CLIENT) MidnightLib.onInitializeClient();
     }
 
-    @EventBusSubscriber(modid = "midnightlib", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = "midnightlib", value = Dist.CLIENT)
     public static class MidnightLibBusEvents {
         @SubscribeEvent
         public static void onPostInit(FMLClientSetupEvent event) {
             ModList.get().forEachModContainer((modid, modContainer) -> {
-                if (MidnightConfig.configClass.containsKey(modid) && !MidnightLib.hiddenMods.contains(modid)) {
+                if (MidnightConfig.configInstances.containsKey(modid) && !MidnightLib.hiddenMods.contains(modid)) {
                     modContainer.registerExtensionPoint(IConfigScreenFactory.class, (minecraftClient, screen) -> MidnightConfig.getScreen(screen, modid));
                 }
             });

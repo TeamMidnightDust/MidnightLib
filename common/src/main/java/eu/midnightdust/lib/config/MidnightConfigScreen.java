@@ -1,8 +1,6 @@
 package eu.midnightdust.lib.config;
 
 import com.google.common.collect.Lists;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tab.GridScreenTab;
@@ -28,7 +26,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@Environment(EnvType.CLIENT)
 public class MidnightConfigScreen extends Screen {
     public MidnightConfig instance;
     public final String translationPrefix, modid;

@@ -3,8 +3,6 @@ package eu.midnightdust.core;
 import eu.midnightdust.core.config.MidnightLibConfig;
 import eu.midnightdust.lib.config.AutoCommand;
 import eu.midnightdust.lib.config.MidnightConfig;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +17,6 @@ public class MidnightLib {
     public static final String MOD_ID = "midnightlib";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    @Environment(EnvType.CLIENT)
     public static void onInitializeClient() {
         try {
             if (Util.getOperatingSystem() != Util.OperatingSystem.OSX) {

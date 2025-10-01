@@ -1,7 +1,5 @@
 package eu.midnightdust.lib.config;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
@@ -12,7 +10,6 @@ import net.minecraft.text.Text;
 
 import java.util.List;
 
-@Environment(EnvType.CLIENT)
 public class MidnightConfigListWidget extends ElementListWidget<ButtonEntry> {
     public boolean renderHeaderSeparator = true;
 

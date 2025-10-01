@@ -3,8 +3,6 @@ package eu.midnightdust.lib.config;
 import com.google.gson.*;
 import com.google.gson.stream.*;
 import eu.midnightdust.lib.util.PlatformFunctions;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.resource.language.I18n;
@@ -83,7 +81,6 @@ public abstract class MidnightConfig {
         instance.loadValuesFromJson();
     }
 
-    @Environment(EnvType.CLIENT)
     public void addClientEntry(Field field, EntryInfo info) {
         Entry e = info.entry;
         if (e != null && info.dataType != null) {
@@ -215,11 +212,9 @@ public abstract class MidnightConfig {
     public void onTabInit(String tabName, MidnightConfigListWidget list, MidnightConfigScreen screen) {
     }
 
-    @Environment(EnvType.CLIENT)
     public static Screen getScreen(Screen parent, String modid) {
         return configInstances.get(modid).getScreen(parent);
     }
-    @Environment(EnvType.CLIENT)
     public Screen getScreen(Screen parent) {
         return new MidnightConfigScreen(parent, modid);
     }
