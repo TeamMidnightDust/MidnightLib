@@ -16,12 +16,12 @@ public class EntryInfo {
     public MidnightConfig.Condition[] conditions;
     public final Field field;
     public final Class<?> dataType;
-    public final String modid, fieldName;
+    public final String modid, fieldName, translationKey;
     int listIndex;
     Object defaultValue, value, function;
     String tempValue;   // The value visible in the config screen
     boolean inLimits = true;
-    Text name, error;
+    Text error;
     ClickableWidget actionButton; // color picker button / explorer button
     Tab tab;
     boolean conditionsMet = true;
@@ -41,9 +41,10 @@ public class EntryInfo {
         }
 
         if (entry != null && !entry.name().isEmpty())
-            this.name = Text.translatable(entry.name());
+            this.translationKey = entry.name();
         else if (comment != null && !comment.name().isEmpty())
-            this.name = Text.translatable(comment.name());
+            this.translationKey = comment.name();
+        else this.translationKey = modid + ".midnightconfig." + fieldName;
     }
 
     public void setValue(Object value) {
@@ -97,7 +98,7 @@ public class EntryInfo {
     }
 
     public Tooltip getTooltip(boolean isButton) {
-        String key = this.modid + ".midnightconfig." + this.fieldName + (!isButton ? ".label" : "") + ".tooltip";
+        String key = translationKey + (!isButton ? ".label" : "") + ".tooltip";
         return Tooltip.of(isButton && this.error != null ? this.error : I18n.hasTranslation(key) ? Text.translatable(key) : Text.empty());
     }
 }

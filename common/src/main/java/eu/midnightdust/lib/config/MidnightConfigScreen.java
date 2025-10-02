@@ -75,7 +75,7 @@ public class MidnightConfigScreen extends Screen {
         }
         scrollProgress = list.getScrollY();
         for (EntryInfo info : MidnightConfig.entries.values())
-            info.updateFieldValue();
+            if (Objects.equals(modid, info.modid)) info.updateFieldValue();
         updateButtons();
         if (instance.reloadScreen) {
             updateList();
@@ -154,7 +154,6 @@ public class MidnightConfigScreen extends Screen {
                 if (!visibleButLocked) continue;
             }
             if (info.modid.equals(modid) && (info.tab == null || info.tab == tabManager.getCurrentTab())) {
-                Text name = Objects.requireNonNullElseGet(info.name, () -> Text.translatable(translationPrefix + info.fieldName));
                 TextIconButtonWidget resetButton = TextIconButtonWidget.builder(Text.translatable("controls.reset"), (button -> {
                     info.value = info.defaultValue;
                     info.listIndex = 0;
@@ -245,8 +244,8 @@ public class MidnightConfigScreen extends Screen {
                         widgets.add(cycleButton);
                     }
                     if (!info.conditionsMet) widgets.forEach(w -> w.active = false);
-                    this.list.addButton(widgets, name, info);
-                } else this.list.addButton(List.of(), name, info);
+                    this.list.addButton(widgets, Text.translatable(info.translationKey), info);
+                } else this.list.addButton(List.of(), Text.translatable(info.translationKey), info);
             }
             list.setScrollY(scrollProgress);
             updateButtons();
