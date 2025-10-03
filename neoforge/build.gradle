@@ -49,6 +49,20 @@ loom {
             }
             source sourceSets.test
         }
+        testServer {
+            server()
+            name = "Test Minecraft Server"
+
+            mods {
+                create('midnightlib') {
+                    sourceSet sourceSets.main
+                }
+                create('modid') {      // test mod
+                    sourceSet sourceSets.test
+                }
+            }
+            source sourceSets.test
+        }
     }
 
 }

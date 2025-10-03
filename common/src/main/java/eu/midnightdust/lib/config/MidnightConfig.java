@@ -37,7 +37,7 @@ public abstract class MidnightConfig {
     private static final Pattern DECIMAL_ONLY = Pattern.compile("-?(\\d+\\.?\\d*|\\d*\\.?\\d+|\\.)");
     private static final Pattern HEXADECIMAL_ONLY = Pattern.compile("(-?[#0-9a-fA-F]*)");
     private static final Gson gson = new GsonBuilder()
-            .excludeFieldsWithModifiers(Modifier.TRANSIENT).excludeFieldsWithModifiers(Modifier.PRIVATE)
+            .excludeFieldsWithModifiers(Modifier.TRANSIENT).excludeFieldsWithModifiers(Modifier.PRIVATE).excludeFieldsWithModifiers(Modifier.FINAL)
             .addSerializationExclusionStrategy(new ExclusionStrategy() {
                 public boolean shouldSkipClass(Class<?> clazz) { return false; }
                 public boolean shouldSkipField(FieldAttributes fieldAttributes) { return fieldAttributes.getAnnotation(Entry.class) == null; }
@@ -70,13 +70,12 @@ public abstract class MidnightConfig {
         MidnightConfig instance = createInstance(modid, config);
 
         for (Field field : config.getFields()) {
-            EntryInfo info = new EntryInfo(field, modid);
             //noinspection ConstantValue
             if ((field.isAnnotationPresent(Entry.class) || field.isAnnotationPresent(Comment.class))
                     && !field.isAnnotationPresent(Server.class)
                     && !field.isAnnotationPresent(Hidden.class)
                     && PlatformFunctions.isClientEnv())
-                instance.addClientEntry(field, info);
+                instance.addClientEntry(field, new EntryInfo(field, modid));
         }
         instance.loadValuesFromJson();
     }
@@ -212,10 +211,10 @@ public abstract class MidnightConfig {
     public void onTabInit(String tabName, MidnightConfigListWidget list, MidnightConfigScreen screen) {
     }
 
-    public static Screen getScreen(Screen parent, String modid) {
+    public static MidnightConfigScreen getScreen(Screen parent, String modid) {
         return configInstances.get(modid).getScreen(parent);
     }
-    public Screen getScreen(Screen parent) {
+    public MidnightConfigScreen getScreen(Screen parent) {
         return new MidnightConfigScreen(parent, modid);
     }
 

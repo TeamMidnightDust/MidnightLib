@@ -31,6 +31,11 @@ loom {
             configName = "Test Minecraft Client"
             source sourceSets.test
         }
+        testServer {
+            server()
+            configName = "Test Minecraft Server"
+            source sourceSets.test
+        }
     }
 }
 
