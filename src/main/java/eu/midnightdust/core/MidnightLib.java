@@ -98,7 +98,11 @@ public class MidnightLib {
             if (PlatformFunctions.isClientEnv()) this.onInitializeClient();
         }
 
+        //? if >= 1.21.6 {
         @EventBusSubscriber(modid = "midnightlib", value = Dist.CLIENT)
+        //?} else {
+        /^@EventBusSubscriber(modid = "midnightlib", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+        ^///?}
         public static class MidnightLibBusEvents {
             @SubscribeEvent
             public static void onPostInit(FMLClientSetupEvent event) {

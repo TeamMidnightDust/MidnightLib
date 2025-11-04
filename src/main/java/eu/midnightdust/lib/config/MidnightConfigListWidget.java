@@ -6,8 +6,13 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+//? if >= 1.21.6 {
+import net.minecraft.client.renderer.RenderPipelines;
+//?} else {
+/*import net.minecraft.client.renderer.RenderType;
+*///?}
+
 
 public class MidnightConfigListWidget extends ContainerObjectSelectionList<ButtonEntry> {
     public boolean renderHeaderSeparator = true;
@@ -26,7 +31,13 @@ public class MidnightConfigListWidget extends ContainerObjectSelectionList<Butto
         if (renderHeaderSeparator)
             super.renderListSeparators(context);
         else
-            context.blit(RenderPipelines.GUI_TEXTURED, this.minecraft.level == null ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR, this.getX(), this.getBottom(), 0, 0, this.getWidth(), 2, 32, 2);
+            context.blit(
+            //? if >= 1.21.6 {
+             RenderPipelines.GUI_TEXTURED
+            //?} else {
+            /*RenderType::guiTextured
+            *///?}
+            , this.minecraft.level == null ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR, this.getX(), this.getBottom(), 0, 0, this.getWidth(), 2, 32, 2);
     }
 
     public void addButton(List<AbstractWidget> buttons, Component text, EntryInfo info) {
