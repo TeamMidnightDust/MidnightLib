@@ -11,10 +11,12 @@ import net.minecraft.client.gui.components.MultiLineTextWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+//? if >= 1.21.9 {
+ import net.minecraft.client.input.MouseButtonEvent;
+//?}
 
 public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry> {
     private static final Font textRenderer = Minecraft.getInstance().font;
@@ -41,13 +43,19 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
         }
     }
 
+    @Override
+    //? if >= 1.21.9 {
     public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+    int y = this.getY();
+    //?} else {
+    /*public void render(GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+    *///?}
         buttons.forEach(b -> {
-            b.setY(this.getY());
+            b.setY(y);
             b.render(context, mouseX, mouseY, tickDelta);
         });
         if (title != null) {
-            title.setY(this.getY() + 5);
+            title.setY(y + 5);
             title.render(context, mouseX, mouseY, tickDelta);
 
             if (info.entry != null && !this.buttons.isEmpty() && this.buttons.getFirst() instanceof AbstractWidget widget) {
@@ -55,16 +63,24 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
                 if (idMode != -1) context.renderItem(idMode == 0 ?
                                 BuiltInRegistries.ITEM.getValue(ResourceLocation.tryParse(this.info.tempValue)).getDefaultInstance()
                                 : BuiltInRegistries.BLOCK.getValue(ResourceLocation.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
-                        widget.getX() + widget.getWidth() - 18, this.getY() + 2);
+                        widget.getX() + widget.getWidth() - 18, y + 2);
             }
         }
     }
 
     @Override
+    //? if >= 1.21.9 {
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
+    //?} else {
+    /*public boolean mouseClicked(double d, double e, int i) {
+    *///?}
         if (this.info != null && this.info.comment != null && !this.info.comment.url().isBlank())
             ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().screen, this.info.comment.url(), true);
+        //? if >= 1.21.9 {
         return super.mouseClicked(click, doubled);
+        //?} else {
+        /*return super.mouseClicked(d, e, i);
+        *///?}
     }
 
     public List<? extends GuiEventListener> children() {

@@ -14,7 +14,6 @@ import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -29,6 +28,9 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
+//? if >= 1.21.9 {
+import net.minecraft.client.input.KeyEvent;
+//?}
 
 public class MidnightConfigScreen extends Screen {
     public MidnightConfig instance;
@@ -101,9 +103,15 @@ public class MidnightConfigScreen extends Screen {
     }
 
     @Override
+    //? if >= 1.21.9 {
     public boolean keyPressed(KeyEvent input) {
         return this.tabNavigation.keyPressed(input) || super.keyPressed(input);
     }
+    //?} else {
+    /*public boolean keyPressed(int key, int scanCode, int modifiers) {
+        return this.tabNavigation.keyPressed(key) || super.keyPressed(key, scanCode, modifiers);
+    }
+    *///?}
 
     @Override
     public void onClose() {

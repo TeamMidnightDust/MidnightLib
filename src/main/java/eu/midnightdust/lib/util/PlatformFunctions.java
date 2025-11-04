@@ -43,9 +43,9 @@ public class PlatformFunctions {
     }
     public static boolean isClientEnv() {
         //? if >= 1.21.9 {
-        return FMLEnvironment.getDist().isClient();
-        //?} else {
-        // return FMLEnvironment.dist.isClient();
+        /^return FMLEnvironment.getDist().isClient();
+        ^///?} else {
+         return FMLEnvironment.dist.isClient();
         //?}
     }
     public static boolean isModLoaded(String modid) {

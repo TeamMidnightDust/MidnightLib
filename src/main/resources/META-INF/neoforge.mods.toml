@@ -10,7 +10,7 @@ displayName = "${name}"
 logoFile = "midnightlib.png"
 authors = "TeamMidnightDust, Motschen"
 description = '''
-Common Library for Team MidnightDust's mods.
+Lightweight config library with config screens and commands.
 '''
 
 [[mixins]]
