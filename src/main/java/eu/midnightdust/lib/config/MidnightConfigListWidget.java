@@ -22,7 +22,11 @@ public class MidnightConfigListWidget extends ContainerObjectSelectionList<Butto
     }
 
     @Override
+    //? if >= 1.21.4 {
     public int scrollBarX() {
+    //?} else {
+    /*public int getScrollbarPosition() {
+    *///?}
         return this.width - 7;
     }
 
@@ -33,11 +37,11 @@ public class MidnightConfigListWidget extends ContainerObjectSelectionList<Butto
         else
             context.blit(
             //? if >= 1.21.6 {
-             RenderPipelines.GUI_TEXTURED
-            //?} else {
-            /*RenderType::guiTextured
-            *///?}
-            , this.minecraft.level == null ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR, this.getX(), this.getBottom(), 0, 0, this.getWidth(), 2, 32, 2);
+             RenderPipelines.GUI_TEXTURED,
+            //?} else if >= 1.21.4 {
+            //RenderType::guiTextured,
+            //?}
+            this.minecraft.level == null ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR, this.getX(), this.getBottom(), 0, 0, this.getWidth(), 2, 32, 2);
     }
 
     public void addButton(List<AbstractWidget> buttons, Component text, EntryInfo info) {

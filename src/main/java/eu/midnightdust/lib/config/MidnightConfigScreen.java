@@ -78,7 +78,11 @@ public class MidnightConfigScreen extends Screen {
             updateList();
             list.setScrollAmount(0);
         }
+        //? >= 1.21.4 {
         scrollProgress = list.scrollAmount();
+        //?} else {
+        /*scrollProgress = list.getScrollAmount();
+        *///?}
         for (EntryInfo info : MidnightConfig.entries.values())
             if (Objects.equals(modid, info.modid)) info.updateFieldValue();
         updateButtons();

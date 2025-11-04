@@ -61,8 +61,13 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
             if (info.entry != null && !this.buttons.isEmpty() && this.buttons.getFirst() instanceof AbstractWidget widget) {
                 int idMode = this.info.entry.idMode();
                 if (idMode != -1) context.renderItem(idMode == 0 ?
+                                //? if >= 1.21.4 {
                                 BuiltInRegistries.ITEM.getValue(ResourceLocation.tryParse(this.info.tempValue)).getDefaultInstance()
                                 : BuiltInRegistries.BLOCK.getValue(ResourceLocation.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
+                                //?} else {
+                                /*BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(this.info.tempValue)).getDefaultInstance()
+                                : BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
+                                *///?}
                         widget.getX() + widget.getWidth() - 18, y + 2);
             }
         }
