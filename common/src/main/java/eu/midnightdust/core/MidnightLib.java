@@ -3,11 +3,11 @@ package eu.midnightdust.core;
 import eu.midnightdust.core.config.MidnightLibConfig;
 import eu.midnightdust.lib.config.AutoCommand;
 import eu.midnightdust.lib.config.MidnightConfig;
-import net.minecraft.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.UIManager;
+import net.minecraft.Util;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public class MidnightLib {
 
     public static void onInitializeClient() {
         try {
-            if (Util.getOperatingSystem() != Util.OperatingSystem.OSX) {
+            if (Util.getPlatform() != Util.OS.OSX) {
                 System.setProperty("java.awt.headless", "false");
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             }

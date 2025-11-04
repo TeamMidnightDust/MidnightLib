@@ -5,12 +5,13 @@ import eu.midnightdust.lib.config.MidnightConfigListWidget;
 import eu.midnightdust.lib.config.MidnightConfigScreen;
 import eu.midnightdust.test.MidnightLibExtras;
 import eu.midnightdust.lib.config.MidnightConfig;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.TranslatableOption;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.OptionEnum;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class MidnightConfigExample extends MidnightConfig {
     @Entry(category = TEXT, name="I am a (non-primitive) Boolean") public static Boolean nonPrimitive = true;           // Example for a non-primative boolean option
     @Entry(category = TEXT) public static String name = "Hello World!";          // Example for a string option, which is in a category!
     @Entry(category = TEXT, width = 7, min = 7, isColor = true, name = "I am a color!") public static String titleColor = "#ffffff"; // The isColor property adds a color chooser for a hexadecimal color
-    @Entry(category = TEXT, idMode = 0) public static Identifier id = Identifier.ofVanilla("diamond");          // Example for an identifier with matching items displayed next to it!
+    @Entry(category = TEXT, idMode = 0) public static ResourceLocation id = ResourceLocation.withDefaultNamespace("diamond");          // Example for an identifier with matching items displayed next to it!
     @Entry(category = TEXT) public static ModPlatform modPlatform = ModPlatform.FABRIC;   // Example for an enum option
     public enum ModPlatform {                               // Enums allow the user to cycle through predefined options
         QUILT, FABRIC, FORGE, NEOFORGE, VANILLA
@@ -54,7 +55,7 @@ public class MidnightConfigExample extends MidnightConfig {
     // The name field can be used to specify a custom translation string or plain text
     @Entry(category = LISTS, name = "I am a string list!") public static List<String> stringList = Lists.newArrayList("String1", "String2"); // Array String Lists are also supported
     @Entry(category = LISTS, isColor = true, name = "I am a color list!") public static List<String> colorList = Lists.newArrayList("#ac5f99", "#11aa44"); // Lists also support colors
-    @Entry(category = LISTS, name = "I am an identifier list!", idMode = 1) public static List<Identifier> idList = Lists.newArrayList(Identifier.ofVanilla("dirt")); // A list of block identifiers
+    @Entry(category = LISTS, name = "I am an identifier list!", idMode = 1) public static List<ResourceLocation> idList = Lists.newArrayList(ResourceLocation.withDefaultNamespace("dirt")); // A list of block identifiers
     @Entry(category = LISTS, name = "I am an integer list!") public static List<Integer> intList = Lists.newArrayList(69, 420);
     @Entry(category = LISTS, name = "I am a float list!") public static List<Float> floatList = Lists.newArrayList(4.1f, -1.3f, -1f);
 
@@ -128,7 +129,7 @@ public class MidnightConfigExample extends MidnightConfig {
 
     public static int imposter = 16777215; // - Entries without an @Entry or @Comment annotation are ignored
 
-    public enum GraphicsSteps implements TranslatableOption {
+    public enum GraphicsSteps implements OptionEnum {
         FAST(0, "options.graphics.fast"),
         FANCY(1, "options.graphics.fancy"),
         FABULOUS(2, "options.graphics.fabulous");
@@ -142,9 +143,9 @@ public class MidnightConfigExample extends MidnightConfig {
         }
 
         @Override
-        public Text getText() {
-            MutableText mutableText = Text.translatable(this.getTranslationKey());
-            return this == GraphicsSteps.FABULOUS ? mutableText.formatted(Formatting.ITALIC).formatted(Formatting.AQUA) : mutableText;
+        public @NotNull Component getCaption() {
+            MutableComponent mutableText = Component.translatable(this.getKey());
+            return this == GraphicsSteps.FABULOUS ? mutableText.withStyle(ChatFormatting.ITALIC, ChatFormatting.AQUA) : mutableText;
         }
 
         @Override
@@ -153,7 +154,7 @@ public class MidnightConfigExample extends MidnightConfig {
         }
 
         @Override
-        public String getTranslationKey() {
+        public @NotNull String getKey() {
             return this.translationKey;
         }
     }
@@ -164,8 +165,8 @@ public class MidnightConfigExample extends MidnightConfig {
     @Override
     public void onTabInit(String tabName, MidnightConfigListWidget list, MidnightConfigScreen screen) {
         if (Objects.equals(tabName, EXTRAS)) {
-            MidnightLibExtras.KeybindButton.add(MinecraftClient.getInstance().options.advancementsKey, list, screen);
-            MidnightLibExtras.KeybindButton.add(MinecraftClient.getInstance().options.dropKey, list, screen);
+            MidnightLibExtras.KeybindButton.add(Minecraft.getInstance().options.keyAdvancements, list, screen);
+            MidnightLibExtras.KeybindButton.add(Minecraft.getInstance().options.keyDrop, list, screen);
         }
     }
 

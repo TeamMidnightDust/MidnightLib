@@ -1,15 +1,16 @@
 package eu.midnightdust.lib.config;
 
 import com.mojang.brigadier.arguments.*;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import eu.midnightdust.lib.config.MidnightConfig.Entry;
 import eu.midnightdust.lib.util.PlatformFunctions;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
-
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 
 import static eu.midnightdust.lib.config.MidnightConfig.Entry;
 
@@ -25,19 +26,19 @@ public class AutoCommand {
         this.type = MidnightConfig.getUnderlyingType(field);
         this.isList = field.getType() == List.class;
 
-        var command = CommandManager.literal(field.getName()).executes(this::getValue);
+        var command = Commands.literal(field.getName()).executes(this::getValue);
 
         if (type.isEnum()) {
             for (Object enumValue : field.getType().getEnumConstants())
-                command = command.then(CommandManager.literal(enumValue.toString())
+                command = command.then(Commands.literal(enumValue.toString())
                         .executes(ctx -> this.setValue(ctx.getSource(), enumValue, "")));
         } else if (isList) {
             for (String action : new String[]{"add", "remove"})
-                command = command.then(CommandManager.literal(action)
-                        .then(CommandManager.argument(VALUE, getArgType()).executes(ctx -> setValueFromArg(ctx, action))));
-        } else command = command.then(CommandManager.argument(VALUE, getArgType()).executes(ctx -> setValueFromArg(ctx, "")));
+                command = command.then(Commands.literal(action)
+                        .then(Commands.argument(VALUE, getArgType()).executes(ctx -> setValueFromArg(ctx, action))));
+        } else command = command.then(Commands.argument(VALUE, getArgType()).executes(ctx -> setValueFromArg(ctx, "")));
 
-        PlatformFunctions.registerCommand(CommandManager.literal("midnightconfig").requires(source -> source.hasPermissionLevel(2)).then(CommandManager.literal(modid).then(command)));
+        PlatformFunctions.registerCommand(Commands.literal("midnightconfig").requires(source -> source.hasPermission(2)).then(Commands.literal(modid).then(command)));
     }
 
     public ArgumentType<?> getArgType() {
@@ -49,14 +50,14 @@ public class AutoCommand {
         return StringArgumentType.string();
     }
 
-    public int setValueFromArg(CommandContext<ServerCommandSource> context, String action) {
+    public int setValueFromArg(CommandContext<CommandSourceStack> context, String action) {
         if (type == int.class) return setValue(context.getSource(), IntegerArgumentType.getInteger(context, VALUE), action);
         else if (type == double.class) return setValue(context.getSource(), DoubleArgumentType.getDouble(context, VALUE), action);
         else if (type == float.class) return setValue(context.getSource(), FloatArgumentType.getFloat(context, VALUE), action);
         else if (type == boolean.class) return setValue(context.getSource(), BoolArgumentType.getBool(context, VALUE), action);
         return setValue(context.getSource(), StringArgumentType.getString(context, VALUE), action);
     }
-    private int setValue(ServerCommandSource source, Object value, String action) {
+    private int setValue(CommandSourceStack source, Object value, String action) {
         boolean add = Objects.equals(action, "add");
         try {
             if (!isList) field.set(null, value);
@@ -69,16 +70,16 @@ public class AutoCommand {
             MidnightConfig.write(modid);
         }
         catch (Exception e) {
-            source.sendError(Text.literal(isList ? "Could not %s %s %s %s: %s".formatted(add ? "add" : "remove", value, add ? "to" : "from", field.getName(), e) : "Could not set %s to value %s: %s".formatted(field.getName(), value, e)));
+            source.sendFailure(Component.literal(isList ? "Could not %s %s %s %s: %s".formatted(add ? "add" : "remove", value, add ? "to" : "from", field.getName(), e) : "Could not set %s to value %s: %s".formatted(field.getName(), value, e)));
             return 0;
         }
-        source.sendFeedback(() -> Text.literal(isList ? "Successfully %s %s %s %s".formatted(add ? "added" : "removed", value, add ? "to" : "from", field.getName()) :
+        source.sendSuccess(() -> Component.literal(isList ? "Successfully %s %s %s %s".formatted(add ? "added" : "removed", value, add ? "to" : "from", field.getName()) :
                 "Successfully set %s to %s".formatted(field.getName(), value)), true);
         return 1;
     }
-    private int getValue(CommandContext<ServerCommandSource> context) {
-        context.getSource().sendFeedback(() -> {
-            try { return Text.literal("The value of %s is %s".formatted(field.getName(), field.get(null)));
+    private int getValue(CommandContext<CommandSourceStack> context) {
+        context.getSource().sendSuccess(() -> {
+            try { return Component.literal("The value of %s is %s".formatted(field.getName(), field.get(null)));
             } catch (IllegalAccessException e) {throw new RuntimeException(e);}
             }, true);
         return 0;

@@ -2,9 +2,8 @@ package eu.midnightdust.lib.util;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.minecraft.server.command.ServerCommandSource;
-
 import java.nio.file.Path;
+import net.minecraft.commands.CommandSourceStack;
 
 public class PlatformFunctions {
     @ExpectPlatform
@@ -28,7 +27,7 @@ public class PlatformFunctions {
         throw new AssertionError();
     }
     @ExpectPlatform
-    public static void registerCommand(LiteralArgumentBuilder<ServerCommandSource> command) {
+    public static void registerCommand(LiteralArgumentBuilder<CommandSourceStack> command) {
         // Just throw an error, the content should get replaced at runtime.
         throw new AssertionError();
     }

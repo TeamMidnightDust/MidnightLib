@@ -1,36 +1,35 @@
 package eu.midnightdust.lib.config;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.ElementListWidget;
-import net.minecraft.text.Text;
-
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
 
-public class MidnightConfigListWidget extends ElementListWidget<ButtonEntry> {
+public class MidnightConfigListWidget extends ContainerObjectSelectionList<ButtonEntry> {
     public boolean renderHeaderSeparator = true;
 
-    public MidnightConfigListWidget(MinecraftClient client, int width, int height, int y, int itemHeight) {
+    public MidnightConfigListWidget(Minecraft client, int width, int height, int y, int itemHeight) {
         super(client, width, height, y, itemHeight);
     }
 
     @Override
-    public int getScrollbarX() {
+    public int scrollBarX() {
         return this.width - 7;
     }
 
     @Override
-    public void drawHeaderAndFooterSeparators(DrawContext context) {
+    public void renderListSeparators(GuiGraphics context) {
         if (renderHeaderSeparator)
-            super.drawHeaderAndFooterSeparators(context);
+            super.renderListSeparators(context);
         else
-            context.drawTexture(RenderPipelines.GUI_TEXTURED, this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE, this.getX(), this.getBottom(), 0, 0, this.getWidth(), 2, 32, 2);
+            context.blit(RenderPipelines.GUI_TEXTURED, this.minecraft.level == null ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR, this.getX(), this.getBottom(), 0, 0, this.getWidth(), 2, 32, 2);
     }
 
-    public void addButton(List<ClickableWidget> buttons, Text text, EntryInfo info) {
+    public void addButton(List<AbstractWidget> buttons, Component text, EntryInfo info) {
         this.addEntry(new ButtonEntry(buttons, text, info));
     }
 

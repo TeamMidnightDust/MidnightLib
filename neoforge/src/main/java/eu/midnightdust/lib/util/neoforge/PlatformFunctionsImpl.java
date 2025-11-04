@@ -2,7 +2,7 @@ package eu.midnightdust.lib.util.neoforge;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import eu.midnightdust.lib.util.PlatformFunctions;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
@@ -27,7 +27,7 @@ public class PlatformFunctionsImpl {
     public static boolean isModLoaded(String modid) {
         return ModList.get().isLoaded(modid);
     }
-    public static void registerCommand(LiteralArgumentBuilder<ServerCommandSource> command) {
+    public static void registerCommand(LiteralArgumentBuilder<CommandSourceStack> command) {
         commands.add(command);
     }
 }

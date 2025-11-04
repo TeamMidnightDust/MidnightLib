@@ -3,7 +3,7 @@ package eu.midnightdust.neoforge;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import eu.midnightdust.core.MidnightLib;
 import eu.midnightdust.lib.config.MidnightConfig;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @Mod("midnightlib")
 public class MidnightLibNeoForge {
-    public static List<LiteralArgumentBuilder<ServerCommandSource>> commands = new ArrayList<>();
+    public static List<LiteralArgumentBuilder<CommandSourceStack>> commands = new ArrayList<>();
 
     public MidnightLibNeoForge() {
         if (FMLEnvironment.getDist() == Dist.CLIENT) MidnightLib.onInitializeClient();
