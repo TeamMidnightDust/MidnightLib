@@ -6,7 +6,7 @@ import eu.midnightdust.lib.util.PlatformFunctions;
 import java.util.Objects;
 
 public class MidnightLibConfig extends MidnightConfig {
-    public static final boolean HAS_MODMENU = PlatformFunctions.isModLoaded("modmenu") || Objects.equals(PlatformFunctions.getPlatformName(), "neoforge");
+    public static final boolean HAS_MODMENU = PlatformFunctions.isModLoaded("modmenu") || !Objects.equals(PlatformFunctions.getPlatformName(), "fabric");
 
     @Entry public static ConfigButton config_screen_list = HAS_MODMENU ? ConfigButton.MODMENU : ConfigButton.TRUE;
 

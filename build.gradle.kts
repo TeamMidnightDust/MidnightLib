@@ -59,8 +59,7 @@ loom {
     }
     if (loader == "forge") {
         forge.mixinConfigs(
-            "template-common.mixins.json",
-            "template-forge.mixins.json",
+            "midnightlib.mixins.json",
         )
     }
 }
