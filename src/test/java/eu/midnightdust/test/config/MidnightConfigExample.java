@@ -1,5 +1,6 @@
 package eu.midnightdust.test.config;
 
+//? if >= 1.21.10 {
 import com.google.common.collect.Lists;
 import eu.midnightdust.lib.config.MidnightConfigListWidget;
 import eu.midnightdust.lib.config.MidnightConfigScreen;
@@ -169,5 +170,5 @@ public class MidnightConfigExample extends MidnightConfig {
             MidnightLibExtras.KeybindButton.add(Minecraft.getInstance().options.keyDrop, list, screen);
         }
     }
-
 }
+//?}

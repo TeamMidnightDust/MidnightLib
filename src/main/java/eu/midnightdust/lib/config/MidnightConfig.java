@@ -45,10 +45,16 @@ public abstract class MidnightConfig {
                 public boolean shouldSkipClass(Class<?> clazz) { return false; }
                 public boolean shouldSkipField(FieldAttributes fieldAttributes) { return fieldAttributes.getAnnotation(Entry.class) == null; }
             })
-            .registerTypeAdapter(ResourceLocation.class, new TypeAdapter<ResourceLocation>() {
-                public void write(JsonWriter out, ResourceLocation id) throws IOException { out.value(id.toString()); }
-                public ResourceLocation read(JsonReader in) throws IOException { return ResourceLocation.parse(in.nextString()); }
-            }).setPrettyPrinting().create();
+            .registerTypeAdapter(ResourceLocation.class,
+                //? if >= 1.21.6 {
+                 new TypeAdapter<ResourceLocation>() {
+                     public void write(JsonWriter out, ResourceLocation id) throws IOException { out.value(id.toString()); }
+                     public ResourceLocation read(JsonReader in) throws IOException { return ResourceLocation.parse(in.nextString()); }
+                 }
+                //?} else {
+                /*new ResourceLocation.Serializer()
+                *///?}
+            ).setPrettyPrinting().create();
 
     protected static final LinkedHashMap<String, EntryInfo> entries = new LinkedHashMap<>();    // modid:fieldName -> EntryInfo
 
@@ -124,7 +130,13 @@ public abstract class MidnightConfig {
         info.function = (BiFunction<EditBox, Button, Predicate<String>>) (t, b) -> s -> {
             s = s.trim();
             if (!(s.isEmpty() || !isNumber || pattern.matcher(s).matches()) ||
-                    (info.dataType == ResourceLocation.class && ResourceLocation.read(s).isError())) return false;
+                    (info.dataType == ResourceLocation.class && ResourceLocation.read(s)
+                            //? if >= 1.21 {
+                             .isError()
+                            //?} else {
+                            /*.error().isPresent()
+                            *///?}
+                    )) return false;
 
             Number value = 0; boolean inLimits = false; info.error = null;
             if (!(isNumber && s.isEmpty()) && !s.equals("-") && !s.equals(".")) {

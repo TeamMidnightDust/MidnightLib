@@ -38,8 +38,14 @@ public class MidnightConfigOverviewScreen extends Screen {
     }
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+        //? if >= 1.21 {
+         super.render(context, mouseX, mouseY, delta);
+        //?} else {
+        /*super.renderBackground(context);
+        *///?}
         this.list.render(context, mouseX, mouseY, delta);
         context.drawCenteredString(font, title, width / 2, 10, 0xFFFFFFFF);
+        //? if < 1.21
+        /*super.render(context, mouseX, mouseY, delta);*/
     }
 }

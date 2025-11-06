@@ -3,6 +3,8 @@ package eu.midnightdust.lib.config;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Optional;
+
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.tabs.Tab;
@@ -81,8 +83,8 @@ public class EntryInfo {
             if (!condition.requiredModId().isEmpty() && !PlatformFunctions.isModLoaded(condition.requiredModId()))
                 this.conditionsMet = false;
             String requiredOption = condition.requiredOption().contains(":") ? condition.requiredOption() : (this.modid + ":" + condition.requiredOption());
-            if (MidnightConfig.entries.get(requiredOption) instanceof EntryInfo info)
-                this.conditionsMet &= List.of(condition.requiredValue()).contains(info.tempValue);
+            Optional.ofNullable(MidnightConfig.entries.get(requiredOption)).ifPresent(info -> this.conditionsMet &= List.of(condition.requiredValue()).contains(info.tempValue));
+
             if (!this.conditionsMet) break;
         }
         if (prevConditionState != this.conditionsMet) MidnightConfig.configInstances.get(modid).reloadScreen = true;

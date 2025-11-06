@@ -4,11 +4,8 @@ import com.google.common.collect.Lists;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.SpriteIconButton;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.tabs.GridLayoutTab;
 import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.components.tabs.TabManager;
@@ -30,6 +27,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 //? if >= 1.21.9 {
 import net.minecraft.client.input.KeyEvent;
+//?}
+
+//? if >=1.21 {
+ import net.minecraft.client.gui.components.SpriteIconButton;
 //?}
 
 public class MidnightConfigScreen extends Screen {
@@ -78,11 +79,7 @@ public class MidnightConfigScreen extends Screen {
             updateList();
             list.setScrollAmount(0);
         }
-        //? >= 1.21.4 {
-        scrollProgress = list.scrollAmount();
-        //?} else {
-        /*scrollProgress = list.getScrollAmount();
-        *///?}
+        scrollProgress = /*? < 1.21.4 {*/ /*list.getScrollAmount() *//*?} else {*/ list.scrollAmount() /*?}*/;
         for (EntryInfo info : MidnightConfig.entries.values())
             if (Objects.equals(modid, info.modid)) info.updateFieldValue();
         updateButtons();
@@ -97,9 +94,10 @@ public class MidnightConfigScreen extends Screen {
 
         for (ButtonEntry entry : this.list.children()) {
             if (entry.buttons != null && entry.buttons.size() > 1 && entry.info.field != null) {
-                if (entry.buttons.get(0) instanceof AbstractWidget widget)
+                Optional.ofNullable(entry.buttons.get(0)).ifPresent(widget -> {
                     if (widget.isFocused() || widget.isHovered())
                         widget.setTooltip(entry.info.getTooltip(true));
+                });
                 if (entry.buttons.get(1) instanceof Button button)
                     button.active = !Objects.equals(String.valueOf(entry.info.value), String.valueOf(entry.info.defaultValue)) && entry.info.conditionsMet;
             }
@@ -169,12 +167,24 @@ public class MidnightConfigScreen extends Screen {
                 if (!visibleButLocked) continue;
             }
             if (info.modid.equals(modid) && (info.tab == null || info.tab == tabManager.getCurrentTab())) {
-                SpriteIconButton resetButton = SpriteIconButton.builder(Component.translatable("controls.reset"), (button -> {
+                //? if >= 1.21 {
+                 SpriteIconButton resetButton = SpriteIconButton.builder(Component.translatable("controls.reset"),
+                //?} else {
+                /*TextAndImageButton resetButton = TextAndImageButton.builder(Component.translatable("controls.reset"), new ResourceLocation("midnightlib", "icon/reset.png"),
+                *///?}
+                (button -> {
                     info.value = info.defaultValue;
                     info.listIndex = 0;
                     info.tempValue = info.toTemporaryValue();
                     updateList();
-                }), true).sprite(ResourceLocation.fromNamespaceAndPath("midnightlib", "icon/reset"), 12, 12).size(20, 20).build();
+                })
+                //? if >= 1.21 {
+                 , true).sprite(ResourceLocation.fromNamespaceAndPath("midnightlib", "icon/reset"), 12, 12).size(20, 20).build();
+                //?} else {
+                /*).textureSize(12, 12).usedTextureSize(12, 12).offset(0, 4).build();
+                resetButton.setWidth(20);
+                *///?}
+
                 resetButton.setPosition(width - 205 + 150 + 25, 0);
 
                 if (info.function != null) {
@@ -225,7 +235,13 @@ public class MidnightConfigScreen extends Screen {
                         }
                         info.actionButton = colorButton;
                     } else if (e.selectionMode() > -1) {
-                        Button explorerButton = SpriteIconButton.builder(Component.empty(),
+
+                        Button explorerButton =
+                                //? if >= 1.21 {
+                                 SpriteIconButton.builder(Component.empty(),
+                                //?} else {
+                                /*TextAndImageButton.builder(Component.empty(), new ResourceLocation("midnightlib", "icon/explorer.png"),
+                                *///?}
                                 button -> new Thread(() -> {
                                     JFileChooser fileChooser = new JFileChooser(info.tempValue);
                                     fileChooser.setFileSelectionMode(e.selectionMode());
@@ -238,8 +254,13 @@ public class MidnightConfigScreen extends Screen {
                                         info.setValue(fileChooser.getSelectedFile().getAbsolutePath());
                                         updateList();
                                     }
-                                }).start(), true
-                        ).sprite(ResourceLocation.fromNamespaceAndPath("midnightlib", "icon/explorer"), 12, 12).size(20, 20).build();
+                                }).start()
+                                //? if >= 1.21 {
+                                 , true).sprite(ResourceLocation.fromNamespaceAndPath("midnightlib", "icon/explorer"), 12, 12).size(20, 20)
+                                //?} else {
+                                        /*).textureSize(12, 12).usedTextureSize(12, 12).offset(0, 4)
+                                *///?}
+                                .build();
                         explorerButton.setTooltip(Tooltip.create(Component.translatable("midnightconfig.action.file_chooser")));
                         explorerButton.setPosition(width - 185, 0);
                         info.actionButton = explorerButton;
@@ -269,8 +290,14 @@ public class MidnightConfigScreen extends Screen {
 
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+        //? if >= 1.21 {
+         super.render(context, mouseX, mouseY, delta);
+        //?} else {
+        /*super.renderBackground(context);
+        *///?}
         this.list.render(context, mouseX, mouseY, delta);
         if (tabs.size() < 2) context.drawCenteredString(font, title, width / 2, 10, 0xFFFFFFFF);
+        //? if < 1.21
+        /*super.render(context, mouseX, mouseY, delta);*/
     }
 }

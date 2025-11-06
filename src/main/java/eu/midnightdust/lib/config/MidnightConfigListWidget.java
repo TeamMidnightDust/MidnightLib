@@ -18,7 +18,11 @@ public class MidnightConfigListWidget extends ContainerObjectSelectionList<Butto
     public boolean renderHeaderSeparator = true;
 
     public MidnightConfigListWidget(Minecraft client, int width, int height, int y, int itemHeight) {
-        super(client, width, height, y, itemHeight);
+        //? if >= 1.21 {
+         super(client, width, height, y, itemHeight);
+        //?} else {
+        /*super(client, width, height, y, height + y, itemHeight);
+        *///?}
     }
 
     @Override
@@ -30,6 +34,7 @@ public class MidnightConfigListWidget extends ContainerObjectSelectionList<Butto
         return this.width - 7;
     }
 
+    //? if >= 1.21 {
     @Override
     public void renderListSeparators(GuiGraphics context) {
         if (renderHeaderSeparator)
@@ -39,10 +44,11 @@ public class MidnightConfigListWidget extends ContainerObjectSelectionList<Butto
             //? if >= 1.21.6 {
              RenderPipelines.GUI_TEXTURED,
             //?} else if >= 1.21.4 {
-            //RenderType::guiTextured,
-            //?}
+            /*RenderType::guiTextured,
+            *///?}
             this.minecraft.level == null ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR, this.getX(), this.getBottom(), 0, 0, this.getWidth(), 2, 32, 2);
     }
+    //?}
 
     public void addButton(List<AbstractWidget> buttons, Component text, EntryInfo info) {
         this.addEntry(new ButtonEntry(buttons, text, info));

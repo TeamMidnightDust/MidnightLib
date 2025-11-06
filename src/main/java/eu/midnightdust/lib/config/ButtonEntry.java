@@ -2,6 +2,8 @@ package eu.midnightdust.lib.config;
 
 import com.google.common.collect.Lists;
 import java.util.List;
+import java.util.Optional;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -35,7 +37,13 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
         int scaledWidth = Minecraft.getInstance().getWindow().getGuiScaledWidth();
 
         if (text != null && (!text.getString().contains("spacer") || !buttons.isEmpty())) {
-            title = new MultiLineTextWidget(12, 0, Component.translationArg(text), textRenderer).setCentered(centered);
+            title = new MultiLineTextWidget(12, 0,
+                    //? if >= 1.21 {
+                    Component.translationArg(text)
+                    //?} else {
+                    /*text.copy()
+                    *///?}
+                    , textRenderer).setCentered(centered);
             if (info != null)
                 title.setTooltip(info.getTooltip(false));
             title.setMaxWidth(!buttons.isEmpty() ? buttons.get(buttons.size() > 2 ? buttons.size() - 1 : 0).getX() - 16 : scaledWidth - 24);
@@ -58,17 +66,19 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
             title.setY(y + 5);
             title.render(context, mouseX, mouseY, tickDelta);
 
-            if (info.entry != null && !this.buttons.isEmpty() && this.buttons.getFirst() instanceof AbstractWidget widget) {
-                int idMode = this.info.entry.idMode();
-                if (idMode != -1) context.renderItem(idMode == 0 ?
-                                //? if >= 1.21.4 {
+            if (info.entry != null && !this.buttons.isEmpty()) {
+                Optional.ofNullable(this.buttons.get(0)).ifPresent(widget -> {
+                    int idMode = this.info.entry.idMode();
+                    if (idMode != -1) context.renderItem(idMode == 0 ?
+                                    //? if >= 1.21.4 {
                                 BuiltInRegistries.ITEM.getValue(ResourceLocation.tryParse(this.info.tempValue)).getDefaultInstance()
                                 : BuiltInRegistries.BLOCK.getValue(ResourceLocation.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
                                 //?} else {
-                                /*BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(this.info.tempValue)).getDefaultInstance()
-                                : BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
-                                *///?}
-                        widget.getX() + widget.getWidth() - 18, y + 2);
+                                    /*BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(this.info.tempValue)).getDefaultInstance()
+                                    : BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
+                            *///?}
+                            widget.getX() + widget.getWidth() - 18, y + 2);
+                });
             }
         }
     }
@@ -80,7 +90,11 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
     /*public boolean mouseClicked(double d, double e, int i) {
     *///?}
         if (this.info != null && this.info.comment != null && !this.info.comment.url().isBlank())
-            ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().screen, this.info.comment.url(), true);
+            //? if >= 1.21 {
+             ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().screen, this.info.comment.url(), true);
+            //?} else {
+            /*ConfirmLinkScreen.confirmLinkNow(this.info.comment.url(), Minecraft.getInstance().screen, true);
+            *///?}
         //? if >= 1.21.9 {
         return super.mouseClicked(click, doubled);
         //?} else {
