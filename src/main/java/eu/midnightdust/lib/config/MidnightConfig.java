@@ -46,7 +46,7 @@ public abstract class MidnightConfig {
                 public boolean shouldSkipField(FieldAttributes fieldAttributes) { return fieldAttributes.getAnnotation(Entry.class) == null; }
             })
             .registerTypeAdapter(ResourceLocation.class,
-                //? if >= 1.21.6 {
+                //? if >= 1.21.4 {
                  new TypeAdapter<ResourceLocation>() {
                      public void write(JsonWriter out, ResourceLocation id) throws IOException { out.value(id.toString()); }
                      public ResourceLocation read(JsonReader in) throws IOException { return ResourceLocation.parse(in.nextString()); }
