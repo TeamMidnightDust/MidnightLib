@@ -3,11 +3,7 @@ package eu.midnightdust.lib.util;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import java.nio.file.Path;
 
-import eu.midnightdust.core.MidnightLib;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.loading.FMLPaths;
 
 //? if fabric {
 import net.fabricmc.api.EnvType;
@@ -19,6 +15,12 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
+*///?}
+//? if forge {
+/*import eu.midnightdust.core.MidnightLib;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.fml.loading.FMLPaths;
 *///?}
 
 public class PlatformFunctions {

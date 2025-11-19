@@ -235,7 +235,6 @@ public class MidnightConfigScreen extends Screen {
                         }
                         info.actionButton = colorButton;
                     } else if (e.selectionMode() > -1) {
-
                         Button explorerButton =
                                 //? if >= 1.21 {
                                  SpriteIconButton.builder(Component.empty(),

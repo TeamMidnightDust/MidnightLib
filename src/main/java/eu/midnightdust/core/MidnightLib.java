@@ -80,7 +80,9 @@ public class MidnightLib {
     public static void registerAutoCommand() {
         MidnightConfig.configInstances.forEach((modid, config) -> {
             for (Field field : config.configClass.getFields()) {
-                if (field.isAnnotationPresent(MidnightConfig.Entry.class) && !field.isAnnotationPresent(MidnightConfig.Client.class) && !field.isAnnotationPresent(MidnightConfig.Hidden.class))
+                if (field.isAnnotationPresent(MidnightConfig.Entry.class)
+                        && !field.isAnnotationPresent(MidnightConfig.Client.class)
+                        && !field.isAnnotationPresent(MidnightConfig.Hidden.class))
                     new AutoCommand(field, modid);
             }
         });

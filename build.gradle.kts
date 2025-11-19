@@ -1,10 +1,9 @@
-import java.util.*
-
 plugins {
     id("dev.architectury.loom")
     id("architectury-plugin")
     id("me.modmuss50.mod-publish-plugin")
     id("com.github.johnrengelman.shadow")
+    `maven-publish`
 }
 
 val minecraft = stonecutter.current.version
@@ -16,16 +15,11 @@ base {
     archivesName.set("${mod.id}-$loader")
 }
 
-//architectury.common(stonecutter.tree.branches.mapNotNull {
-//    if (stonecutter.current.project !in it) null
-//    else it.prop("loom.platform")
-//})
 repositories {
     maven("https://maven.neoforged.net/releases/")
 
-    //modmenu
+    // modmenu
     maven("https://maven.terraformersmc.com/")
-    //placeholder api (modmenu depencency)
     maven("https://maven.nucleoid.xyz/")
 }
 dependencies {
@@ -35,9 +29,7 @@ dependencies {
         modImplementation("net.fabricmc:fabric-loader:${mod.dep("fabric_loader")}")
         modImplementation("com.terraformersmc:modmenu:${mod.dep("modmenu_version")}")
 
-        //some features (like automatic resource loading from non vanilla namespaces) work only with fabric API installed
-        //for example translations from assets/modid/lang/en_us.json won't be working, same stuff with textures
-        //but we keep runtime only to not accidentally depend on fabric's api, because it doesn't exist in neo/forge
+        // Fabric API is required to load modded resources
         modImplementation("net.fabricmc.fabric-api:fabric-api:${mod.dep("fabric_version")}")
     }
     if (loader == "forge") {
@@ -58,22 +50,14 @@ loom {
         }
     }
     if (loader == "forge") {
-        forge.mixinConfigs(
-            "midnightlib.mixins.json",
-        )
+        forge.mixinConfigs("midnightlib.mixins.json")
     }
 }
 
-
-val localProperties = Properties()
-val localPropertiesFile = rootProject.file("local.properties")
-if (localPropertiesFile.exists()) {
-    localProperties.load(localPropertiesFile.inputStream())
-}
 publishMods {
-    val modrinthToken = localProperties.getProperty("publish.modrinthToken", System.getenv("MODRINTH_TOKEN"))
-    val curseforgeToken = localProperties.getProperty("publish.curseforgeToken", System.getenv("CURSEFORGE_TOKEN"))
-
+    val modrinthToken = System.getenv("MODRINTH_TOKEN")
+    val curseforgeToken = System.getenv("CURSEFORGE_TOKEN")
+    val githubToken = System.getenv("GITHUB_TOKEN").orEmpty()
 
     file = project.tasks.remapJar.get().archiveFile
     dryRun = modrinthToken == null || curseforgeToken == null
@@ -105,7 +89,52 @@ publishMods {
             optional("modmenu")
         }
     }
+
+    github {
+        accessToken = githubToken
+        repository = "TeamMidnightDust/MidnightLib"
+        commitish = "multiversion" // This is the branch the release tag will be created from
+
+        tagName = "v" + properties["mod.version"]
+
+        // Allow the release to be initially created without any files.
+        allowEmptyFiles = true
+    }
 }
+//publishing {
+//    publications {
+//        create<MavenPublication>("mavenJava") {
+//            pom {
+//                groupId = "eu.midnightdust"
+//                artifactId = "midnightlib"
+//                version = project.version
+//
+//                from(components["java"])
+//            }
+//        }
+//    }
+//}
+publishing {
+    repositories {
+        maven {
+            name = "MidnightDust"
+            url = uri("https://maven.midnightdust.eu/snapshots")
+            credentials(PasswordCredentials::class)
+        }
+    }
+    publications {
+        create<MavenPublication>("mavenJava") {
+            pom {
+                groupId = "eu.midnightdust"
+                artifactId = project.mod.id
+                version = "${project.version}-${loader}"
+
+                from(components["java"])
+            }
+        }
+    }
+}
+
 
 java {
     withSourcesJar()
