@@ -64,7 +64,11 @@ public abstract class MidnightConfig {
     protected boolean reloadScreen = false;
     public Class<? extends MidnightConfig> configClass;
 
-    public static <T extends MidnightConfig> T createInstance(String modid, Class<? extends MidnightConfig> configClass) { // This is basically an argumented constructor without the requirement of having one in each config class
+    /**
+     * This is basically an argumented constructor without the requirement of having one in each config class.<br>
+     * Not meant to be used externally.
+     * */
+    protected static <T extends MidnightConfig> T createInstance(String modid, Class<? extends MidnightConfig> configClass) {
         try {
             T instance = (T) configClass.getDeclaredConstructor().newInstance();
             instance.modid = modid;
@@ -75,6 +79,11 @@ public abstract class MidnightConfig {
         catch (Exception e) { throw new RuntimeException(e); }
     }
 
+    /**
+     * Initializes the config by registering all fields annotated with {@link Entry} or {@link Comment}<br>
+     * @param modid Your mod's id
+     * @param config The class containing your mod's config
+     * */
     public static void init(String modid, Class<? extends MidnightConfig> config) {
         MidnightConfig instance = createInstance(modid, config);
 
@@ -89,7 +98,12 @@ public abstract class MidnightConfig {
         instance.loadValuesFromJson();
     }
 
-    public void addClientEntry(Field field, EntryInfo info) {
+    /**
+     * Loads the config entry and saves relevant information into the {@link EntryInfo} object.
+     * @param field The config entry's Java field
+     * @param info The {@link EntryInfo} object to associate with this field
+     * */
+    protected void addClientEntry(Field field, EntryInfo info) {
         Entry e = info.entry;
         if (e != null && info.dataType != null) {
             if (info.dataType == int.class) textField(info, Integer::parseInt, INTEGER_ONLY, (int) e.min(), (int) e.max(), true);
@@ -117,6 +131,12 @@ public abstract class MidnightConfig {
         entries.put(modid + ":" + field.getName(), info);
     }
 
+    /**
+     * Identifies a field's underlying data type.<br>
+     * For non-primitive data types, the class of the primitive equivalent is returned.<br>
+     * For lists, this is the data type of list entries.
+     * @param field The field to investigate
+     * */
     public static Class<?> getUnderlyingType(Field field) {
         Class<?> rawType = field.getType();
         if (field.getType() == List.class)
@@ -125,7 +145,10 @@ public abstract class MidnightConfig {
         } catch (NoSuchFieldException | IllegalAccessException ignored) { return rawType; }
     }
 
-    private static void textField(EntryInfo info, Function<String,Number> f, Pattern pattern, double min, double max, boolean cast) {
+    /**
+     * Defines a function to validate number, text, identifier or color inputs and saves it into the {@link EntryInfo} object.
+     * */
+    protected static void textField(EntryInfo info, Function<String,Number> f, Pattern pattern, double min, double max, boolean cast) {
         boolean isNumber = pattern != null;
         info.function = (BiFunction<EditBox, Button, Predicate<String>>) (t, b) -> s -> {
             s = s.trim();
@@ -163,6 +186,11 @@ public abstract class MidnightConfig {
         };
     }
 
+    /**
+     * Gets the translated title of an enum option
+     * @param value the enum option to translate
+     * @param info the associated {@link EntryInfo} object
+     * */
     protected Component getEnumTranslatableText(Object value, EntryInfo info) {
         if (value instanceof OptionEnum translatableOption) return translatableOption.getCaption();
 
@@ -170,6 +198,9 @@ public abstract class MidnightConfig {
         return I18n.exists(translationKey) ? Component.translatable(translationKey) : Component.literal(info.toTemporaryValue());
     }
 
+    /**
+     * (Re-)Loads the config by reading json file defined at {@link #getJsonFilePath()}
+     * */
     public void loadValuesFromJson() {
         try {
             gson.fromJson(Files.newBufferedReader(getJsonFilePath()), configClass);
@@ -188,15 +219,28 @@ public abstract class MidnightConfig {
         });
     }
 
+    /**
+     * Writes the mod's current config state to disk.
+     * @param modid Specifies which mod's config to save.
+     * */
     public static void write(String modid) {
         configInstances.get(modid).writeChanges(modid);
     }
 
+    /**
+     * DO NOT USE OR OVERRIDE!<br>
+     * This is only present to keep compatibility with mods that were overriding the previous method.
+     * */
     @Deprecated
     public void writeChanges(String modid) {
         this.writeChanges();
     }
 
+    /**
+     * Writes the mod's current config state to disk.<br>
+     * This method can be overridden to define custom onSave behaviour.<br>
+     * Make sure to call {@code super.writeChanges()}!
+     * */
     public void writeChanges() {
         try {
             Path path;
@@ -206,23 +250,48 @@ public abstract class MidnightConfig {
         } catch (Exception e) { e.fillInStackTrace(); }
     }
 
+    /**
+     * Gets the path to store the config json file at.<br>
+     * Override to set a custom file path.
+     * */
     public Path getJsonFilePath() {
         return PlatformFunctions.getConfigDirectory().resolve(modid + ".json");
     }
 
-    @SuppressWarnings("unused") // Utility for mod authors
+    /**
+     * Gets a config field's default value.
+     * @param modid The entry's mod id
+     * @param entry The entry's field name
+     * */
+    @SuppressWarnings("unused")
     public static @Nullable Object getDefaultValue(String modid, String entry) {
         String key = modid + ":" + entry;
         return entries.containsKey(key) ? entries.get(key).defaultValue : null;
     }
 
-    // Overridable method
+    /**
+     * Add custom widgets to the config screen by overriding this method.
+     * @param tabName Name of the currently selected tab
+     * @param list The scrollable list containing regular config entries
+     * @param screen The entire config screen
+     * */
     public void onTabInit(String tabName, MidnightConfigListWidget list, MidnightConfigScreen screen) {
     }
 
+    /**
+     * Creates an instance of the config screen.
+     * @param parent The parent screen, which will be returned to when exiting the config
+     * @param modid The mod of which to load the config screen
+     * */
     public static MidnightConfigScreen getScreen(Screen parent, String modid) {
         return configInstances.get(modid).getScreen(parent);
     }
+
+    /**
+     * Creates an instance of the config screen.
+     * This can be overridden to return a fully custom config screen.
+     * @param parent The parent screen, which will be returned to when exiting the config
+     * */
     public MidnightConfigScreen getScreen(Screen parent) {
         return new MidnightConfigScreen(parent, modid);
     }
