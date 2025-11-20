@@ -112,7 +112,6 @@ public class MidnightLib {
 
 
     /*? if neoforge {*/
-
         /*public static List<LiteralArgumentBuilder<CommandSourceStack>> commands = new ArrayList<>();
 
         public MidnightLib() {

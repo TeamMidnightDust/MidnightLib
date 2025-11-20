@@ -18,19 +18,11 @@ public class MidnightConfigListWidget extends ContainerObjectSelectionList<Butto
     public boolean renderHeaderSeparator = true;
 
     public MidnightConfigListWidget(Minecraft client, int width, int height, int y, int itemHeight) {
-        //? if >= 1.21 {
-         super(client, width, height, y, itemHeight);
-        //?} else {
-        /*super(client, width, height, y, height + y, itemHeight);
-        *///?}
+         super(client, width, height, y, /*? if < 1.21 {*/ /*height + y,*/ /*?}*/ itemHeight);
     }
 
     @Override
-    //? if >= 1.21.4 {
-    public int scrollBarX() {
-    //?} else {
-    /*public int getScrollbarPosition() {
-    *///?}
+    public int /*? if >= 1.21.4 {*/ scrollBarX() /*?} else {*/ /*getScrollbarPosition()*/ /*?}*/ {
         return this.width - 7;
     }
 

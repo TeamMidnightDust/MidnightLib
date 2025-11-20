@@ -17,7 +17,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 //? if >= 1.21.9 {
- import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 //?}
 
 public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry> {
@@ -37,13 +37,7 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
         int scaledWidth = Minecraft.getInstance().getWindow().getGuiScaledWidth();
 
         if (text != null && (!text.getString().contains("spacer") || !buttons.isEmpty())) {
-            title = new MultiLineTextWidget(12, 0,
-                    //? if >= 1.21 {
-                    Component.translationArg(text)
-                    //?} else {
-                    /*text.copy()
-                    *///?}
-                    , textRenderer).setCentered(centered);
+            title = new MultiLineTextWidget(12, 0, text.copy(), textRenderer).setCentered(centered);
             if (info != null)
                 title.setTooltip(info.getTooltip(false));
             title.setMaxWidth(!buttons.isEmpty() ? buttons.get(buttons.size() > 2 ? buttons.size() - 1 : 0).getX() - 16 : scaledWidth - 24);
@@ -70,13 +64,8 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
                 Optional.ofNullable(this.buttons.get(0)).ifPresent(widget -> {
                     int idMode = this.info.entry.idMode();
                     if (idMode != -1) context.renderItem(idMode == 0 ?
-                                    //? if >= 1.21.4 {
-                                BuiltInRegistries.ITEM.getValue(ResourceLocation.tryParse(this.info.tempValue)).getDefaultInstance()
-                                : BuiltInRegistries.BLOCK.getValue(ResourceLocation.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
-                                //?} else {
-                                    /*BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(this.info.tempValue)).getDefaultInstance()
-                                    : BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
-                            *///?}
+                                BuiltInRegistries.ITEM./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get*/ /*?}*/(ResourceLocation.tryParse(this.info.tempValue)).getDefaultInstance()
+                                : BuiltInRegistries.BLOCK./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get*/ /*?}*/(ResourceLocation.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
                             widget.getX() + widget.getWidth() - 18, y + 2);
                 });
             }

@@ -30,7 +30,7 @@ import net.minecraft.client.input.KeyEvent;
 //?}
 
 //? if >=1.21 {
- import net.minecraft.client.gui.components.SpriteIconButton;
+import net.minecraft.client.gui.components.SpriteIconButton;
 //?}
 
 public class MidnightConfigScreen extends Screen {
@@ -79,7 +79,7 @@ public class MidnightConfigScreen extends Screen {
             updateList();
             list.setScrollAmount(0);
         }
-        scrollProgress = /*? < 1.21.4 {*/ /*list.getScrollAmount() *//*?} else {*/ list.scrollAmount() /*?}*/;
+        scrollProgress = /*? if < 1.21.4 {*/ /*list.getScrollAmount() *//*?} else {*/ list.scrollAmount() /*?}*/;
         for (EntryInfo info : MidnightConfig.entries.values())
             if (Objects.equals(modid, info.modid)) info.updateFieldValue();
         updateButtons();

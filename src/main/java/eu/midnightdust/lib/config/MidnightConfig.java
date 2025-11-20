@@ -130,13 +130,7 @@ public abstract class MidnightConfig {
         info.function = (BiFunction<EditBox, Button, Predicate<String>>) (t, b) -> s -> {
             s = s.trim();
             if (!(s.isEmpty() || !isNumber || pattern.matcher(s).matches()) ||
-                    (info.dataType == ResourceLocation.class && ResourceLocation.read(s)
-                            //? if >= 1.21 {
-                             .isError()
-                            //?} else {
-                            /*.error().isPresent()
-                            *///?}
-                    )) return false;
+                    (info.dataType == ResourceLocation.class && ResourceLocation.read(s)./*? if >= 1.21 {*/isError() /*?} else {*/ /*error().isPresent()*/ /*?}*/)) return false;
 
             Number value = 0; boolean inLimits = false; info.error = null;
             if (!(isNumber && s.isEmpty()) && !s.equals("-") && !s.equals(".")) {
