@@ -29,11 +29,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-/** MidnightConfig by Martin "Motschen" Prokoph
- *  Minimalist config library - feel free to copy!
- *  Originally based on <a href="https://github.com/Minenash/TinyConfig">...</a>
- *  Credits to Minenash */
-
+/** MidnightConfig is an incredibly lightweight, but still fully-featured config library for Minecraft mods.<br>
+ *  Originally based on <a href="https://github.com/Minenash/TinyConfig">TinyConfig</a> by Minenash.*/
 @SuppressWarnings("unchecked")
 public abstract class MidnightConfig {
     private static final Pattern INTEGER_ONLY = Pattern.compile("(-?[0-9]*)");
@@ -88,7 +85,6 @@ public abstract class MidnightConfig {
         MidnightConfig instance = createInstance(modid, config);
 
         for (Field field : config.getFields()) {
-            //noinspection ConstantValue
             if ((field.isAnnotationPresent(Entry.class) || field.isAnnotationPresent(Comment.class))
                     && !field.isAnnotationPresent(Server.class)
                     && !field.isAnnotationPresent(Hidden.class)
@@ -194,6 +190,7 @@ public abstract class MidnightConfig {
     protected Component getEnumTranslatableText(Object value, EntryInfo info) {
         if (value instanceof OptionEnum translatableOption) return translatableOption.getCaption();
 
+        assert info.dataType != null;
         String translationKey = "%s.midnightconfig.enum.%s.%s".formatted(modid, info.dataType.getSimpleName(), info.toTemporaryValue());
         return I18n.exists(translationKey) ? Component.translatable(translationKey) : Component.literal(info.toTemporaryValue());
     }
