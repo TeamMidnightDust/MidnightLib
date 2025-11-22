@@ -23,7 +23,7 @@
     "environment": "*",
     "entrypoints": {
         "server": [
-            "eu.midnightdust.core.MidnightLib"
+            "eu.midnightdust.lib.config.AutoCommand"
         ],
         "client": [
             "eu.midnightdust.core.MidnightLib"

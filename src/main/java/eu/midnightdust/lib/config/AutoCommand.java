@@ -7,16 +7,22 @@ import eu.midnightdust.lib.util.PlatformFunctions;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
+
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 
-public class AutoCommand {
+//? fabric
+import net.fabricmc.api.DedicatedServerModInitializer;
+
+public class AutoCommand /*? fabric {*/ implements DedicatedServerModInitializer /*?}*/ {
     final static String VALUE = "value";
-    final Field field;
-    final Class<?> type;
-    final String modid;
-    final boolean isList;
+    Field field;
+    Class<?> type;
+    String modid;
+    boolean isList;
+
+    public AutoCommand() {}
 
     public AutoCommand(Field field, String modid) {
         this.field = field; this.modid = modid;
@@ -80,5 +86,16 @@ public class AutoCommand {
             } catch (IllegalAccessException e) {throw new RuntimeException(e);}
             }, true);
         return 0;
+    }
+
+    public void onInitializeServer() {
+        MidnightConfig.configInstances.forEach((modid, config) -> {
+            for (Field field : config.configClass.getFields()) {
+                if (field.isAnnotationPresent(MidnightConfig.Entry.class)
+                        && !field.isAnnotationPresent(MidnightConfig.Client.class)
+                        && !field.isAnnotationPresent(MidnightConfig.Hidden.class))
+                    new AutoCommand(field, modid);
+            }
+        });
     }
 }

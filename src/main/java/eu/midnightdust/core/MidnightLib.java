@@ -1,7 +1,6 @@
 package eu.midnightdust.core;
 
 import eu.midnightdust.core.config.MidnightLibConfig;
-import eu.midnightdust.lib.config.AutoCommand;
 import eu.midnightdust.lib.config.MidnightConfig;
 
 import org.slf4j.Logger;
@@ -9,14 +8,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.UIManager;
 import net.minecraft.Util;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import java.util.List;
 
 //? if fabric {
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.api.DedicatedServerModInitializer;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
@@ -24,9 +21,10 @@ import com.terraformersmc.modmenu.api.ModMenuApi;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MidnightLib implements DedicatedServerModInitializer, ClientModInitializer, ModMenuApi {
+public class MidnightLib implements ClientModInitializer, ModMenuApi {
 //?} else if neoforge {
 /*import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import eu.midnightdust.lib.config.AutoCommand;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import net.minecraft.commands.CommandSourceStack;
 
@@ -45,6 +43,7 @@ import java.util.ConcurrentModificationException;
 public class MidnightLib {
 *///?} else if forge {
 /*import java.util.ConcurrentModificationException;
+import eu.midnightdust.lib.config.AutoCommand;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
@@ -54,7 +53,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -77,25 +75,10 @@ public class MidnightLib {
         MidnightLibConfig.init(MOD_ID, MidnightLibConfig.class);
     }
 
-    public static void registerAutoCommand() {
-        MidnightConfig.configInstances.forEach((modid, config) -> {
-            for (Field field : config.configClass.getFields()) {
-                if (field.isAnnotationPresent(MidnightConfig.Entry.class)
-                        && !field.isAnnotationPresent(MidnightConfig.Client.class)
-                        && !field.isAnnotationPresent(MidnightConfig.Hidden.class))
-                    new AutoCommand(field, modid);
-            }
-        });
-    }
-
     //? if fabric {
-        public void onInitializeServer() {
-            registerAutoCommand();
-        }
-
         @Override
         public ConfigScreenFactory<?> getModConfigScreenFactory() {
-            return parent -> MidnightLibConfig.getScreen(parent,"midnightlib");
+            return parent -> MidnightLibConfig.getScreen(parent,MOD_ID);
         }
 
         @Override
@@ -109,8 +92,6 @@ public class MidnightLib {
         }
     //?}
 
-
-
     /*? if neoforge {*/
         /*public static List<LiteralArgumentBuilder<CommandSourceStack>> commands = new ArrayList<>();
 
@@ -119,9 +100,9 @@ public class MidnightLib {
         }
 
         //? if >= 1.21.6 {
-        @EventBusSubscriber(modid = "midnightlib", value = Dist.CLIENT)
+        @EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
         //?} else {
-        /^@EventBusSubscriber(modid = "midnightlib", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+        /^@EventBusSubscriber(modid = MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
         ^///?}
         public static class MidnightLibBusEvents {
             @SubscribeEvent
@@ -131,11 +112,11 @@ public class MidnightLib {
                         modContainer.registerExtensionPoint(IConfigScreenFactory.class, (minecraftClient, screen) -> MidnightConfig.getScreen(screen, modid));
                     }
                 });
-                MidnightLib.registerAutoCommand();
+                new AutoCommand().onInitializeServer();
             }
         }
 
-        @EventBusSubscriber(modid = "midnightlib")
+        @EventBusSubscriber(modid = MOD_ID)
         public static class MidnightLibEvents {
             @SubscribeEvent
             public static void registerCommands(RegisterCommandsEvent event) {
@@ -155,7 +136,7 @@ public class MidnightLib {
 
     public static List<LiteralArgumentBuilder<CommandSourceStack>> commands = new ArrayList<>();
 
-        @Mod.EventBusSubscriber(modid = "midnightlib", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+        @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
         public static class MidnightLibBusEvents {
             @SubscribeEvent
             public static void onPostInit(FMLClientSetupEvent event) {
@@ -164,11 +145,11 @@ public class MidnightLib {
                         modContainer.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () -> new ConfigScreenHandler.ConfigScreenFactory((minecraftClient, screen) -> MidnightConfig.getScreen(screen, modid)));
                     }
                 });
-                MidnightLib.registerAutoCommand();
+                new AutoCommand().onInitializeServer();
             }
         }
 
-        @Mod.EventBusSubscriber(modid = "midnightlib")
+        @Mod.EventBusSubscriber(modid = MOD_ID)
         public static class MidnightLibEvents {
             @SubscribeEvent
             public static void registerCommands(RegisterCommandsEvent event) {
