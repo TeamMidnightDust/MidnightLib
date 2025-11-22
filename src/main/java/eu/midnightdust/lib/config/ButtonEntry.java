@@ -64,8 +64,8 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
                 Optional.ofNullable(this.buttons.get(0)).ifPresent(widget -> {
                     int idMode = this.info.entry.idMode();
                     if (idMode != -1) context.renderItem(idMode == 0 ?
-                                BuiltInRegistries.ITEM./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get*/ /*?}*/(ResourceLocation.tryParse(this.info.tempValue)).getDefaultInstance()
-                                : BuiltInRegistries.BLOCK./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get*/ /*?}*/(ResourceLocation.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
+                                BuiltInRegistries.ITEM./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(ResourceLocation.tryParse(this.info.tempValue)).getDefaultInstance()
+                                : BuiltInRegistries.BLOCK./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(ResourceLocation.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
                             widget.getX() + widget.getWidth() - 18, y + 2);
                 });
             }

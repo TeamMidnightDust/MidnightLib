@@ -29,9 +29,17 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+//? if < 1.21.6 {
+/*//? fabric
+import net.fabricmc.api.*;
+//? neoforge
+/^import net.neoforged.api.distmarker.*;^/
+//? forge
+/^import net.minecraftforge.api.distmarker.*;^/
+*///?}
+
 /** MidnightConfig is an incredibly lightweight, but still fully-featured config library for Minecraft mods.<br>
  *  Originally based on <a href="https://github.com/Minenash/TinyConfig">TinyConfig</a> by Minenash.*/
-@SuppressWarnings("unchecked")
 public abstract class MidnightConfig {
     private static final Pattern INTEGER_ONLY = Pattern.compile("(-?[0-9]*)");
     private static final Pattern DECIMAL_ONLY = Pattern.compile("-?(\\d+\\.?\\d*|\\d*\\.?\\d+|\\.)");
@@ -67,6 +75,7 @@ public abstract class MidnightConfig {
      * */
     protected static <T extends MidnightConfig> T createInstance(String modid, Class<? extends MidnightConfig> configClass) {
         try {
+            //noinspection unchecked
             T instance = (T) configClass.getDeclaredConstructor().newInstance();
             instance.modid = modid;
             instance.configClass = configClass;
@@ -149,7 +158,7 @@ public abstract class MidnightConfig {
         info.function = (BiFunction<EditBox, Button, Predicate<String>>) (t, b) -> s -> {
             s = s.trim();
             if (!(s.isEmpty() || !isNumber || pattern.matcher(s).matches()) ||
-                    (info.dataType == ResourceLocation.class && ResourceLocation.read(s)./*? if >= 1.21 {*/isError() /*?} else {*/ /*error().isPresent()*/ /*?}*/)) return false;
+                    (info.dataType == ResourceLocation.class && ResourceLocation.read(s)./*? if >= 1.21 {*/isError() /*?} else {*/ /*error().isPresent() *//*?}*/)) return false;
 
             Number value = 0; boolean inLimits = false; info.error = null;
             if (!(isNumber && s.isEmpty()) && !s.equals("-") && !s.equals(".")) {
@@ -280,9 +289,15 @@ public abstract class MidnightConfig {
      * @param parent The parent screen, which will be returned to when exiting the config
      * @param modid The mod of which to load the config screen
      * */
+    //? if < 1.21.6 {
+    /*/^? fabric {^/ @Environment(EnvType.CLIENT) /^?} else {^/ /^@OnlyIn(Dist.CLIENT) ^//^?}^/
+    public static Screen getScreen(Screen parent, String modid) {
+    *///?} else {
     public static MidnightConfigScreen getScreen(Screen parent, String modid) {
+    //?}
         return configInstances.get(modid).getScreen(parent);
     }
+
 
     /**
      * Creates an instance of the config screen.
