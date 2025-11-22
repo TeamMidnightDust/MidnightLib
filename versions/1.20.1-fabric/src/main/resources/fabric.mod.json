@@ -29,12 +29,12 @@
             "eu.midnightdust.core.MidnightLib"
         ],
         "modmenu": [
-            "eu.midnightdust.core.MidnightLib"
+            "eu.midnightdust.core.MidnightLib\$ModMenuInit"
         ]
     },
     "depends": {
         "fabric-resource-loader-v0": "*",
-        "minecraft": "*"
+        "minecraft": "${minecraft}"
     },
 
     "mixins": [

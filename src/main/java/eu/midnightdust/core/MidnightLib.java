@@ -21,7 +21,7 @@ import com.terraformersmc.modmenu.api.ModMenuApi;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MidnightLib implements ClientModInitializer, ModMenuApi {
+public class MidnightLib implements ClientModInitializer {
 //?} else if neoforge {
 /*import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import eu.midnightdust.lib.config.AutoCommand;
@@ -76,9 +76,10 @@ public class MidnightLib {
     }
 
     //? if fabric {
+    public static class ModMenuInit implements ModMenuApi {
         @Override
         public ConfigScreenFactory<?> getModConfigScreenFactory() {
-            return parent -> MidnightLibConfig.getScreen(parent,MOD_ID);
+            return parent -> MidnightLibConfig.getScreen(parent, MOD_ID);
         }
 
         @Override
@@ -90,6 +91,7 @@ public class MidnightLib {
             });
             return map;
         }
+    }
     //?}
 
     /*? if neoforge {*/

@@ -1,0 +1,31 @@
+modLoader = "javafml"
+loaderVersion = "[43,)"
+#issueTrackerURL = ""
+license = "MIT License"
+
+[[mods]]
+modId = "midnightlib"
+version = "${version}"
+displayName = "${name}"
+logoFile = "midnightlib.png"
+authors = "TeamMidnightDust, Motschen"
+description = '''
+Lightweight config library with config screens and commands.
+'''
+
+[[mixins]]
+config = "midnightlib.mixins.json"
+
+[[dependencies.midnightlib]]
+modId = "forge"
+mandatory = true
+versionRange = "[43,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.midnightlib]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${minecraft}"
+ordering = "NONE"
+side = "BOTH"
