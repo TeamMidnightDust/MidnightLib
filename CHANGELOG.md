@@ -1,3 +1,5 @@
+## MidnightLib v1.9.1
+- Fix crash when loading existing main config on NeoForge
 # MidnightLib v1.9.0
 - Setup a **multiversion** build environment 
   - MidnightLib will now always be up-to-date on all relevant versions of Minecraft  

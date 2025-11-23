@@ -4,20 +4,15 @@ import eu.midnightdust.lib.config.MidnightConfig;
 import eu.midnightdust.lib.util.PlatformFunctions;
 
 public class MidnightLibConfig extends MidnightConfig {
-    //? if fabric {
-    @Entry public static ConfigButton config_screen_list = PlatformFunctions.isModLoaded("modmenu") ? ConfigButton.MODMENU : ConfigButton.TRUE;
+    public static final boolean HAS_MODMENU = PlatformFunctions.isModLoaded("modmenu") || "neoforge".equals(PlatformFunctions.getPlatformName());
 
-    public static boolean shouldShowButton() {
-        return config_screen_list.equals(ConfigButton.TRUE) || (config_screen_list.equals(ConfigButton.MODMENU) && !PlatformFunctions.isModLoaded("modmenu"));
-    }
-    //?} else {
-    /*@Entry public static ConfigButton config_screen_list = ConfigButton.FALSE;
+    @Entry public static ConfigButton config_screen_list = HAS_MODMENU ? ConfigButton.MODMENU : ConfigButton.TRUE;
 
-    public static boolean shouldShowButton() {
-        return config_screen_list.equals(ConfigButton.TRUE);
-    }
-    *///?}
     public enum ConfigButton {
-        TRUE, FALSE /*? if fabric {*/, MODMENU /*?}*/
+        TRUE, FALSE, MODMENU
+    }
+
+    public static boolean shouldShowButton() {
+        return config_screen_list.equals(ConfigButton.TRUE) || (config_screen_list.equals(ConfigButton.MODMENU) && !HAS_MODMENU);
     }
 }
