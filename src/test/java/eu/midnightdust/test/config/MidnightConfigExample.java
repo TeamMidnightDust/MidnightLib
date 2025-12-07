@@ -10,7 +10,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.OptionEnum;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +38,7 @@ public class MidnightConfigExample extends MidnightConfig {
     @Entry(category = TEXT, name="I am a (non-primitive) Boolean") public static Boolean nonPrimitive = true;           // Example for a non-primative boolean option
     @Entry(category = TEXT) public static String name = "Hello World!";          // Example for a string option, which is in a category!
     @Entry(category = TEXT, width = 7, min = 7, isColor = true, name = "I am a color!") public static String titleColor = "#ffffff"; // The isColor property adds a color chooser for a hexadecimal color
-    @Entry(category = TEXT, idMode = 0) public static ResourceLocation id = ResourceLocation.withDefaultNamespace("diamond");          // Example for an identifier with matching items displayed next to it!
+    @Entry(category = TEXT, idMode = 0) public static Identifier id = Identifier.withDefaultNamespace("diamond");          // Example for an identifier with matching items displayed next to it!
     @Entry(category = TEXT) public static ModPlatform modPlatform = ModPlatform.FABRIC;   // Example for an enum option
     public enum ModPlatform {                               // Enums allow the user to cycle through predefined options
         QUILT, FABRIC, FORGE, NEOFORGE, VANILLA
@@ -56,7 +56,7 @@ public class MidnightConfigExample extends MidnightConfig {
     // The name field can be used to specify a custom translation string or plain text
     @Entry(category = LISTS, name = "I am a string list!") public static List<String> stringList = Lists.newArrayList("String1", "String2"); // Array String Lists are also supported
     @Entry(category = LISTS, isColor = true, name = "I am a color list!") public static List<String> colorList = Lists.newArrayList("#ac5f99", "#11aa44"); // Lists also support colors
-    @Entry(category = LISTS, name = "I am an identifier list!", idMode = 1) public static List<ResourceLocation> idList = Lists.newArrayList(ResourceLocation.withDefaultNamespace("dirt")); // A list of block identifiers
+    @Entry(category = LISTS, name = "I am an identifier list!", idMode = 1) public static List<Identifier> idList = Lists.newArrayList(Identifier.withDefaultNamespace("dirt")); // A list of block identifiers
     @Entry(category = LISTS, name = "I am an integer list!") public static List<Integer> intList = Lists.newArrayList(69, 420);
     @Entry(category = LISTS, name = "I am a float list!") public static List<Float> floatList = Lists.newArrayList(4.1f, -1.3f, -1f);
 

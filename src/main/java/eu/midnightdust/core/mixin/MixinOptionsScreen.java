@@ -12,7 +12,7 @@ import java.util.Objects;
 import net.minecraft.client.gui.screens.Screen;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 //? if >= 1.21 {
  import org.spongepowered.asm.mixin.Final;
@@ -35,7 +35,7 @@ public abstract class MixinOptionsScreen extends Screen {
     @Shadow @Final private HeaderAndFooterLayout layout;
     @Unique SpriteIconButton midnightlib$button = SpriteIconButton.builder(Component.translatable("midnightlib.overview.title"), (
             buttonWidget) -> Objects.requireNonNull(minecraft).setScreen(new MidnightConfigOverviewScreen(this)), true)
-            .sprite(ResourceLocation.fromNamespaceAndPath(MOD_ID,"icon/"+MOD_ID), 16, 16).size(20, 20).build();
+            .sprite(Identifier.fromNamespaceAndPath(MOD_ID,"icon/"+MOD_ID), 16, 16).size(20, 20).build();
 
     @Inject(at = @At("HEAD"), method = "init")
     public void midnightlib$onInit(CallbackInfo ci) {
@@ -55,7 +55,7 @@ public abstract class MixinOptionsScreen extends Screen {
         midnightlib$button.setPosition(layout.getWidth() / 2  + 158, layout.getY() + layout.getFooterHeight() - 4);
     }
     //?} else {
-    /*@Unique TextAndImageButton midnightlib$button = TextAndImageButton.builder(Component.translatable("midnightlib.overview.title"), new ResourceLocation("midnightlib", "icon/midnightlib.png"),
+    /*@Unique TextAndImageButton midnightlib$button = TextAndImageButton.builder(Component.translatable("midnightlib.overview.title"), new Identifier("midnightlib", "icon/midnightlib.png"),
             button -> Objects.requireNonNull(minecraft).setScreen(new MidnightConfigOverviewScreen(this))).textureSize(16, 16).usedTextureSize(16, 16).offset(0, 2).build();
 
     @Inject(at = @At("HEAD"), method = "init")

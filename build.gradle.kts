@@ -205,4 +205,12 @@ stonecutter {
     constants {
         arrayOf("fabric", "neoforge", "forge").forEach { it -> put(it, loader == it) }
     }
+    replacements.string {
+        direction = eval(current.version, ">=1.21.11-rc2")
+        replace("ResourceLocation", "Identifier")
+    }
+    replacements.string {
+        direction = eval(current.version, ">=1.21.11-rc2")
+        replace("net.minecraft.Util", "net.minecraft.util.Util")
+    }
 }

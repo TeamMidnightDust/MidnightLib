@@ -2,7 +2,7 @@ package eu.midnightdust.lib.config;
 
 import com.google.common.collect.Lists;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.Button;
@@ -16,7 +16,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -170,7 +170,7 @@ public class MidnightConfigScreen extends Screen {
                 //? if >= 1.21 {
                  SpriteIconButton resetButton = SpriteIconButton.builder(Component.translatable("controls.reset"),
                 //?} else {
-                /*TextAndImageButton resetButton = TextAndImageButton.builder(Component.translatable("controls.reset"), new ResourceLocation("midnightlib", "icon/reset.png"),
+                /*TextAndImageButton resetButton = TextAndImageButton.builder(Component.translatable("controls.reset"), new Identifier("midnightlib", "icon/reset.png"),
                 *///?}
                 (button -> {
                     info.value = info.defaultValue;
@@ -179,7 +179,7 @@ public class MidnightConfigScreen extends Screen {
                     updateList();
                 })
                 //? if >= 1.21 {
-                 , true).sprite(ResourceLocation.fromNamespaceAndPath("midnightlib", "icon/reset"), 12, 12).size(20, 20).build();
+                 , true).sprite(Identifier.fromNamespaceAndPath("midnightlib", "icon/reset"), 12, 12).size(20, 20).build();
                 //?} else {
                 /*).textureSize(12, 12).usedTextureSize(12, 12).offset(0, 4).build();
                 resetButton.setWidth(20);
@@ -239,7 +239,7 @@ public class MidnightConfigScreen extends Screen {
                                 //? if >= 1.21 {
                                  SpriteIconButton.builder(Component.empty(),
                                 //?} else {
-                                /*TextAndImageButton.builder(Component.empty(), new ResourceLocation("midnightlib", "icon/explorer.png"),
+                                /*TextAndImageButton.builder(Component.empty(), new Identifier("midnightlib", "icon/explorer.png"),
                                 *///?}
                                 button -> new Thread(() -> {
                                     JFileChooser fileChooser = new JFileChooser(info.tempValue);
@@ -255,7 +255,7 @@ public class MidnightConfigScreen extends Screen {
                                     }
                                 }).start()
                                 //? if >= 1.21 {
-                                 , true).sprite(ResourceLocation.fromNamespaceAndPath("midnightlib", "icon/explorer"), 12, 12).size(20, 20)
+                                 , true).sprite(Identifier.fromNamespaceAndPath("midnightlib", "icon/explorer"), 12, 12).size(20, 20)
                                 //?} else {
                                         /*).textureSize(12, 12).usedTextureSize(12, 12).offset(0, 4)
                                 *///?}

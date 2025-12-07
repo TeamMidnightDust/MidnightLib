@@ -16,7 +16,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -33,7 +33,7 @@ public class MidnightLibExtras {
             SpriteIconButton resetButton = SpriteIconButton.builder(Component.translatable("controls.reset"), (button -> {
                 binding.setKey(binding.getDefaultKey());
                 screen.updateList();
-            }), true).sprite(ResourceLocation.fromNamespaceAndPath("midnightlib","icon/reset"), 12, 12).size(20, 20).build();
+            }), true).sprite(Identifier.fromNamespaceAndPath("midnightlib","icon/reset"), 12, 12).size(20, 20).build();
             resetButton.setPosition(screen.width - 205 + 150 + 25, 0);
             editButton.resetButton = resetButton;
             editButton.updateMessage(false);

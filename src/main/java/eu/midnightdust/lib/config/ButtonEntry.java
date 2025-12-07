@@ -15,7 +15,7 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 //? if >= 1.21.9 {
 import net.minecraft.client.input.MouseButtonEvent;
 //?}
@@ -64,8 +64,8 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
                 Optional.ofNullable(this.buttons.get(0)).ifPresent(widget -> {
                     int idMode = this.info.entry.idMode();
                     if (idMode != -1) context.renderItem(idMode == 0 ?
-                                BuiltInRegistries.ITEM./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(ResourceLocation.tryParse(this.info.tempValue)).getDefaultInstance()
-                                : BuiltInRegistries.BLOCK./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(ResourceLocation.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
+                                BuiltInRegistries.ITEM./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(Identifier.tryParse(this.info.tempValue)).getDefaultInstance()
+                                : BuiltInRegistries.BLOCK./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(Identifier.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
                             widget.getX() + widget.getWidth() - 18, y + 2);
                 });
             }

@@ -10,7 +10,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,14 +50,14 @@ public abstract class MidnightConfig {
                 public boolean shouldSkipClass(Class<?> clazz) { return false; }
                 public boolean shouldSkipField(FieldAttributes fieldAttributes) { return fieldAttributes.getAnnotation(Entry.class) == null; }
             })
-            .registerTypeAdapter(ResourceLocation.class,
+            .registerTypeAdapter(Identifier.class,
                 //? if >= 1.21.4 {
-                 new TypeAdapter<ResourceLocation>() {
-                     public void write(JsonWriter out, ResourceLocation id) throws IOException { out.value(id.toString()); }
-                     public ResourceLocation read(JsonReader in) throws IOException { return ResourceLocation.parse(in.nextString()); }
+                 new TypeAdapter<Identifier>() {
+                     public void write(JsonWriter out, Identifier id) throws IOException { out.value(id.toString()); }
+                     public Identifier read(JsonReader in) throws IOException { return Identifier.parse(in.nextString()); }
                  }
                 //?} else {
-                /*new ResourceLocation.Serializer()
+                /*new Identifier.Serializer()
                 *///?}
             ).setPrettyPrinting().create();
 
@@ -114,7 +114,7 @@ public abstract class MidnightConfig {
             if (info.dataType == int.class) textField(info, Integer::parseInt, INTEGER_ONLY, (int) e.min(), (int) e.max(), true);
             else if (info.dataType == float.class) textField(info, Float::parseFloat, DECIMAL_ONLY, (float) e.min(), (float) e.max(), false);
             else if (info.dataType == double.class) textField(info, Double::parseDouble, DECIMAL_ONLY, e.min(), e.max(), false);
-            else if (info.dataType == String.class || info.dataType == ResourceLocation.class) textField(info, String::length, null, Math.min(e.min(), 0), Math.max(e.max(), 1), true);
+            else if (info.dataType == String.class || info.dataType == Identifier.class) textField(info, String::length, null, Math.min(e.min(), 0), Math.max(e.max(), 1), true);
             else if (info.dataType == boolean.class) {
                 Function<Object, Component> func = value -> Component.translatable((Boolean) value ? "gui.yes" : "gui.no").withStyle((Boolean) value ? ChatFormatting.GREEN : ChatFormatting.RED);
                 info.function = new AbstractMap.SimpleEntry<Button.OnPress, Function<Object, Component>>(button -> {
@@ -158,7 +158,7 @@ public abstract class MidnightConfig {
         info.function = (BiFunction<EditBox, Button, Predicate<String>>) (t, b) -> s -> {
             s = s.trim();
             if (!(s.isEmpty() || !isNumber || pattern.matcher(s).matches()) ||
-                    (info.dataType == ResourceLocation.class && ResourceLocation.read(s)./*? if >= 1.21 {*/isError() /*?} else {*/ /*error().isPresent() *//*?}*/)) return false;
+                    (info.dataType == Identifier.class && Identifier.read(s)./*? if >= 1.21 {*/isError() /*?} else {*/ /*error().isPresent() *//*?}*/)) return false;
 
             Number value = 0; boolean inLimits = false; info.error = null;
             if (!(isNumber && s.isEmpty()) && !s.equals("-") && !s.equals(".")) {
@@ -176,8 +176,8 @@ public abstract class MidnightConfig {
             b.active = entries.values().stream().allMatch(e -> e.inLimits);
 
             if (inLimits) {
-                if (info.dataType == ResourceLocation.class)
-                    info.setValue(ResourceLocation.tryParse(s));
+                if (info.dataType == Identifier.class)
+                    info.setValue(Identifier.tryParse(s));
                 else info.setValue(isNumber ? value : s);
             }
 
@@ -197,7 +197,9 @@ public abstract class MidnightConfig {
      * @param info the associated {@link EntryInfo} object
      * */
     protected Component getEnumTranslatableText(Object value, EntryInfo info) {
-        if (value instanceof OptionEnum translatableOption) return translatableOption.getCaption();
+        if (value instanceof StringRepresentable option) return Component.translatable(option.getSerializedName());
+        //? if < 1.21.11
+        /*if (value instanceof OptionEnum option) return option.getCaption();*/
 
         assert info.dataType != null;
         String translationKey = "%s.midnightconfig.enum.%s.%s".formatted(modid, info.dataType.getSimpleName(), info.toTemporaryValue());
@@ -310,7 +312,7 @@ public abstract class MidnightConfig {
 
     /**
      * Entry Annotation<br>
-     * - <b>width</b>: The maximum character length of the {@link String}, {@link ResourceLocation} or String/Identifier {@link List<>} field<br>
+     * - <b>width</b>: The maximum character length of the {@link String}, {@link Identifier} or String/Identifier {@link List<>} field<br>
      * - <b>min</b>: The minimum value of the <code>int</code>, <code>float</code> or <code>double</code> field<br>
      * - <b>max</b>: The maximum value of the <code>int</code>, <code>float</code> or <code>double</code> field<br>
      * - <b>name</b>: Will be used instead of the default translation key, if not empty<br>

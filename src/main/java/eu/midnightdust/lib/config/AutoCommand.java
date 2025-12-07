@@ -15,6 +15,9 @@ import net.minecraft.network.chat.Component;
 //? fabric
 import net.fabricmc.api.DedicatedServerModInitializer;
 
+//? if >= 1.21.11
+import net.minecraft.server.permissions.*;
+
 public class AutoCommand /*? fabric {*/ implements DedicatedServerModInitializer /*?}*/ {
     final static String VALUE = "value";
     Field field;
@@ -41,7 +44,8 @@ public class AutoCommand /*? fabric {*/ implements DedicatedServerModInitializer
                         .then(Commands.argument(VALUE, getArgType()).executes(ctx -> setValueFromArg(ctx, action))));
         } else command = command.then(Commands.argument(VALUE, getArgType()).executes(ctx -> setValueFromArg(ctx, "")));
 
-        PlatformFunctions.registerCommand(Commands.literal("midnightconfig").requires(source -> source.hasPermission(2)).then(Commands.literal(modid).then(command)));
+        PlatformFunctions.registerCommand(Commands.literal("midnightconfig").requires(source ->
+                source/*? if >= 1.21.11 {*/.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS))/*?} else {*/ /*.hasPermission(2) *//*?}*/).then(Commands.literal(modid).then(command)));
     }
 
     public ArgumentType<?> getArgType() {
