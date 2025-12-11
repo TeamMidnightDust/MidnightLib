@@ -1,3 +1,5 @@
+## MidnightLib v1.9.2
+- Add support for using `StringRepresentable` to translate enums
 ## MidnightLib v1.9.1
 - Fix crash when loading existing main config on NeoForge
 # MidnightLib v1.9.0
