@@ -2,7 +2,7 @@ package eu.midnightdust.lib.config;
 
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
@@ -28,9 +28,9 @@ public class MidnightConfigListWidget extends ContainerObjectSelectionList<Butto
 
     //? if >= 1.21 {
     @Override
-    public void renderListSeparators(GuiGraphics context) {
+    public void extractListSeparators(GuiGraphicsExtractor context) {
         if (renderHeaderSeparator)
-            super.renderListSeparators(context);
+            super.extractListSeparators(context);
         else
             context.blit(
             //? if >= 1.21.6 {

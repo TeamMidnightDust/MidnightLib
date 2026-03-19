@@ -1,12 +1,12 @@
 plugins {
-    id("net.fabricmc.fabric-loom")
+    id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT" // For unobfuscated releases (>= 26.1)
     id("me.modmuss50.mod-publish-plugin")
     id("com.github.johnrengelman.shadow")
     `maven-publish`
 }
 
 val minecraft = stonecutter.current.version
-val loader = stonecutter.current.project.replace("${minecraft}-","")//loom.platform.get().name.lowercase() TODO
+val loader = stonecutter.current.project.substringAfterLast('-')
 
 version = "${mod.version}+$minecraft"
 group = mod.group
@@ -40,7 +40,6 @@ dependencies {
     if (loader == "neoforge") {
         "neoForge"("net.neoforged:neoforge:${mod.dep("neoforge_loader")}")
     }
-    //mappings (loom.officialMojangMappings())
 }
 
 loom {
@@ -125,15 +124,18 @@ publishing {
     }
 }
 
+val requiredJava = when {
+    sc.current.parsed >= "26.1-pre-3" -> JavaVersion.VERSION_25
+    sc.current.parsed >= "1.20.5" -> JavaVersion.VERSION_21
+    sc.current.parsed >= "1.18" -> JavaVersion.VERSION_17
+    sc.current.parsed >= "1.17" -> JavaVersion.VERSION_16
+    else -> JavaVersion.VERSION_1_8
+}
 
 java {
     withSourcesJar()
-    val java =
-        if (stonecutter.eval(minecraft, ">=26.1-pre-3")) JavaVersion.VERSION_25
-        else if (stonecutter.eval(minecraft, ">=1.20.5")) JavaVersion.VERSION_21
-        else JavaVersion.VERSION_17
-    targetCompatibility = java
-    sourceCompatibility = java
+    targetCompatibility = requiredJava
+    sourceCompatibility = requiredJava
 }
 
 val shadowBundle: Configuration by configurations.creating {
@@ -141,21 +143,9 @@ val shadowBundle: Configuration by configurations.creating {
     isCanBeResolved = true
 }
 
-tasks.shadowJar {
-    configurations = listOf(shadowBundle)
-    archiveClassifier = "dev-shadow"
-}
-
 tasks.jar {
-    //injectAccessWidener = true TODO
-    //input = tasks.shadowJar.get().archiveFile TODO
-    archiveClassifier = null
-    dependsOn(tasks.shadowJar)
+    inputs.property("archivesName", base.archivesName)
 }
-
-//tasks.jar {
-//    archiveClassifier = "dev"
-//}
 
 val buildAndCollect = tasks.register<Copy>("buildAndCollect") {
     group = "build"
@@ -217,5 +207,25 @@ stonecutter {
     replacements.string {
         direction = eval(current.version, ">=1.21.11-rc2")
         replace("net.minecraft.Util", "net.minecraft.util.Util")
+    }
+    replacements.string {
+        direction = eval(current.version, ">=26.1-pre.1")
+        replace("render(", "extractRenderState(")
+    }
+    replacements.string {
+        direction = eval(current.version, ">=26.1-pre.1")
+        replace("GuiGraphics", "GuiGraphicsExtractor")
+    }
+    replacements.string {
+        direction = eval(current.version, ">=26.1-pre.1")
+        replace("renderListSeparators", "extractListSeparators")
+    }
+    replacements.string {
+        direction = eval(current.version, ">=26.1-pre.1")
+        replace("renderContent", "extractContent")
+    }
+    replacements.string {
+        direction = eval(current.version, ">=26.1-pre.1")
+        replace("drawCenteredString", "centeredText")
     }
 }

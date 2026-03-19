@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.MultiLineTextWidget;
@@ -47,23 +47,23 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
 
     @Override
     //? if >= 1.21.9 {
-    public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+    public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
     int y = this.getY();
     //?} else {
-    /*public void render(GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+    /*public void extractRenderState(GuiGraphicsExtractor context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
     *///?}
         buttons.forEach(b -> {
             b.setY(y);
-            b.render(context, mouseX, mouseY, tickDelta);
+            b.extractRenderState(context, mouseX, mouseY, tickDelta);
         });
         if (title != null) {
             title.setY(y + 5);
-            title.render(context, mouseX, mouseY, tickDelta);
+            title.extractRenderState(context, mouseX, mouseY, tickDelta);
 
             if (info.entry != null && !this.buttons.isEmpty()) {
                 Optional.ofNullable(this.buttons.get(0)).ifPresent(widget -> {
                     int idMode = this.info.entry.idMode();
-                    if (idMode != -1) context.renderItem(idMode == 0 ?
+                    if (idMode != -1) context./*? if >= 26.1-pre.1 {*/item /*?} else {*/ /*renderItem *//*?}*/(idMode == 0 ?
                                 BuiltInRegistries.ITEM./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(Identifier.tryParse(this.info.tempValue)).getDefaultInstance()
                                 : BuiltInRegistries.BLOCK./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(Identifier.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
                             widget.getX() + widget.getWidth() - 18, y + 2);

@@ -3,7 +3,7 @@ package eu.midnightdust.lib.config;
 import com.google.common.collect.Lists;
 import net.minecraft.ChatFormatting;
 import net.minecraft.util.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.tabs.GridLayoutTab;
@@ -133,7 +133,11 @@ public class MidnightConfigScreen extends Screen {
     @Override
     public void init() {
         super.init();
-        tabNavigation.setWidth(this.width);
+        //? if >= 26.1-pre.3 {
+        tabNavigation.updateWidth(this.width);
+        //?} else {
+        /*tabNavigation.setWidth(this.width);
+        *///?}
         tabNavigation.arrangeElements();
         if (tabs.size() > 1)
             this.addRenderableWidget(tabNavigation);
@@ -191,6 +195,7 @@ public class MidnightConfigScreen extends Screen {
                     AbstractWidget widget;
                     MidnightConfig.Entry e = info.entry;
                     if (info.function instanceof Map.Entry) { // Enums & booleans
+                        //noinspection unchecked
                         var values = (Map.Entry<Button.OnPress, Function<Object, Component>>) info.function;
                         if (info.dataType.isEnum()) {
                             values.setValue(value -> instance.getEnumTranslatableText(value, info));
@@ -204,8 +209,9 @@ public class MidnightConfigScreen extends Screen {
                     if (widget instanceof EditBox textField) {
                         textField.setMaxLength(e.width());
                         textField.setValue(info.tempValue);
+                        //noinspection unchecked
                         Predicate<String> processor = ((BiFunction<EditBox, Button, Predicate<String>>) info.function).apply(textField, done);
-                        textField.setFilter(processor);
+                        //textField.setFilter(processor); //TODO!!!!!!!
                     }
                     widget.setTooltip(info.getTooltip(true));
 
@@ -288,15 +294,15 @@ public class MidnightConfigScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         //? if >= 1.21 {
-         super.render(context, mouseX, mouseY, delta);
+         super.extractRenderState(context, mouseX, mouseY, delta);
         //?} else {
         /*super.renderBackground(context);
         *///?}
-        this.list.render(context, mouseX, mouseY, delta);
-        if (tabs.size() < 2) context.drawCenteredString(font, title, width / 2, 10, 0xFFFFFFFF);
+        this.list.extractRenderState(context, mouseX, mouseY, delta);
+        if (tabs.size() < 2) context.centeredText(font, title, width / 2, 10, 0xFFFFFFFF);
         //? if < 1.21
-        /*super.render(context, mouseX, mouseY, delta);*/
+        /*super.extractRenderState(context, mouseX, mouseY, delta);*/
     }
 }

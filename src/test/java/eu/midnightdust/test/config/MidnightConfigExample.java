@@ -1,7 +1,7 @@
 package eu.midnightdust.test.config;
 
-//? if >= 1.21.10 {
-import com.google.common.collect.Lists;
+//? if = 1.21.11 {
+/*import com.google.common.collect.Lists;
 import eu.midnightdust.lib.config.MidnightConfigListWidget;
 import eu.midnightdust.lib.config.MidnightConfigScreen;
 import eu.midnightdust.test.MidnightLibExtras;
@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/** Every option in a MidnightConfig class has to be public and static, so we can access it from other classes.
- * The config class also has to extend MidnightConfig*/
+/^* Every option in a MidnightConfig class has to be public and static, so we can access it from other classes.
+ * The config class also has to extend MidnightConfig^/
 @SuppressWarnings({"unused", "DefaultAnnotationParam"})
 public class MidnightConfigExample extends MidnightConfig {
     public static final String TEXT = "text";
@@ -171,4 +171,4 @@ public class MidnightConfigExample extends MidnightConfig {
         }
     }
 }
-//?}
+*///?}

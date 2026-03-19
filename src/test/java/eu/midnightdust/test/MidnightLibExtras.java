@@ -1,7 +1,7 @@
 package eu.midnightdust.test;
 
-//? if >= 1.21.10 {
-import com.google.common.collect.Lists;
+//? if = 1.21.11 {
+/*import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
 import eu.midnightdust.lib.config.EntryInfo;
 import eu.midnightdust.lib.config.MidnightConfigListWidget;
@@ -20,10 +20,10 @@ import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-/*
+/^
  Pre-made additional (niche) functionality that is not included in MidnightLib to keep the file size small.
  Feel free to copy the parts you need :)
-*/
+^/
 public class MidnightLibExtras {
     public static class KeybindButton extends Button {
         public static Button focusedButton;
@@ -98,4 +98,4 @@ public class MidnightLibExtras {
         }
     }
 }
-//?}
+*///?}

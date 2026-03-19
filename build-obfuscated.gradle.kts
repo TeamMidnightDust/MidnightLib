@@ -1,12 +1,12 @@
 plugins {
-    id("fabric-loom")
+    id("dev.architectury.loom") version "1.13-SNAPSHOT" // For obfuscated releases (<= 1.21.11)
     id("me.modmuss50.mod-publish-plugin")
     id("com.github.johnrengelman.shadow")
     `maven-publish`
 }
 
 val minecraft = stonecutter.current.version
-val loader = stonecutter.current.project.replace("${minecraft}-","")//loom.platform.get().name.lowercase() TODO
+val loader = stonecutter.current.project.substringAfterLast('-')
 
 version = "${mod.version}+$minecraft"
 group = mod.group
@@ -55,7 +55,7 @@ loom {
         }
     }
     if (loader == "forge") {
-        //forge.mixinConfigs("midnightlib.mixins.json") TODO
+        forge.mixinConfigs("midnightlib.mixins.json")
     }
 }
 
@@ -128,15 +128,18 @@ publishing {
     }
 }
 
+val requiredJava = when {
+    sc.current.parsed >= "26.1-pre-3" -> JavaVersion.VERSION_25
+    sc.current.parsed >= "1.20.5" -> JavaVersion.VERSION_21
+    sc.current.parsed >= "1.18" -> JavaVersion.VERSION_17
+    sc.current.parsed >= "1.17" -> JavaVersion.VERSION_16
+    else -> JavaVersion.VERSION_1_8
+}
 
 java {
     withSourcesJar()
-    val java =
-        if (stonecutter.eval(minecraft, ">=26.1-pre-3")) JavaVersion.VERSION_25
-        else if (stonecutter.eval(minecraft, ">=1.20.5")) JavaVersion.VERSION_21
-        else JavaVersion.VERSION_17
-    targetCompatibility = java
-    sourceCompatibility = java
+    targetCompatibility = requiredJava
+    sourceCompatibility = requiredJava
 }
 
 val shadowBundle: Configuration by configurations.creating {
@@ -150,8 +153,8 @@ tasks.shadowJar {
 }
 
 tasks.remapJar {
-    //injectAccessWidener = true TODO
-    //input = tasks.shadowJar.get().archiveFile TODO
+    injectAccessWidener = true
+    inputs.file(tasks.shadowJar.get().archiveFile)
     archiveClassifier = null
     dependsOn(tasks.shadowJar)
 }
@@ -220,5 +223,25 @@ stonecutter {
     replacements.string {
         direction = eval(current.version, ">=1.21.11-rc2")
         replace("net.minecraft.Util", "net.minecraft.util.Util")
+    }
+    replacements.string {
+        direction = eval(current.version, ">=26.1-pre.1")
+        replace("render(", "extractRenderState(")
+    }
+    replacements.string {
+        direction = eval(current.version, ">=26.1-pre.1")
+        replace("GuiGraphics", "GuiGraphicsExtractor")
+    }
+    replacements.string {
+        direction = eval(current.version, ">=26.1-pre.1")
+        replace("renderListSeparators", "extractListSeparators")
+    }
+    replacements.string {
+        direction = eval(current.version, ">=26.1-pre.1")
+        replace("renderContent", "extractContent")
+    }
+    replacements.string {
+        direction = eval(current.version, ">=26.1-pre.1")
+        replace("drawCenteredString", "centeredText")
     }
 }
