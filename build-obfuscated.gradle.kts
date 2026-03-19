@@ -1,13 +1,12 @@
 plugins {
-    id("dev.architectury.loom")
-    id("architectury-plugin")
+    id("fabric-loom")
     id("me.modmuss50.mod-publish-plugin")
     id("com.github.johnrengelman.shadow")
     `maven-publish`
 }
 
 val minecraft = stonecutter.current.version
-val loader = loom.platform.get().name.lowercase()
+val loader = stonecutter.current.project.replace("${minecraft}-","")//loom.platform.get().name.lowercase() TODO
 
 version = "${mod.version}+$minecraft"
 group = mod.group
@@ -24,13 +23,19 @@ repositories {
 }
 dependencies {
     minecraft("com.mojang:minecraft:$minecraft")
+    fun impl(dependency: String) {
+        if (stonecutter.eval(minecraft, "<=1.21.11"))
+            modImplementation(dependency)
+        else
+            implementation(dependency)
+    }
 
     if (loader == "fabric") {
-        modImplementation("net.fabricmc:fabric-loader:${mod.dep("fabric_loader")}")
-        modImplementation("com.terraformersmc:modmenu:${mod.dep("modmenu_version")}")
+        impl("net.fabricmc:fabric-loader:${mod.dep("fabric_loader")}")
+        impl("com.terraformersmc:modmenu:${mod.dep("modmenu_version")}")
 
         // Fabric API is required to load modded resources
-        modImplementation("net.fabricmc.fabric-api:fabric-api:${mod.dep("fabric_version")}")
+        impl("net.fabricmc.fabric-api:fabric-api:${mod.dep("fabric_version")}")
     }
     if (loader == "forge") {
         "forge"("net.minecraftforge:forge:${minecraft}-${mod.dep("forge_loader")}")
@@ -50,7 +55,7 @@ loom {
         }
     }
     if (loader == "forge") {
-        forge.mixinConfigs("midnightlib.mixins.json")
+        //forge.mixinConfigs("midnightlib.mixins.json") TODO
     }
 }
 
@@ -126,7 +131,10 @@ publishing {
 
 java {
     withSourcesJar()
-    val java = if (stonecutter.eval(minecraft, ">=1.20.5")) JavaVersion.VERSION_21 else JavaVersion.VERSION_17
+    val java =
+        if (stonecutter.eval(minecraft, ">=26.1-pre-3")) JavaVersion.VERSION_25
+        else if (stonecutter.eval(minecraft, ">=1.20.5")) JavaVersion.VERSION_21
+        else JavaVersion.VERSION_17
     targetCompatibility = java
     sourceCompatibility = java
 }
@@ -142,8 +150,8 @@ tasks.shadowJar {
 }
 
 tasks.remapJar {
-    injectAccessWidener = true
-    input = tasks.shadowJar.get().archiveFile
+    //injectAccessWidener = true TODO
+    //input = tasks.shadowJar.get().archiveFile TODO
     archiveClassifier = null
     dependsOn(tasks.shadowJar)
 }

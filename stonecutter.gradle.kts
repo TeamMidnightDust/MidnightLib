@@ -1,7 +1,7 @@
 plugins {
     id("dev.kikugie.stonecutter")
-    id("dev.architectury.loom") version "1.13-SNAPSHOT" apply false
-    id("architectury-plugin") version "3.4-SNAPSHOT" apply false
+    id("fabric-loom") version "1.15-SNAPSHOT" apply false // For obfuscated releases (<= 1.21.11)
+    id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT" apply false // For unobfuscated releases (>= 26.1)
     id("com.github.johnrengelman.shadow") version "8.1.1" apply false
     id("me.modmuss50.mod-publish-plugin") version "0.8.4" apply false
 }

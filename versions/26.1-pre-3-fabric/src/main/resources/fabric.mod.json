@@ -1,0 +1,54 @@
+{
+    "schemaVersion": 1,
+    "id": "${id}",
+    "version": "${version}",
+    "name": "${name}",
+    "description": "Lightweight config library with config screens and commands.",
+    "authors": [
+        "Motschen"
+    ],
+    "contributors": [
+        "maloryware",
+        "Jaffe2718"
+    ],
+    "contact": {
+        "homepage": "https://www.midnightdust.eu/",
+        "sources": "https://github.com/TeamMidnightDust/MidnightLib",
+        "issues": "https://github.com/TeamMidnightDust/MidnightLib/issues"
+    },
+
+    "license": "MIT",
+    "icon": "assets/midnightlib/icon.png",
+
+    "environment": "*",
+    "entrypoints": {
+        "server": [
+            "eu.midnightdust.lib.config.AutoCommand"
+        ],
+        "client": [
+            "eu.midnightdust.core.MidnightLib"
+        ],
+        "modmenu": [
+            "eu.midnightdust.core.MidnightLib\$ModMenuInit"
+        ]
+    },
+    "depends": {
+        "fabric-resource-loader-v0": "*",
+        "minecraft": "${minecraft}"
+    },
+
+    "mixins": [
+        "midnightlib.mixins.json"
+    ],
+
+    "custom": {
+        "modmenu": {
+            "links": {
+                "modmenu.discord": "http://discord.midnightdust.eu/",
+                "modmenu.website": "https://midnightdust.eu/midnightlib",
+                "midnightlib.wiki": "https://midnightdust.eu/wiki/midnightlib"
+            },
+            "badges": [ "library" ]
+        }
+    }
+}
