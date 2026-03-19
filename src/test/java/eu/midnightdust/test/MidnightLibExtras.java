@@ -1,7 +1,6 @@
 package eu.midnightdust.test;
 
-//? if = 1.21.11 {
-/*import com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
 import eu.midnightdust.lib.config.EntryInfo;
 import eu.midnightdust.lib.config.MidnightConfigListWidget;
@@ -9,6 +8,7 @@ import eu.midnightdust.lib.config.MidnightConfigScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.SpriteIconButton;
@@ -20,10 +20,10 @@ import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-/^
+/*
  Pre-made additional (niche) functionality that is not included in MidnightLib to keep the file size small.
  Feel free to copy the parts you need :)
-^/
+*/
 public class MidnightLibExtras {
     public static class KeybindButton extends Button {
         public static Button focusedButton;
@@ -52,6 +52,10 @@ public class MidnightLibExtras {
             this.binding = binding;
             updateMessage(false);
         }
+
+        @Override
+        protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {}
+
         @Override
         public boolean keyPressed(KeyEvent input) {
             if (focusedButton == this) {
@@ -98,4 +102,3 @@ public class MidnightLibExtras {
         }
     }
 }
-*///?}

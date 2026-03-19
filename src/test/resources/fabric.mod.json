@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "modid",
+  "version": "${version}",
+
+  "name": "MidnightLib Test Mod",
+  "description": "Example Mod for Team MidnightDust's mods.",
+  "authors": [ "MidnightDust" ],
+
+  "license": "CC0",
+  "icon": "assets/midnightlib/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "eu.midnightdust.test.MidnightLibTest"
+    ]
+  },
+  "depends": {
+    "fabric-resource-loader-v0": "*",
+    "midnightlib": ">=1.6.0"
+  }
+}

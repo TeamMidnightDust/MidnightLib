@@ -1,26 +1,22 @@
 package eu.midnightdust.test.config;
 
-//? if = 1.21.11 {
-/*import com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 import eu.midnightdust.lib.config.MidnightConfigListWidget;
 import eu.midnightdust.lib.config.MidnightConfigScreen;
 import eu.midnightdust.test.MidnightLibExtras;
 import eu.midnightdust.lib.config.MidnightConfig;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.OptionEnum;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.util.StringRepresentable;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/^* Every option in a MidnightConfig class has to be public and static, so we can access it from other classes.
- * The config class also has to extend MidnightConfig^/
+/** Every option in a MidnightConfig class has to be public and static, so we can access it from other classes.
+ * The config class also has to extend MidnightConfig
+ */
 @SuppressWarnings({"unused", "DefaultAnnotationParam"})
 public class MidnightConfigExample extends MidnightConfig {
     public static final String TEXT = "text";
@@ -130,32 +126,19 @@ public class MidnightConfigExample extends MidnightConfig {
 
     public static int imposter = 16777215; // - Entries without an @Entry or @Comment annotation are ignored
 
-    public enum GraphicsSteps implements OptionEnum {
+    public enum GraphicsSteps implements StringRepresentable {
         FAST(0, "options.graphics.fast"),
         FANCY(1, "options.graphics.fancy"),
         FABULOUS(2, "options.graphics.fabulous");
 
-        private final int id;
         private final String translationKey;
 
         GraphicsSteps(int id, String translationKey) {
-            this.id = id;
             this.translationKey = translationKey;
         }
 
         @Override
-        public @NotNull Component getCaption() {
-            MutableComponent mutableText = Component.translatable(this.getKey());
-            return this == GraphicsSteps.FABULOUS ? mutableText.withStyle(ChatFormatting.ITALIC, ChatFormatting.AQUA) : mutableText;
-        }
-
-        @Override
-        public int getId() {
-            return this.id;
-        }
-
-        @Override
-        public @NotNull String getKey() {
+        public String getSerializedName() {
             return this.translationKey;
         }
     }
@@ -171,4 +154,3 @@ public class MidnightConfigExample extends MidnightConfig {
         }
     }
 }
-*///?}

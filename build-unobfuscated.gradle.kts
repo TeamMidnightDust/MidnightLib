@@ -1,3 +1,6 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
 plugins {
     id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT" // For unobfuscated releases (>= 26.1)
     id("me.modmuss50.mod-publish-plugin")
@@ -195,6 +198,46 @@ tasks.build {
     description = "Must run through 'chiseledBuild'"
 }
 
+tasks.processResources {
+    // Minify json resources
+    doLast {
+        fileTree(outputs.files.singleFile).matching {
+            include("**/*.json")
+        }.forEach { file ->
+            file.writeText(JsonOutput.toJson(JsonSlurper().parse(file)))
+        }
+    }
+}
+
+sourceSets {
+    test {
+        compileClasspath.plus(main.get().compileClasspath)
+        runtimeClasspath.plus(main.get().runtimeClasspath)
+        java {
+            srcDirs.add(File("src/test/java"))
+        }
+        resources {
+            srcDirs.add(File("src/test/resources"))
+        }
+    }
+}
+
+loom {
+    runs {
+        create("testClient"
+        ) {
+            client()
+            configName = "Test Minecraft Client"
+            source(sourceSets.test.get())
+        }
+        create("testServer"
+        ) {
+            server()
+            configName = "Test Minecraft Server"
+            source(sourceSets.test.get())
+        }
+    }
+}
 
 stonecutter {
     constants {
