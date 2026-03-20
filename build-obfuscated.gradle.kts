@@ -2,7 +2,7 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
 plugins {
-    id("dev.architectury.loom") version "1.13-SNAPSHOT" // For obfuscated releases (<= 1.21.11)
+    id("net.fabricmc.fabric-loom-remap") version "1.15-SNAPSHOT" // For obfuscated releases (<= 1.21.11)
     id("me.modmuss50.mod-publish-plugin")
     id("com.github.johnrengelman.shadow")
     `maven-publish`
@@ -27,10 +27,7 @@ repositories {
 dependencies {
     minecraft("com.mojang:minecraft:$minecraft")
     fun impl(dependency: String) {
-        if (stonecutter.eval(minecraft, "<=1.21.11"))
-            modImplementation(dependency)
-        else
-            implementation(dependency)
+        modImplementation(dependency)
     }
 
     if (loader == "fabric") {
@@ -58,7 +55,7 @@ loom {
         }
     }
     if (loader == "forge") {
-        forge.mixinConfigs("midnightlib.mixins.json")
+        //forge.mixinConfigs("midnightlib.mixins.json")
     }
 }
 
@@ -132,7 +129,7 @@ publishing {
 }
 
 val requiredJava = when {
-    sc.current.parsed >= "26.1-pre-3" -> JavaVersion.VERSION_25
+    sc.current.parsed >= "26.1-pre-1" -> JavaVersion.VERSION_25
     sc.current.parsed >= "1.20.5" -> JavaVersion.VERSION_21
     sc.current.parsed >= "1.18" -> JavaVersion.VERSION_17
     sc.current.parsed >= "1.17" -> JavaVersion.VERSION_16
@@ -156,7 +153,7 @@ tasks.shadowJar {
 }
 
 tasks.remapJar {
-    injectAccessWidener = true
+    //injectAccessWidener = true
     inputs.file(tasks.shadowJar.get().archiveFile)
     archiveClassifier = null
     dependsOn(tasks.shadowJar)
@@ -258,33 +255,5 @@ loom {
 stonecutter {
     constants {
         arrayOf("fabric", "neoforge", "forge").forEach { it -> put(it, loader == it) }
-    }
-    replacements.string {
-        direction = eval(current.version, ">=1.21.11-rc2")
-        replace("ResourceLocation", "Identifier")
-    }
-    replacements.string {
-        direction = eval(current.version, ">=1.21.11-rc2")
-        replace("net.minecraft.Util", "net.minecraft.util.Util")
-    }
-    replacements.string {
-        direction = eval(current.version, ">=26.1-pre.1")
-        replace("render(", "extractRenderState(")
-    }
-    replacements.string {
-        direction = eval(current.version, ">=26.1-pre.1")
-        replace("GuiGraphics", "GuiGraphicsExtractor")
-    }
-    replacements.string {
-        direction = eval(current.version, ">=26.1-pre.1")
-        replace("renderListSeparators", "extractListSeparators")
-    }
-    replacements.string {
-        direction = eval(current.version, ">=26.1-pre.1")
-        replace("renderContent", "extractContent")
-    }
-    replacements.string {
-        direction = eval(current.version, ">=26.1-pre.1")
-        replace("drawCenteredString", "centeredText")
     }
 }

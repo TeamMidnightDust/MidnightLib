@@ -45,19 +45,6 @@ dependencies {
     }
 }
 
-loom {
-    //accessWidenerPath = rootProject.file("src/main/resources/template.accesswidener")
-
-    decompilers {
-        get("vineflower").apply { // Adds names to lambdas - useful for mixins
-            options.put("mark-corresponding-synthetics", "1")
-        }
-    }
-    if (loader == "forge") {
-        //forge.mixinConfigs("midnightlib.mixins.json") TODO
-    }
-}
-
 publishMods {
     val modrinthToken = System.getenv("MODRINTH_TOKEN")
     val curseforgeToken = System.getenv("CURSEFORGE_TOKEN")
@@ -128,7 +115,7 @@ publishing {
 }
 
 val requiredJava = when {
-    sc.current.parsed >= "26.1-pre-3" -> JavaVersion.VERSION_25
+    sc.current.parsed >= "26.1-pre-1" -> JavaVersion.VERSION_25
     sc.current.parsed >= "1.20.5" -> JavaVersion.VERSION_21
     sc.current.parsed >= "1.18" -> JavaVersion.VERSION_17
     sc.current.parsed >= "1.17" -> JavaVersion.VERSION_16
@@ -242,33 +229,5 @@ loom {
 stonecutter {
     constants {
         arrayOf("fabric", "neoforge", "forge").forEach { it -> put(it, loader == it) }
-    }
-    replacements.string {
-        direction = eval(current.version, ">=1.21.11-rc2")
-        replace("ResourceLocation", "Identifier")
-    }
-    replacements.string {
-        direction = eval(current.version, ">=1.21.11-rc2")
-        replace("net.minecraft.Util", "net.minecraft.util.Util")
-    }
-    replacements.string {
-        direction = eval(current.version, ">=26.1-pre.1")
-        replace("render(", "extractRenderState(")
-    }
-    replacements.string {
-        direction = eval(current.version, ">=26.1-pre.1")
-        replace("GuiGraphics", "GuiGraphicsExtractor")
-    }
-    replacements.string {
-        direction = eval(current.version, ">=26.1-pre.1")
-        replace("renderListSeparators", "extractListSeparators")
-    }
-    replacements.string {
-        direction = eval(current.version, ">=26.1-pre.1")
-        replace("renderContent", "extractContent")
-    }
-    replacements.string {
-        direction = eval(current.version, ">=26.1-pre.1")
-        replace("drawCenteredString", "centeredText")
     }
 }
