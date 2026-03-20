@@ -20,7 +20,7 @@ stonecutter {
         fun mc(loader: String, vararg versions: String) {
             for (version in versions) version("$version-$loader", version).buildscript(if (stonecutter.eval(version, ">=26.1-pre.1")) "build-unobfuscated.gradle.kts" else "build-obfuscated.gradle.kts")
         }
-        mc("fabric","1.20.1", "1.21.1", "1.21.5", "1.21.8", "1.21.10", "1.21.11", "26.1-rc-2")
+        mc("fabric","1.20.1", "1.21.1", "1.21.5", "1.21.8", "1.21.10", "1.21.11", "26.1-pre-3")
         //mc("fabric", "26.1-rc-1")
         //mc("forge","1.20.1")
         //mc("neoforge", "1.21.1", "1.21.5", "1.21.8", "1.21.10", "1.21.11")

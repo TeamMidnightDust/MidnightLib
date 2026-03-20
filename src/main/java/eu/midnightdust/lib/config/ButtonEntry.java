@@ -2,7 +2,6 @@ package eu.midnightdust.lib.config;
 
 import com.google.common.collect.Lists;
 import java.util.List;
-import java.util.Optional;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -18,6 +17,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 //? if >= 1.21.9 {
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.world.item.ItemStack;
+//?}
+//? if >= 26.1-pre.1 {
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 //?}
 
 public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry> {
@@ -59,16 +64,12 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
         if (title != null) {
             title.setY(y + 5);
             title.extractRenderState(context, mouseX, mouseY, tickDelta);
-
-            if (info.entry != null && !this.buttons.isEmpty()) {
-                Optional.ofNullable(this.buttons.get(0)).ifPresent(widget -> {
-                    int idMode = this.info.entry.idMode();
-                    if (idMode != -1) context./*? if >= 26.1-pre.1 {*/item /*?} else {*/ /*renderItem *//*?}*/(idMode == 0 ?
-                                BuiltInRegistries.ITEM./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(Identifier.tryParse(this.info.tempValue)).getDefaultInstance()
-                                : BuiltInRegistries.BLOCK./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(Identifier.tryParse(this.info.tempValue)).asItem().getDefaultInstance(),
-                            widget.getX() + widget.getWidth() - 18, y + 2);
-                });
-            }
+        }
+        if (info.entry != null && !this.buttons.isEmpty() && this.info.entry.idMode() != -1) {
+            var id = Identifier.tryParse(this.info.tempValue);
+            var item = this.info.entry.idMode() == 0 ? BuiltInRegistries.ITEM./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(id) : BuiltInRegistries.BLOCK./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(id).asItem();
+            var stack = /*? if >= 26.1-pre.1 {*/ new ItemStack(Holder.direct(item, DataComponentMap.builder().set(DataComponents.ITEM_MODEL, Identifier.tryParse(this.info.tempValue)).build())) /*?} else {*/ /*item.getDefaultInstance()*/ /*?}*/;
+            context./*? if >= 26.1-pre.1 {*/ fakeItem /*?} else {*/ /*renderItem *//*?}*/(stack, this.buttons.get(0).getX() + this.buttons.get(0).getWidth() - 18, y + 2);
         }
     }
 

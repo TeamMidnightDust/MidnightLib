@@ -25,7 +25,7 @@ import org.lwjgl.glfw.GLFW;
  Feel free to copy the parts you need :)
 */
 public class MidnightLibExtras {
-    public static class KeybindButton extends Button {
+    public static class KeybindButton extends Button.Plain {
         public static Button focusedButton;
 
         public static void add(KeyMapping binding, MidnightConfigListWidget list, MidnightConfigScreen screen) {
@@ -52,9 +52,6 @@ public class MidnightLibExtras {
             this.binding = binding;
             updateMessage(false);
         }
-
-        @Override
-        protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {}
 
         @Override
         public boolean keyPressed(KeyEvent input) {

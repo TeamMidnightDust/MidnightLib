@@ -211,7 +211,11 @@ public class MidnightConfigScreen extends Screen {
                         textField.setValue(info.tempValue);
                         //noinspection unchecked
                         Predicate<String> processor = ((BiFunction<EditBox, Button, Predicate<String>>) info.function).apply(textField, done);
-                        //textField.setFilter(processor); //TODO!!!!!!!
+                        //? if >= 26.1-pre.1 {
+                        textField.setResponder(s -> {if (!processor.test(s)) textField.setValue(info.tempValue);});
+                        //?} else {
+                        /*textField.setFilter(processor);
+                         *///?}
                     }
                     widget.setTooltip(info.getTooltip(true));
 
