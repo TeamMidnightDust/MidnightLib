@@ -4,7 +4,6 @@ import groovy.json.JsonSlurper
 plugins {
     id("net.fabricmc.fabric-loom-remap") version "1.15-SNAPSHOT" // For obfuscated releases (<= 1.21.11)
     id("me.modmuss50.mod-publish-plugin")
-    id("com.github.johnrengelman.shadow")
     `maven-publish`
 }
 
@@ -142,21 +141,11 @@ java {
     sourceCompatibility = requiredJava
 }
 
-val shadowBundle: Configuration by configurations.creating {
-    isCanBeConsumed = false
-    isCanBeResolved = true
-}
-
-tasks.shadowJar {
-    configurations = listOf(shadowBundle)
-    archiveClassifier = "dev-shadow"
-}
-
 tasks.remapJar {
     //injectAccessWidener = true
-    inputs.file(tasks.shadowJar.get().archiveFile)
+    inputs.file(tasks.jar.get().archiveFile)
     archiveClassifier = null
-    dependsOn(tasks.shadowJar)
+    dependsOn(tasks.jar)
 }
 
 tasks.jar {

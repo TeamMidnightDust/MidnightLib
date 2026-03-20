@@ -4,7 +4,6 @@ import groovy.json.JsonSlurper
 plugins {
     id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT" // For unobfuscated releases (>= 26.1)
     id("me.modmuss50.mod-publish-plugin")
-    id("com.github.johnrengelman.shadow")
     `maven-publish`
 }
 
@@ -128,11 +127,6 @@ java {
     sourceCompatibility = requiredJava
 }
 
-val shadowBundle: Configuration by configurations.creating {
-    isCanBeConsumed = false
-    isCanBeResolved = true
-}
-
 tasks.jar {
     inputs.property("archivesName", base.archivesName)
 }
@@ -207,6 +201,9 @@ sourceSets {
             srcDirs.add(File("src/test/resources"))
         }
     }
+}
+tasks.withType<AbstractTestTask>().configureEach {
+    failOnNoDiscoveredTests = false
 }
 
 loom {
