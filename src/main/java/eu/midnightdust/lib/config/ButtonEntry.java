@@ -65,7 +65,7 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
             title.setY(y + 5);
             title.extractRenderState(context, mouseX, mouseY, tickDelta);
         }
-        if (info.entry != null && !this.buttons.isEmpty() && this.info.entry.idMode() != -1) {
+        if (info != null && info.entry != null && !this.buttons.isEmpty() && this.info.entry.idMode() != -1) {
             var id = Identifier.tryParse(this.info.tempValue);
             var item = this.info.entry.idMode() == 0 ? BuiltInRegistries.ITEM./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(id) : BuiltInRegistries.BLOCK./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(id).asItem();
             var stack = /*? if >= 26.1-pre.1 {*/ new ItemStack(Holder.direct(item, DataComponentMap.builder().set(DataComponents.ITEM_MODEL, Identifier.tryParse(this.info.tempValue)).build())) /*?} else {*/ /*item.getDefaultInstance()*/ /*?}*/;
