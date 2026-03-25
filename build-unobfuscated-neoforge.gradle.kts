@@ -2,7 +2,7 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
 plugins {
-    id("dev.architectury.loom") version "1.13-SNAPSHOT" // For obfuscated releases (<= 1.21.11)
+    id("net.neoforged.moddev") version "2.0.141" // For unobfuscated releases (>= 26.1)
     id("me.modmuss50.mod-publish-plugin")
     `maven-publish`
 }
@@ -24,9 +24,8 @@ repositories {
     maven("https://maven.nucleoid.xyz/")
 }
 dependencies {
-    minecraft("com.mojang:minecraft:$minecraft")
     fun impl(dependency: String) {
-        modImplementation(dependency)
+        implementation(dependency)
     }
 
     if (loader == "fabric") {
@@ -40,30 +39,45 @@ dependencies {
         "forge"("net.minecraftforge:forge:${minecraft}-${mod.dep("forge_loader")}")
     }
     if (loader == "neoforge") {
-        "neoForge"("net.neoforged:neoforge:${mod.dep("neoforge_loader")}")
+        //"neoForge"("net.neoforged:neoforge:${mod.dep("neoforge_loader")}")
     }
-    mappings (loom.officialMojangMappings())
 }
+neoForge {
+    version = mod.dep("neoforge_loader") as String
 
-loom {
-    //accessWidenerPath = rootProject.file("src/main/resources/template.accesswidener")
-
-    decompilers {
-        get("vineflower").apply { // Adds names to lambdas - useful for mixins
-            options.put("mark-corresponding-synthetics", "1")
+    runs {
+        register("client") {
+            gameDirectory = file("../../run/")
+            client()
         }
-    }
-    if (loader == "forge") {
-        //forge.mixinConfigs("midnightlib.mixins.json")
+
+        register("server") {
+            gameDirectory = file("../../run/")
+            server()
+        }
+
+        // register("testClient") {
+        //     client()
+        //     gameDirectory = file("../../run/")
+        //     configName = "Test Minecraft Client"
+        //     source(sourceSets.test.get())
+        // }
+        // register("testServer") {
+        //     server()
+        //     gameDirectory = file("../../run/")
+        //     configName = "Test Minecraft Server"
+        //     source(sourceSets.test.get())
+        // }
     }
 }
+
 
 publishMods {
     val modrinthToken = System.getenv("MODRINTH_TOKEN")
     val curseforgeToken = System.getenv("CURSEFORGE_TOKEN")
     val githubToken = System.getenv("GITHUB_TOKEN").orEmpty()
 
-    file = project.tasks.remapJar.get().archiveFile
+    file = project.tasks.jar.get().archiveFile
     dryRun = modrinthToken == null || curseforgeToken == null
 
     displayName = "${mod.name} ${mod.version} - ${loader.replaceFirstChar { it.uppercase() }} ${property("mod.mc_title")}"
@@ -141,20 +155,13 @@ java {
     sourceCompatibility = requiredJava
 }
 
-tasks.remapJar {
-    //injectAccessWidener = true
-    inputs.file(tasks.jar.get().archiveFile)
-    archiveClassifier = null
-    dependsOn(tasks.jar)
-}
-
 tasks.jar {
-    archiveClassifier = "dev"
+    inputs.property("archivesName", base.archivesName)
 }
 
 val buildAndCollect = tasks.register<Copy>("buildAndCollect") {
     group = "build"
-    from(tasks.remapJar.get().archiveFile, tasks.remapSourcesJar.get().archiveFile)
+    from(tasks.jar.get().archiveFile)
     into(rootProject.layout.buildDirectory.file("libs/${mod.version}/$loader"))
     dependsOn("build")
 }
@@ -223,22 +230,8 @@ sourceSets {
         }
     }
 }
-
-loom {
-    runs {
-        create("testClient"
-        ) {
-            client()
-            configName = "Test Minecraft Client"
-            source(sourceSets.test.get())
-        }
-        create("testServer"
-        ) {
-            server()
-            configName = "Test Minecraft Server"
-            source(sourceSets.test.get())
-        }
-    }
+tasks.withType<AbstractTestTask>().configureEach {
+    failOnNoDiscoveredTests = false
 }
 
 stonecutter {

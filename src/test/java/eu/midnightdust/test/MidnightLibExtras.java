@@ -1,5 +1,6 @@
 package eu.midnightdust.test;
 
+//? fabric {
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
 import eu.midnightdust.lib.config.EntryInfo;
@@ -99,3 +100,4 @@ public class MidnightLibExtras {
         }
     }
 }
+//?}

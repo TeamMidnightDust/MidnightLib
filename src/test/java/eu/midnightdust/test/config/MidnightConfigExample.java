@@ -1,5 +1,6 @@
 package eu.midnightdust.test.config;
 
+//? fabric {
 import com.google.common.collect.Lists;
 import eu.midnightdust.lib.config.MidnightConfigListWidget;
 import eu.midnightdust.lib.config.MidnightConfigScreen;
@@ -154,3 +155,4 @@ public class MidnightConfigExample extends MidnightConfig {
         }
     }
 }
+//?}
