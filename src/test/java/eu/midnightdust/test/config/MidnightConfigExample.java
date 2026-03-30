@@ -11,9 +11,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 
 import javax.swing.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /** Every option in a MidnightConfig class has to be public and static, so we can access it from other classes.
  * The config class also has to extend MidnightConfig
@@ -28,6 +31,12 @@ public class MidnightConfigExample extends MidnightConfig {
     public static final String CONDITIONS = "conditions";
     public static final String EXTRAS = "extras";
 
+    @Comment(category = TEXT, name = "UTC Time: %s")
+    public static final Supplier<Object[]> utcTime = () -> {                     // use the return value to format the comment
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        return new Object[]{sdf.format(now)};
+    };
     @Comment(category = TEXT) public static Comment text1;                       // Comments are rendered like an option without a button and are excluded from the config file
     @Comment(category = TEXT, centered = true) public static Comment text2;      // Centered comments are the same as normal ones - just centered!
     @Comment(category = TEXT) public static Comment spacer1;                     // Comments containing the word "spacer" will just appear as a blank line

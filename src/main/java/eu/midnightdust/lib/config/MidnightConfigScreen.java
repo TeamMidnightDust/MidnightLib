@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 //? if >= 1.21.9 {
 import net.minecraft.client.input.KeyEvent;
 //?}
@@ -290,7 +291,20 @@ public class MidnightConfigScreen extends Screen {
                     }
                     if (!info.conditionsMet) widgets.forEach(w -> w.active = false);
                     this.list.addButton(widgets, Component.translatable(info.translationKey), info);
-                } else this.list.addButton(List.of(), Component.translatable(info.translationKey), info);
+                } else {
+                    Object[] formatter = {};
+                    try {
+                        Object value = info.field.get(null);
+                        if (value instanceof Supplier supplier) {
+                             if (supplier.get() instanceof Object[] args) {
+                                 formatter = args;
+                             } else if (supplier.get() != null) {
+                                 formatter = new Object[]{supplier.get()};
+                             }
+                        }
+                    } catch (IllegalAccessException ignored) {}
+                    this.list.addButton(List.of(), Component.translatable(info.translationKey, formatter), info);
+                }
             }
             list.setScrollAmount(scrollProgress);
             updateButtons();
