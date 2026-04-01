@@ -33,18 +33,18 @@ public class MidnightConfigExample extends MidnightConfig {
     public static final String EXTRAS = "extras";
 
     @Comment(category = TEXT, name = "§bUTC Time: %s")
-    public static final Supplier<Object[]> utcTime = () -> {                     // use the return value to format the comment
+    public static Supplier<Object[]> utcTime = () -> {                     // use the return value to format the comment
         Date now = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         return new Object[]{sdf.format(now)};
     };
     @Comment(category = TEXT, name = "OS: §6%s, Arch: §6%s")
-    public static final String[] platformInfo = {
+    public static String[] platformInfo = {
             System.getProperty("os.name"),
             System.getProperty("os.arch")
     };
     @Comment(category = TEXT, name = "Minecraft %s, %s mods loaded")
-    public static final List<String> gameInfo = List.of(
+    public static List<String> gameInfo = List.of(
         FabricLoader.getInstance().getRawGameVersion(),
         String.valueOf(FabricLoader.getInstance().getAllMods().size())
     );
