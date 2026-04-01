@@ -20,6 +20,7 @@ import net.minecraft.resources.Identifier;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -295,12 +296,23 @@ public class MidnightConfigScreen extends Screen {
                     Object[] formatter = {};
                     try {
                         Object value = info.field.get(null);
-                        if (value instanceof Supplier supplier) {
+                        if (value instanceof Supplier<?> supplier) {
                              if (supplier.get() instanceof Object[] args) {
                                  formatter = args;
                              } else if (supplier.get() != null) {
                                  formatter = new Object[]{supplier.get()};
                              }
+                        } else if (value instanceof Iterable<?> iterable) {
+                            ArrayList<Object> list = new ArrayList<>();
+                            iterable.forEach(list::add);
+                            formatter = list.toArray();
+                        } else if (value != null && value.getClass().isArray()) {
+                            formatter = new Object[Array.getLength(value)];
+                            for (int i = 0; i < Array.getLength(value); i++) {
+                                formatter[i] = Array.get(value, i);
+                            }
+                        } else if (value != null) {
+                            formatter = new Object[]{value};
                         }
                     } catch (IllegalAccessException ignored) {}
                     this.list.addButton(List.of(), Component.translatable(info.translationKey, formatter), info);
