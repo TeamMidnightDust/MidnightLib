@@ -1,6 +1,8 @@
 package eu.midnightdust.lib.config;
 
 import com.google.common.collect.Lists;
+import eu.midnightdust.lib.event.MidnightEvent;
+import eu.midnightdust.lib.event.MidnightEventType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -70,6 +72,7 @@ public class MidnightConfigScreen extends Screen {
         tabNavigation.selectTab(0, false);
         tabNavigation.arrangeElements();
         prevTab = tabManager.getCurrentTab();
+        MidnightEvent.trigger(MidnightEventType.CONFIG_SCREEN_OPENED, modid, this);
     }
 
     // Real Time config update //
@@ -130,6 +133,7 @@ public class MidnightConfigScreen extends Screen {
             info.inLimits = true;
         });
         Objects.requireNonNull(minecraft).setScreen(parent);
+        MidnightEvent.trigger(MidnightEventType.CONFIG_SCREEN_CLOSED, modid);
     }
 
     @Override
@@ -179,7 +183,7 @@ public class MidnightConfigScreen extends Screen {
                 /*TextAndImageButton resetButton = TextAndImageButton.builder(Component.translatable("controls.reset"), new Identifier("midnightlib", "icon/reset.png"),
                 *///?}
                 (button -> {
-                    info.value = info.defaultValue;
+                    info.setValue(info.defaultValue);
                     info.listIndex = 0;
                     info.tempValue = info.toTemporaryValue();
                     updateList();

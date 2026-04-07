@@ -2,6 +2,8 @@ package eu.midnightdust.lib.config;
 
 import com.google.gson.*;
 import com.google.gson.stream.*;
+import eu.midnightdust.lib.event.MidnightEvent;
+import eu.midnightdust.lib.event.MidnightEventType;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -102,6 +104,7 @@ public abstract class MidnightConfig {
                 instance.addClientEntry(field, new EntryInfo(field, modid));
         }
         instance.loadValuesFromJson();
+        MidnightEvent.trigger(MidnightEventType.CONFIG_REGISTERED, modid);
     }
 
     /**
@@ -261,6 +264,7 @@ public abstract class MidnightConfig {
             if (!Files.exists(path = getJsonFilePath()))
                 Files.createFile(path);
             Files.write(path, gson.toJson(this).getBytes());
+            MidnightEvent.trigger(MidnightEventType.WRITE_CONFIG, modid);
         } catch (Exception e) { e.fillInStackTrace(); }
     }
 

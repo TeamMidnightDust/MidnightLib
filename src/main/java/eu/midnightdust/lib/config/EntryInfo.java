@@ -1,5 +1,7 @@
 package eu.midnightdust.lib.config;
 
+import eu.midnightdust.lib.event.MidnightEvent;
+import eu.midnightdust.lib.event.MidnightEventType;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -49,13 +51,17 @@ public class EntryInfo {
     }
 
     public void setValue(Object value) {
+        Object oldValue;
         if (this.field.getType() != List.class) {
+            oldValue = this.value;
             this.value = value;
             this.tempValue = value.toString();
         } else {
+            oldValue = this.listIndex >= ((List<?>) this.value).size() ? null : ((List<?>) this.value).get(this.listIndex);
             writeList(this.listIndex, value);
             this.tempValue = toTemporaryValue();
         }
+        MidnightEvent.trigger(MidnightEventType.SET_VALUE, this.modid, this.fieldName, oldValue, value);
     }
 
     public String toTemporaryValue() {
