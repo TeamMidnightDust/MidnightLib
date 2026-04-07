@@ -1,7 +1,7 @@
 package eu.midnightdust.test;
 
 //? if fabric {
-/*import eu.midnightdust.lib.event.MidnightEvent;
+import eu.midnightdust.lib.event.MidnightEvent;
 
 public class MidnightEventTest {
     public static void registerEvents() {
@@ -12,4 +12,4 @@ public class MidnightEventTest {
         MidnightEvent.WRITE_CONFIG.register((modid) -> System.out.println("WriteConfig: " + modid));
     }
 }
-*///? }
+//? }
