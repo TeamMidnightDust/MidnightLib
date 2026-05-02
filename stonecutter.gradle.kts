@@ -23,23 +23,23 @@ stonecutter parameters {
             replace("net.minecraft.Util", "net.minecraft.util.Util")
         }
         string {
-            direction = eval(current.version, ">=26.1-pre.1")
+            direction = eval(current.version, ">=26.1")
             replace("render(", "extractRenderState(")
         }
         string {
-            direction = eval(current.version, ">=26.1-pre.1")
+            direction = eval(current.version, ">=26.1")
             replace("GuiGraphics", "GuiGraphicsExtractor")
         }
         string {
-            direction = eval(current.version, ">=26.1-pre.1")
+            direction = eval(current.version, ">=26.1")
             replace("renderListSeparators", "extractListSeparators")
         }
         string {
-            direction = eval(current.version, ">=26.1-pre.1")
+            direction = eval(current.version, ">=26.1")
             replace("renderContent", "extractContent")
         }
         string {
-            direction = eval(current.version, ">=26.1-pre.1")
+            direction = eval(current.version, ">=26.1")
             replace("drawCenteredString", "centeredText")
         }
     }
