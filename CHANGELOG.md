@@ -1,3 +1,9 @@
+## MidnightLib v1.9.3
+- Dynamic comment formatting (tysm [@Jaffe2718](https://github.com/Jaffe2718))
+  - Modders can now provide a list of Strings to format the text with – useful for dynamic stats
+- Fix NullPointerException while loading @Condition from the field behind #129 (by [@Jaffe2718](https://github.com/Jaffe2718))
+- Updated Tatar translations (by [@Amirhan-Taipovjan-Greatest-I](https://github.com/Amirhan-Taipovjan-Greatest-I))
+- Updated Argentine Spanish translations (by [@Texaliuz](https://github.com/Texaliuz))
 ## MidnightLib v1.9.2
 - Add support for using `StringRepresentable` to translate enums
 ## MidnightLib v1.9.1

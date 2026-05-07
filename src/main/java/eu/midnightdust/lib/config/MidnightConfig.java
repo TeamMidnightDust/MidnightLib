@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.google.gson.stream.*;
 import eu.midnightdust.lib.util.PlatformFunctions;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -216,13 +217,18 @@ public abstract class MidnightConfig {
             write(modid);
         }
 
-        entries.values().forEach(info -> {
+        entries.values().forEach((info) -> {
             if (info.field != null && info.entry != null) {
                 try {
-                    info.value = info.field.get(null) == null ? info.defaultValue : info.field.get(null);
+                    info.value = info.field.get(null) == null ?
+                            info.defaultValue : info.field.get(null);
                     info.tempValue = info.toTemporaryValue();
-                    info.updateConditions();
                 } catch (IllegalAccessException ignored) {}
+            }
+        });
+        entries.values().forEach((info) -> {
+            if (info.field != null && info.entry != null && Minecraft.getInstance() != null) {
+                Minecraft.getInstance().submit(info::updateConditions);  // use render thread to prevent IllegalAccessException
             }
         });
     }

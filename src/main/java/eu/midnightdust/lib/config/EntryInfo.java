@@ -70,7 +70,7 @@ public class EntryInfo {
     public void updateFieldValue() {
         try {
             if (this.field.get(null) != value) MidnightConfig.entries.values().forEach(EntryInfo::updateConditions);
-            this.field.set(null, this.value);
+            if (this.entry != null) this.field.set(null, this.value);
         } catch (IllegalAccessException ignored) {
         }
     }
