@@ -34,7 +34,7 @@ public abstract class MixinOptionsScreen extends Screen {
     //? if >= 1.20.4 {
     @Shadow @Final private HeaderAndFooterLayout layout;
     @Unique SpriteIconButton midnightlib$button = SpriteIconButton.builder(Component.translatable("midnightlib.overview.title"), (
-            buttonWidget) -> Objects.requireNonNull(minecraft).setScreen(new MidnightConfigOverviewScreen(this)), true)
+            buttonWidget) -> minecraft.gui.setScreen(new MidnightConfigOverviewScreen(this)), true)
             .sprite(Identifier.fromNamespaceAndPath(MOD_ID,"icon/"+MOD_ID), 16, 16).size(20, 20).build();
 
     @Inject(at = @At("HEAD"), method = "init")
@@ -56,7 +56,7 @@ public abstract class MixinOptionsScreen extends Screen {
     }
     //?} else {
     /*@Unique TextAndImageButton midnightlib$button = TextAndImageButton.builder(Component.translatable("midnightlib.overview.title"), new Identifier("midnightlib", "icon/midnightlib.png"),
-            button -> Objects.requireNonNull(minecraft).setScreen(new MidnightConfigOverviewScreen(this))).textureSize(16, 16).usedTextureSize(16, 16).offset(0, 2).build();
+            button -> minecraft.gui.setScreen(new MidnightConfigOverviewScreen(this))).textureSize(16, 16).usedTextureSize(16, 16).offset(0, 2).build();
 
     @Inject(at = @At("HEAD"), method = "init")
     private void midnightlib$init(CallbackInfo ci) {

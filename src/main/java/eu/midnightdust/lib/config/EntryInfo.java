@@ -8,7 +8,7 @@ import java.util.Optional;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.tabs.Tab;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 
 public class EntryInfo {
@@ -79,7 +79,6 @@ public class EntryInfo {
         boolean prevConditionState = this.conditionsMet;
         if (this.conditions.length > 0) this.conditionsMet = true;    // reset conditions
         for (MidnightConfig.Condition condition : this.conditions) {
-            //noinspection ConstantValue
             if (!condition.requiredModId().isEmpty() && !PlatformFunctions.isModLoaded(condition.requiredModId()))
                 this.conditionsMet = false;
             String requiredOption = condition.requiredOption().contains(":") ? condition.requiredOption() : (this.modid + ":" + condition.requiredOption());
@@ -100,6 +99,6 @@ public class EntryInfo {
 
     public Tooltip getTooltip(boolean isButton) {
         String key = translationKey + (!isButton ? ".label" : "") + ".tooltip";
-        return Tooltip.create(isButton && this.error != null ? this.error : I18n.exists(key) ? Component.translatable(key) : Component.empty());
+        return Tooltip.create(isButton && this.error != null ? this.error : Language.getInstance().has(key) ? Component.translatable(key) : Component.empty());
     }
 }

@@ -2,16 +2,13 @@ package eu.midnightdust.lib.config;
 
 import com.google.common.collect.Lists;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.components.tabs.*;
+import net.minecraft.locale.Language;
 import net.minecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.tabs.GridLayoutTab;
-import net.minecraft.client.gui.components.tabs.Tab;
-import net.minecraft.client.gui.components.tabs.TabManager;
-import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -58,7 +55,7 @@ public class MidnightConfigScreen extends Screen {
             if (Objects.equals(info.modid, modid)) {
                 String tabId = info.entry != null ? info.entry.category() : info.comment.category();
                 String name = translationPrefix + "category." + tabId;
-                if (!I18n.exists(name) && tabId.equals("default"))
+                if (!Language.getInstance().has(name) && tabId.equals("default"))
                     name = translationPrefix + "title";
                 if (!tabs.containsKey(name)) {
                     info.tab = new GridLayoutTab(Component.translatable(name));
@@ -66,9 +63,9 @@ public class MidnightConfigScreen extends Screen {
                 } else info.tab = tabs.get(name);
             }
         });
-        tabNavigation = TabNavigationBar.builder(tabManager, this.width).addTabs(tabs.values().toArray(new Tab[0])).build();
+        //~ if >= 26.2-pre.3 'TabNavigationBar' -> 'MenuTabBar'
+        tabNavigation = MenuTabBar.builder(tabManager, this.width).addTabs(tabs.values().toArray(new Tab[0])).build();
         tabNavigation.selectTab(0, false);
-        tabNavigation.arrangeElements();
         prevTab = tabManager.getCurrentTab();
     }
 
@@ -129,18 +126,26 @@ public class MidnightConfigScreen extends Screen {
             info.tab = null;
             info.inLimits = true;
         });
-        Objects.requireNonNull(minecraft).setScreen(parent);
+        //? if >= 26.2-pre.3 {
+        minecraft.gui.setScreen(parent);
+        //?} else {
+        /*minecraft.gui.setScreen(parent);
+        *///?}
     }
 
     @Override
     public void init() {
         super.init();
-        //? if >= 26.1-pre.3 {
-        tabNavigation.updateWidth(this.width);
-        //?} else {
-        /*tabNavigation.setWidth(this.width);
-        *///?}
+        //? if >= 26.2-pre.3 {
+        tabNavigation.arrangeElements(this.width);
+        //?} else if >= 26.1-pre.3 {
+        /*tabNavigation.updateWidth(this.width);
         tabNavigation.arrangeElements();
+        *///?} else {
+        /*tabNavigation.setWidth(this.width);
+        tabNavigation.arrangeElements();
+        *///?}
+
         if (tabs.size() > 1)
             this.addRenderableWidget(tabNavigation);
 
@@ -333,6 +338,6 @@ public class MidnightConfigScreen extends Screen {
         this.list.extractRenderState(context, mouseX, mouseY, delta);
         if (tabs.size() < 2) context.centeredText(font, title, width / 2, 10, 0xFFFFFFFF);
         //? if < 1.21
-        /*super.extractRenderState(context, mouseX, mouseY, delta);*/
+        //super.extractRenderState(context, mouseX, mouseY, delta);
     }
 }

@@ -24,7 +24,7 @@ public class MidnightConfigOverviewScreen extends Screen {
 
     @Override
     protected void init() {
-        this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (button) -> Objects.requireNonNull(minecraft).setScreen(parent)).bounds(this.width / 2 - 100, this.height - 26, 200, 20).build());
+        this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (button) -> minecraft.gui.setScreen(parent)).bounds(this.width / 2 - 100, this.height - 26, 200, 20).build());
 
         this.addWidget(this.list = new MidnightConfigListWidget(this.minecraft, this.width, this.height - 57, 24, 25));
         List<String> sortedMods = new ArrayList<>(MidnightConfig.configInstances.keySet());
@@ -32,7 +32,7 @@ public class MidnightConfigOverviewScreen extends Screen {
         sortedMods.forEach((modid) -> {
             if (!MidnightLib.hiddenMods.contains(modid)) {
                 list.addButton(List.of(Button.builder(Component.translatable(modid +".midnightconfig.title"), (button) ->
-                        Objects.requireNonNull(minecraft).setScreen(MidnightConfig.getScreen(this, modid))).bounds(this.width / 2 - 125, this.height - 28, 250, 20).build()), null, null);
+                        minecraft.gui.setScreen(MidnightConfig.getScreen(this, modid))).bounds(this.width / 2 - 125, this.height - 28, 250, 20).build()), null, null);
         }});
         super.init();
     }
@@ -46,6 +46,6 @@ public class MidnightConfigOverviewScreen extends Screen {
         this.list.extractRenderState(context, mouseX, mouseY, delta);
         context.centeredText(font, title, width / 2, 10, 0xFFFFFFFF);
         //? if < 1.21
-        /*super.extractRenderState(context, mouseX, mouseY, delta);*/
+        //super.extractRenderState(context, mouseX, mouseY, delta);
     }
 }

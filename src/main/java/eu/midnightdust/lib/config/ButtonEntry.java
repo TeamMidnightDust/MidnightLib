@@ -68,7 +68,7 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
         if (info != null && info.entry != null && !this.buttons.isEmpty() && this.info.entry.idMode() != -1) {
             var id = Identifier.tryParse(this.info.tempValue);
             var item = this.info.entry.idMode() == 0 ? BuiltInRegistries.ITEM./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(id) : BuiltInRegistries.BLOCK./*? if >= 1.21.4 {*/ getValue /*?} else {*/ /*get *//*?}*/(id).asItem();
-            var stack = /*? if >= 26.1-pre.1 {*/ new ItemStack(Holder.direct(item, DataComponentMap.builder().set(DataComponents.ITEM_MODEL, Identifier.tryParse(this.info.tempValue)).build())) /*?} else {*/ /*item.getDefaultInstance()*/ /*?}*/;
+            var stack = /*? if >= 26.1-pre.1 {*/ new ItemStack(Holder.direct(item, DataComponentMap.builder().set(DataComponents.ITEM_MODEL, Identifier.tryParse(this.info.tempValue)).build())) /*?} else {*/ /*item.getDefaultInstance() *//*?}*/;
             context./*? if >= 26.1-pre.1 {*/ fakeItem /*?} else {*/ /*renderItem *//*?}*/(stack, this.buttons.get(0).getX() + this.buttons.get(0).getWidth() - 18, y + 2);
         }
     }
@@ -80,9 +80,11 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
     /*public boolean mouseClicked(double d, double e, int i) {
     *///?}
         if (this.info != null && this.info.comment != null && !this.info.comment.url().isBlank())
-            //? if >= 1.21 {
-             ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().screen, this.info.comment.url(), true);
-            //?} else {
+            //? if >= 26.2-pre.3 {
+            ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().gui.screen(), this.info.comment.url(), true);
+            //?} else if >= 1.21 {
+             /*ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().screen, this.info.comment.url(), true);
+            *///?} else {
             /*ConfirmLinkScreen.confirmLinkNow(this.info.comment.url(), Minecraft.getInstance().screen, true);
             *///?}
         //? if >= 1.21.9 {
