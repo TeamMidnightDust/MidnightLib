@@ -72,7 +72,7 @@ public class MidnightLib {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             }
         } catch (Exception | Error e) { LOGGER.error("Error setting system look and feel", e); }
-        MidnightLibConfig.init(MOD_ID, MidnightLibConfig.class);
+        MidnightLibConfig.register(MOD_ID, MidnightLibConfig.class);
     }
 
     //? if fabric {
