@@ -92,7 +92,8 @@ public abstract class MidnightConfig {
      *
      * @return a newly created instance of the passed {@code config} class
      * */
-    public static <T extends MidnightConfig> T init(String modid, Class<T> config) {
+    @SuppressWarnings("UnusedReturnValue")
+    public static <T extends MidnightConfig> T register(String modid, Class<T> config) {
         T instance = createInstance(modid, config);
 
         for (Field field : config.getFields()) {
@@ -105,6 +106,16 @@ public abstract class MidnightConfig {
         instance.loadValuesFromJson();
 
         return instance;
+    }
+
+    /**
+     * Deprecated.
+     * <p>
+     * Use {@link #register(String, Class)} instead.
+     */
+    @Deprecated
+    public static void init(String modid, Class<? extends MidnightConfig> config) {
+        register(modid, config);
     }
 
     /**
