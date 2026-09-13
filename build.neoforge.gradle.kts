@@ -114,8 +114,8 @@ publishMods {
     file = project.tasks.jar.get().archiveFile
     dryRun = modrinthToken == null || curseforgeToken == null
 
-    displayName = "${property("mod.name")} ${property("mod.version")} - Fabric ${sc.current.version}"
-    version = "${property("mod.version")}+${sc.current.version}-fabric"
+    displayName = "${property("mod.name")} ${property("mod.version")} - Neoforge ${sc.current.version}"
+    version = "${property("mod.version")}+${sc.current.version}-neoforge"
     changelog = rootProject.file("CHANGELOG.md").readText()
     type = STABLE
 
