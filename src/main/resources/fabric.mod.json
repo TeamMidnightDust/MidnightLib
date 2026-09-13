@@ -29,7 +29,7 @@
             "eu.midnightdust.core.MidnightLib"
         ],
         "modmenu": [
-            "eu.midnightdust.core.MidnightLib\$ModMenuInit"
+            "${modmenu_entry}"
         ]
     },
     "depends": {
