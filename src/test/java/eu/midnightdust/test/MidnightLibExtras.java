@@ -19,7 +19,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 /*
  Pre-made additional (niche) functionality that is not included in MidnightLib to keep the file size small.
@@ -57,7 +56,7 @@ public class MidnightLibExtras {
         @Override
         public boolean keyPressed(KeyEvent input) {
             if (focusedButton == this) {
-                if (input.key() == GLFW.GLFW_KEY_ESCAPE) {
+                if (input.key() == 256) {
                     this.binding.setKey(InputConstants.UNKNOWN);
                 } else {
                     this.binding.setKey(InputConstants.getKey(input));

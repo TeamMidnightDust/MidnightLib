@@ -55,14 +55,19 @@ publish:
 "26.2":
   mod.mc_releases:
     - "26.2"
-  mod.fabric_mc_range: ">=26.2"
-  mod.neoforge_mc_range: "[26.2)"
+  mod.fabric_mc_range: ">=26.2 <26.3"
+  mod.neoforge_mc_range: "[26.2, 26.3)"
+"26.3":
+  mod.mc_releases:
+    - "26.3-rc.2"
+  mod.fabric_mc_range: ">=26.3-rc.2"
+  mod.neoforge_mc_range: "[26.3)"
 
 loomx.loom_version: "1.17-SNAPSHOT"
 
 # Loader-specific dependencies
 fabric:deps: # https://fabricmc.net/develop/
-  fabric_loader: 0.19.3
+  fabric_loader: 0.19.5
   "1.20.1":
     fabric_api: 0.92.3+1.20.1
     modmenu: 7.2.2
@@ -87,6 +92,9 @@ fabric:deps: # https://fabricmc.net/develop/
   "26.2":
     fabric_api: 0.157.0+26.2
     modmenu: 20.0.0-alpha.1
+  "26.3":
+    fabric_api: 0.160.4+26.3
+    modmenu: 21.0.0-beta.1
 
 neoforge:deps: # https://neoforged.net/
   "1.21.1":
