@@ -15,11 +15,11 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.Identifier;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.List;
+import org.lwjgl.system.MemoryStack;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -31,6 +31,16 @@ import net.minecraft.client.input.KeyEvent;
 //? if >=1.21 {
 import net.minecraft.client.gui.components.SpriteIconButton;
 //?}
+
+//? if >= 26.3 {
+import org.lwjgl.sdl.*;
+import org.lwjgl.system.MemoryUtil;
+import org.lwjgl.system.Pointer;
+//?} else {
+/*import org.lwjgl.util.tinyfd.TinyFileDialogs;
+import org.lwjgl.PointerBuffer;
+import java.util.concurrent.CompletableFuture;
+*///?}
 
 public class MidnightConfigScreen extends Screen {
     public MidnightConfig instance;
@@ -258,19 +268,7 @@ public class MidnightConfigScreen extends Screen {
                                 //?} else {
                                 /*TextAndImageButton.builder(Component.empty(), new Identifier("midnightlib", "icon/explorer.png"),
                                 *///?}
-                                button -> new Thread(() -> {
-                                    JFileChooser fileChooser = new JFileChooser(info.tempValue);
-                                    fileChooser.setFileSelectionMode(e.selectionMode());
-                                    fileChooser.setDialogType(e.fileChooserType());
-                                    fileChooser.setDialogTitle(Component.translatable(translationPrefix + info.fieldName + ".fileChooser").getString());
-                                    if ((e.selectionMode() == JFileChooser.FILES_ONLY || e.selectionMode() == JFileChooser.FILES_AND_DIRECTORIES) && Arrays.stream(e.fileExtensions()).noneMatch("*"::equals))
-                                        fileChooser.setFileFilter(new FileNameExtensionFilter(
-                                                Component.translatable(translationPrefix + info.fieldName + ".fileFilter").getString(), e.fileExtensions()));
-                                    if (fileChooser.showDialog(null, null) == JFileChooser.APPROVE_OPTION) {
-                                        info.setValue(fileChooser.getSelectedFile().getAbsolutePath());
-                                        updateList();
-                                    }
-                                }).start()
+                                button -> openFilePicker(info)
                                 //? if >= 1.21 {
                                  , true).sprite(Identifier.fromNamespaceAndPath("midnightlib", "icon/explorer"), 12, 12).size(20, 20)
                                 //?} else {
@@ -339,5 +337,82 @@ public class MidnightConfigScreen extends Screen {
         if (tabs.size() < 2) context.centeredText(font, title, width / 2, 10, 0xFFFFFFFF);
         //? if < 1.21
         //super.extractRenderState(context, mouseX, mouseY, delta);
+    }
+
+    private void openFilePicker(EntryInfo info) {
+        boolean multiSelect = info.field.getType() == List.class;
+        //? if >= 26.3 {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            SDL_DialogFileFilter.Buffer filters = SDL_DialogFileFilter.malloc(1, stack);
+            filters.get(0).name(stack.UTF8(Component.translatable(translationPrefix + info.fieldName + ".fileFilter").getString())).pattern(stack.UTF8(Arrays.stream(info.entry.fileExtensions()).reduce((total, ext) -> total + ";" + ext).orElse("")));
+            
+            SDL_DialogFileCallbackI onConfirm = (userdata, filelist, filter) -> {
+                if (filelist != MemoryUtil.NULL) {
+                    long ptr = filelist;
+                    long fptr = MemoryUtil.memGetAddress(filelist);
+                    List<String> files = new ArrayList<>();
+                    while (fptr != MemoryUtil.NULL) {
+                        files.add(MemoryUtil.memUTF8(fptr));
+                        ptr += Pointer.POINTER_SIZE;
+                        fptr = MemoryUtil.memGetAddress(ptr);
+                    }
+                    if (files.isEmpty()) return;
+                    if (multiSelect) {
+                        var list = (List<?>) info.value;
+                        list.clear();
+                        for (int i = 0; i < files.size(); i++) {
+                            info.writeList(i, files.get(i));
+                        }
+                        info.listIndex = 0;
+                        info.tempValue = info.toTemporaryValue();
+                    }
+                    else {
+                        info.setValue(files.get(0));
+                    }
+
+                    updateList();
+                }
+            };
+            if (info.entry.selectionMode() == JFileChooser.DIRECTORIES_ONLY) {
+                SDLDialog.SDL_ShowOpenFolderDialog(onConfirm, MemoryUtil.NULL, MemoryUtil.NULL, info.tempValue, multiSelect);
+            } else {
+                SDLDialog.SDL_ShowOpenFileDialog(onConfirm, MemoryUtil.NULL, MemoryUtil.NULL, filters, info.tempValue, multiSelect);
+            }
+        }
+        //?} else {
+        /*CompletableFuture.runAsync(() -> {
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                String title = Component.translatable(translationPrefix + info.fieldName + ".fileChooser").getString();
+                String result;
+                if (info.entry.selectionMode() == JFileChooser.DIRECTORIES_ONLY) {
+                    result = TinyFileDialogs.tinyfd_selectFolderDialog(title, info.tempValue);
+                } else {
+                    PointerBuffer pointers = stack.mallocPointer(info.entry.fileExtensions().length);
+                    for (String filter : info.entry.fileExtensions())
+                        pointers.put(stack.UTF8("*." + filter));
+                    pointers.flip();
+                    result = TinyFileDialogs.tinyfd_openFileDialog(title, info.tempValue, pointers, Component.translatable(translationPrefix + info.fieldName + ".fileFilter").getString(), multiSelect);
+                }
+
+                if (result != null) {
+                    List<String> files = List.of(result.split("\\|"));
+                    if (files.isEmpty()) return;
+                    if (multiSelect) {
+                        var list = (List<?>) info.value;
+                        list.clear();
+                        for (int i = 0; i < files.size(); i++) {
+                            info.writeList(i, files.get(i));
+                        }
+                        info.listIndex = 0;
+                        info.tempValue = info.toTemporaryValue();
+                    } else {
+                        info.setValue(files.get(0));
+                    }
+
+                    updateList();
+                }
+            }
+        }, Util.backgroundExecutor());
+        *///?}
     }
 }
