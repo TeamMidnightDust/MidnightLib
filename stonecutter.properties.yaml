@@ -59,8 +59,8 @@ publish:
   mod.neoforge_mc_range: "[26.2, 26.3)"
 "26.3":
   mod.mc_releases:
-    - "26.3-rc.2"
-  mod.fabric_mc_range: ">=26.3-rc.2"
+    - "26.3"
+  mod.fabric_mc_range: ">=26.3"
   mod.neoforge_mc_range: "[26.3)"
 
 loomx.loom_version: "1.17-SNAPSHOT"
@@ -111,3 +111,5 @@ neoforge:deps: # https://neoforged.net/
     neoforge_loader: 26.1.0.1-beta
   "26.2":
     neoforge_loader: 26.2.0.1-beta
+  "26.3":
+    neoforge_loader: 26.3.0.0-beta

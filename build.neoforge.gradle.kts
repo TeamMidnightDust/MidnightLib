@@ -1,6 +1,6 @@
 plugins {
     // This plugin applies the correct loom variant based on the Minecraft version
-    id("net.neoforged.moddev") version "2.0.141"
+    id("net.neoforged.moddev") version "2.0.147"
     id("neoforge-mutex")
     id("me.modmuss50.mod-publish-plugin")
     `maven-publish`
@@ -8,7 +8,7 @@ plugins {
 
 // DO NOT set group = ...!
 version = "${property("mod.version")}+${sc.current.version}"
-base.archivesName = "${property("mod.id") as String}-fabric"
+base.archivesName = "${property("mod.id") as String}-neoforge"
 
 val requiredJava: JavaVersion = when {
     sc.current.parsed >= "26.1" -> JavaVersion.VERSION_25
@@ -86,7 +86,7 @@ tasks {
             register("id", "mod.id")
             register("name", "mod.name")
             register("version", "mod.version")
-            register("minecraft", "mod.fabric_mc_range")
+            register("minecraft", "mod.neoforge_mc_range")
         }
 
         filesMatching("META-INF/neoforge.mods.toml") { expand(props) }
@@ -119,13 +119,12 @@ publishMods {
     changelog = rootProject.file("CHANGELOG.md").readText()
     type = STABLE
 
-    modLoaders.addAll("fabric", "quilt")
+    modLoaders.addAll("neoforge")
 
     modrinth {
         projectId = property("publish.modrinth").toString()
         accessToken = modrinthToken
         compatibleVersions.forEach(minecraftVersions::add)
-        requires("fabric-api")
 
         environment = CLIENT_OR_SERVER
     }
@@ -134,7 +133,6 @@ publishMods {
         projectId = property("publish.curseforge").toString()
         accessToken = curseforgeToken.toString()
         compatibleVersions.forEach(minecraftVersions::add)
-        requires("fabric-api")
 
         client.set(true)
         server.set(true)
@@ -154,7 +152,7 @@ publishing {
             pom {
                 groupId = "eu.midnightdust"
                 artifactId = "${project.property("mod.id")}"
-                version = "${project.version}-fabric"
+                version = "${project.version}-neoforge"
 
                 from(components["java"])
             }

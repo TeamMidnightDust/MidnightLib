@@ -4,9 +4,10 @@ loaderVersion = "[2,)"
 license = "MIT License"
 
 [[mods]]
-modId = "midnightlib"
+modId = "${id}"
 version = "${version}"
 displayName = "${name}"
+iconFile = "midnightlib.png"
 logoFile = "midnightlib.png"
 authors = "TeamMidnightDust, Motschen"
 description = '''
