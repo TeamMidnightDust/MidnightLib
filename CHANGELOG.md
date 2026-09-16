@@ -1,14 +1,25 @@
+### MidnightLib v1.9.3.1
+
+- Fix crash on Neoforge 26.3 due to invalid version range
+
 ## MidnightLib v1.9.3
+
 - Dynamic comment formatting (tysm [@Jaffe2718](https://github.com/Jaffe2718))
   - Modders can now provide a list of Strings to format the text with – useful for dynamic stats
 - Fix NullPointerException while loading @Condition from the field behind #129 (by [@Jaffe2718](https://github.com/Jaffe2718))
 - Updated Tatar translations (by [@Amirhan-Taipovjan-Greatest-I](https://github.com/Amirhan-Taipovjan-Greatest-I))
 - Updated Argentine Spanish translations (by [@Texaliuz](https://github.com/Texaliuz))
+
 ## MidnightLib v1.9.2
+
 - Add support for using `StringRepresentable` to translate enums
+
 ## MidnightLib v1.9.1
+
 - Fix crash when loading existing main config on NeoForge
+
 # MidnightLib v1.9.0
+
 - Setup a **multiversion** build environment 
   - MidnightLib will now always be up-to-date on all relevant versions of Minecraft  
     (Fabric/Forge 1.20.1; Fabric/NeoForge 1.21.1, 1.21.5, 1.21.8, 1.21.10)
