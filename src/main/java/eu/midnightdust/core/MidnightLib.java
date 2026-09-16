@@ -45,7 +45,7 @@ public class MidnightLib {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     public void onInitializeClient() {
-        MidnightLibConfig.init(MOD_ID, MidnightLibConfig.class);
+        MidnightLibConfig.register(MOD_ID, MidnightLibConfig.class);
     }
 
     //? if fabric {

@@ -8,7 +8,7 @@ import net.fabricmc.api.ModInitializer;
 public class MidnightLibTest implements ModInitializer {
     @Override
     public void onInitialize() {
-        MidnightConfig.init("modid", MidnightConfigExample.class);
+        MidnightConfig.register("modid", MidnightConfigExample.class);
     }
 }
 //?}
