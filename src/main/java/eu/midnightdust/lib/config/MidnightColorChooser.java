@@ -1,11 +1,8 @@
 package eu.midnightdust.lib.config;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -14,6 +11,18 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.function.Consumer;
+
+//? if < 1.21.11
+//import net.minecraft.client.Minecraft;
+
+//? if >= 1.21.8 {
+import net.minecraft.client.renderer.RenderPipelines;
+//?} else if >= 1.21.5 {
+/*import net.minecraft.client.renderer.RenderType;
+*///?}
+//? if <= 1.21.5 {
+/*import com.mojang.blaze3d.systems.RenderSystem;
+*///?}
 
 public class MidnightColorChooser extends Screen {
     private static final Identifier BACKGROUND_SPRITE = Identifier.withDefaultNamespace("popup/background");
@@ -36,7 +45,7 @@ public class MidnightColorChooser extends Screen {
     @Override
     public void onClose() {
         //~ if >= 26.1 'setScreen' -> 'setScreenAndShow'
-        minecraft.setScreenAndShow(backgroundScreen);
+        minecraft.gui.setScreen(backgroundScreen);
     }
 
     @Override
@@ -66,9 +75,9 @@ public class MidnightColorChooser extends Screen {
     }
 
     @Override
-    //~ if >= 26.1 'resize(Minecraft minecraft, ' -> '.resize('
+    //~ if >= 1.21.11 'resize(Minecraft minecraft, ' -> 'resize('
     public void resize(int width, int height) {
-        //~ if >= 26.1 '.resize(minecraft, ' -> '.resize(' {
+        //~ if >= 1.21.11 '.resize(minecraft, ' -> '.resize(' {
         super.resize(width, height);
         if (this.backgroundScreen != null) {
             this.backgroundScreen.resize(width, height);
@@ -80,26 +89,26 @@ public class MidnightColorChooser extends Screen {
     //~ if >= 26.1 'renderBackground' -> 'extractBackground' {
     public void extractBackground(final @NotNull GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float a) {
         this.backgroundScreen.extractBackground(graphics, mouseX, mouseY, a);
-        //? if >= 26.1 {
+        //? if >= 1.21.8 {
         graphics.nextStratum();
-        //?} else {
+        //?} else if 1.21.5 {
         /*graphics.flush();
-        RenderSystem.clear(256, Minecraft.ON_OSX);
-        *///?}
+        RenderSystem.getDevice().createCommandEncoder().clearDepthTexture(this.minecraft.getMainRenderTarget().getDepthTexture(), 1.0d);
+        *///?} else {
+        //graphics.flush();
+        //RenderSystem.clear(256, Minecraft.ON_OSX);
+        //?}
 
         this.backgroundScreen.extractRenderState(graphics, -1, -1, 1.0f);
 
-        //? if >= 26.1 {
+        //? if >= 1.21.8 {
         graphics.nextStratum();
         //?}
 
         //~ if >= 26.1 'render' -> 'extract'
         this.extractTransparentBackground(graphics);
 
-        //graphics.blitNineSliced(BACKGROUND_SPRITE, this.popupBounds.x - 18, this.popupBounds.y - 18, this.popupBounds.width + 36, this.popupBounds.height + 36, 0, 0, 0, 0, 0);
-
-        //~ if >= 26.1 '.blitSprite(' -> '.blitSprite(RenderPipelines.GUI_TEXTURED, '
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND_SPRITE, this.popupBounds.x - 18, this.popupBounds.y - 18, this.popupBounds.width + 36, this.popupBounds.height + 36);
+        graphics.blitSprite(/*? if >= 1.21.8 {*/ RenderPipelines.GUI_TEXTURED, /*?} else if >= 1.21.5 {*/ /*RenderType::guiTextured, *//*?}*/ BACKGROUND_SPRITE, this.popupBounds.x - 18, this.popupBounds.y - 18, this.popupBounds.width + 36, this.popupBounds.height + 36);
     }
     //~}
 
@@ -108,8 +117,7 @@ public class MidnightColorChooser extends Screen {
         super.extractRenderState(graphics, mouseX, mouseY, a);
         int textWidth = font.width(title) + 10;
 
-        //~ if >= 26.1 '.blitSprite(' -> '.blitSprite(RenderPipelines.GUI_TEXTURED, '
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND_SPRITE, this.popupBounds.x + popupBounds.width / 2 - textWidth / 2, this.popupBounds.y - 16, textWidth, 10);
+        graphics.blitSprite(/*? if >= 1.21.8 {*/ RenderPipelines.GUI_TEXTURED, /*?} else if >= 1.21.5 {*/ /*RenderType::guiTextured, *//*?}*/ BACKGROUND_SPRITE, this.popupBounds.x + popupBounds.width / 2 - textWidth / 2, this.popupBounds.y - 16, textWidth, 10);
         graphics.centeredText(font, title, popupBounds.x + popupBounds.width / 2, popupBounds.y - 15, 0xFFFFFFFF);
         graphics.fill(popupBounds.x, popupBounds.y + 4, popupBounds.x + 64, popupBounds.y + 68, selectedColor.getRGB());
     }

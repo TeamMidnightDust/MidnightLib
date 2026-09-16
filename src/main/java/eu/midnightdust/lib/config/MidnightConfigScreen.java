@@ -37,6 +37,7 @@ import org.lwjgl.system.Pointer;
 /*import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import org.lwjgl.PointerBuffer;
 import java.util.concurrent.CompletableFuture;
+import net.minecraft.util.Util;
 *///?}
 
 public class MidnightConfigScreen extends Screen {

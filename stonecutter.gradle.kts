@@ -53,7 +53,7 @@ stonecutter parameters {
             replace("drawCenteredString", "centeredText")
         }
         string(current.parsed >= "26.2-pre.3") {
-            replace("Objects.requireNonNull(minecraft).setScreen(", "minecraft.gui.setScreen(")
+            replace("minecraft.setScreen(", "minecraft.gui.setScreen(")
         }
     }
 }
