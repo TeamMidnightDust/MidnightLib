@@ -2,9 +2,9 @@ package eu.midnightdust.lib.config;
 
 import com.google.common.collect.Lists;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.tabs.*;
 import net.minecraft.locale.Language;
-import net.minecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.Button;
@@ -136,11 +136,7 @@ public class MidnightConfigScreen extends Screen {
             info.tab = null;
             info.inLimits = true;
         });
-        //? if >= 26.2-pre.3 {
         minecraft.gui.setScreen(parent);
-        //?} else {
-        /*minecraft.gui.setScreen(parent);
-        *///?}
     }
 
     @Override
@@ -248,13 +244,11 @@ public class MidnightConfigScreen extends Screen {
                     }
                     if (e.isColor()) {
                         Button colorButton = Button.builder(Component.literal("⬛"),
-                                button -> new Thread(() -> {
-                                    Color newColor = JColorChooser.showDialog(null, Component.translatable("midnightconfig.colorChooser.title").getString(), Color.decode(!Objects.equals(info.tempValue, "") ? info.tempValue : "#FFFFFF"));
-                                    if (newColor != null) {
-                                        info.setValue("#" + Integer.toHexString(newColor.getRGB()).substring(2));
-                                        updateList();
-                                    }
-                                }).start()
+                                //~ if >= 26.2 '.setScreen(' -> '.setScreenAndShow('
+                                button -> Minecraft.getInstance().setScreenAndShow(new MidnightColorChooser(this, Color.decode(info.tempValue), newColor -> {
+                                    info.setValue("#" + Integer.toHexString(newColor.getRGB()).substring(2));
+                                    updateList();
+                                }))
                         ).bounds(width - 185, 0, 20, 20).tooltip(Tooltip.create(Component.translatable("midnightconfig.action.color_chooser"))).build();
                         try {
                             colorButton.setMessage(Component.literal("⬛").setStyle(Style.EMPTY.withColor(Color.decode(info.tempValue).getRGB())));
@@ -282,7 +276,6 @@ public class MidnightConfigScreen extends Screen {
                     List<AbstractWidget> widgets = Lists.newArrayList(widget, resetButton);
 
                     if (info.actionButton != null) {
-                        if (Util.getPlatform() == Util.OS.OSX) info.actionButton.active = false;
                         widget.setWidth(widget.getWidth() - 22);
                         widget.setX(widget.getX() + 22);
                         widgets.add(info.actionButton);
@@ -345,7 +338,7 @@ public class MidnightConfigScreen extends Screen {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             SDL_DialogFileFilter.Buffer filters = SDL_DialogFileFilter.malloc(1, stack);
             filters.get(0).name(stack.UTF8(Component.translatable(translationPrefix + info.fieldName + ".fileFilter").getString())).pattern(stack.UTF8(Arrays.stream(info.entry.fileExtensions()).reduce((total, ext) -> total + ";" + ext).orElse("")));
-            
+
             SDL_DialogFileCallbackI onConfirm = (userdata, filelist, filter) -> {
                 if (filelist != MemoryUtil.NULL) {
                     long ptr = filelist;
