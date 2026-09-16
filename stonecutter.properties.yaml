@@ -1,6 +1,6 @@
 mod:
   name: MidnightLib
-  version: 1.9.3
+  version: 1.9.3.1
   group: eu.midnightdust
   id: midnightlib
 
@@ -61,7 +61,7 @@ publish:
   mod.mc_releases:
     - "26.3"
   mod.fabric_mc_range: ">=26.3"
-  mod.neoforge_mc_range: "[26.3)"
+  mod.neoforge_mc_range: "[26.3,)"
 
 loomx.loom_version: "1.17-SNAPSHOT"
 
