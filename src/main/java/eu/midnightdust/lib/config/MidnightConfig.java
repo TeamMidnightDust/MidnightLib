@@ -35,8 +35,6 @@ import java.util.regex.Pattern;
 import net.fabricmc.api.*;
 //? neoforge
 /^import net.neoforged.api.distmarker.*;^/
-//? forge
-/^import net.minecraftforge.api.distmarker.*;^/
 *///?}
 
 /** MidnightConfig is an incredibly lightweight, but still fully-featured config library for Minecraft mods.<br>

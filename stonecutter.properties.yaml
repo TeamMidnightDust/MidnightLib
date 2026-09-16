@@ -10,11 +10,6 @@ publish:
   curseforge: "488090"
 
 # Supported versions and their ranges
-"1.20.1":
-  mod.mc_releases:
-    - "1.20.1"
-  mod.fabric_mc_range: ">=1.20 <=1.20.1"
-  mod.forge_mc_range: "[1.20, 1.20.1]"
 "1.21.1":
   mod.mc_releases:
     - "1.21"
@@ -39,7 +34,7 @@ publish:
     - "1.21.9"
     - "1.21.10"
   mod.fabric_mc_range: ">=1.21.9 <=1.21.10"
-  mod.forge_mc_range: "[1.21.9,1.21.10]"
+  mod.neoforge_mc_range: "[1.21.9,1.21.10]"
 "1.21.11":
   mod.mc_releases:
     - "1.21.11"
@@ -68,9 +63,6 @@ loomx.loom_version: "1.17-SNAPSHOT"
 # Loader-specific dependencies
 fabric:deps: # https://fabricmc.net/develop/
   fabric_loader: 0.19.5
-  "1.20.1":
-    fabric_api: 0.92.3+1.20.1
-    modmenu: 7.2.2
   "1.21.1":
     fabric_api: 0.114.0+1.21.1
     modmenu: 11.0.3

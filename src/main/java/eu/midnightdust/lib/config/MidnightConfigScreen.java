@@ -8,6 +8,7 @@ import net.minecraft.locale.Language;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -26,10 +27,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 //? if >= 1.21.9 {
 import net.minecraft.client.input.KeyEvent;
-//?}
-
-//? if >=1.21 {
-import net.minecraft.client.gui.components.SpriteIconButton;
 //?}
 
 //? if >= 26.3 {
@@ -184,23 +181,13 @@ public class MidnightConfigScreen extends Screen {
                 if (!visibleButLocked) continue;
             }
             if (info.modid.equals(modid) && (info.tab == null || info.tab == tabManager.getCurrentTab())) {
-                //? if >= 1.21 {
                  SpriteIconButton resetButton = SpriteIconButton.builder(Component.translatable("controls.reset"),
-                //?} else {
-                /*TextAndImageButton resetButton = TextAndImageButton.builder(Component.translatable("controls.reset"), new Identifier("midnightlib", "icon/reset.png"),
-                *///?}
                 (button -> {
                     info.value = info.defaultValue;
                     info.listIndex = 0;
                     info.tempValue = info.toTemporaryValue();
                     updateList();
-                })
-                //? if >= 1.21 {
-                 , true).sprite(Identifier.fromNamespaceAndPath("midnightlib", "icon/reset"), 12, 12).size(20, 20).build();
-                //?} else {
-                /*).textureSize(12, 12).usedTextureSize(12, 12).offset(0, 4).build();
-                resetButton.setWidth(20);
-                *///?}
+                }), true).sprite(Identifier.fromNamespaceAndPath("midnightlib", "icon/reset"), 12, 12).size(20, 20).build();
 
                 resetButton.setPosition(width - 205 + 150 + 25, 0);
 
@@ -256,18 +243,9 @@ public class MidnightConfigScreen extends Screen {
                         }
                         info.actionButton = colorButton;
                     } else if (e.selectionMode() > -1) {
-                        Button explorerButton =
-                                //? if >= 1.21 {
-                                 SpriteIconButton.builder(Component.empty(),
-                                //?} else {
-                                /*TextAndImageButton.builder(Component.empty(), new Identifier("midnightlib", "icon/explorer.png"),
-                                *///?}
-                                button -> openFilePicker(info)
-                                //? if >= 1.21 {
-                                 , true).sprite(Identifier.fromNamespaceAndPath("midnightlib", "icon/explorer"), 12, 12).size(20, 20)
-                                //?} else {
-                                        /*).textureSize(12, 12).usedTextureSize(12, 12).offset(0, 4)
-                                *///?}
+                        Button explorerButton = SpriteIconButton.builder(Component.empty(), button -> openFilePicker(info), true)
+                                .sprite(Identifier.fromNamespaceAndPath("midnightlib", "icon/explorer"), 12, 12)
+                                .size(20, 20)
                                 .build();
                         explorerButton.setTooltip(Tooltip.create(Component.translatable("midnightconfig.action.file_chooser")));
                         explorerButton.setPosition(width - 185, 0);
@@ -321,15 +299,9 @@ public class MidnightConfigScreen extends Screen {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
-        //? if >= 1.21 {
          super.extractRenderState(context, mouseX, mouseY, delta);
-        //?} else {
-        /*super.renderBackground(context);
-        *///?}
         this.list.extractRenderState(context, mouseX, mouseY, delta);
         if (tabs.size() < 2) context.centeredText(font, title, width / 2, 10, 0xFFFFFFFF);
-        //? if < 1.21
-        //super.extractRenderState(context, mouseX, mouseY, delta);
     }
 
     private void openFilePicker(EntryInfo info) {

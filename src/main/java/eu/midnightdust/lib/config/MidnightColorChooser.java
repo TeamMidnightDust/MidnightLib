@@ -16,7 +16,6 @@ import java.awt.*;
 import java.util.function.Consumer;
 
 public class MidnightColorChooser extends Screen {
-    //~ if >= 1.21 'new ResourceLocation(' -> 'ResourceLocation.withDefaultNamespace('
     private static final Identifier BACKGROUND_SPRITE = Identifier.withDefaultNamespace("popup/background");
     private final Screen backgroundScreen;
     private final Consumer<Color> onConfirm;

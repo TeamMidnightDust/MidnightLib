@@ -1,5 +1,3 @@
-import org.gradle.kotlin.dsl.replace
-
 plugins {
     id("dev.kikugie.stonecutter")
     id("me.modmuss50.mod-publish-plugin") version "2.2.0" apply false
@@ -17,7 +15,7 @@ stonecutter parameters {
 
     // Adds constants to Stonecutter comments (i.e. for `//? if fabric {...`)
     constants {
-        match(loader, "fabric", "neoforge", "forge")
+        match(loader, "fabric", "neoforge")
     }
 
     swaps["mod_version"] = "\"${properties.get<String>("mod.version")}\";"

@@ -87,10 +87,8 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
             ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().gui.screen(), URI.create(this.info.comment.url()), true);
             //?} else if >= 26.2 {
             /*ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().gui.screen(), this.info.comment.url(), true);
-            *///?} else if >= 1.21 {
-             /*ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().screen, this.info.comment.url(), true);
             *///?} else {
-            /*ConfirmLinkScreen.confirmLinkNow(this.info.comment.url(), Minecraft.getInstance().screen, true);
+             /*ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().screen, this.info.comment.url(), true);
             *///?}
         //? if >= 1.21.9 {
         return super.mouseClicked(click, doubled);
