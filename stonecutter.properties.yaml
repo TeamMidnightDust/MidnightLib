@@ -1,0 +1,107 @@
+mod:
+  name: MidnightLib
+  version: 2.0.0-dev.1
+  group: eu.midnightdust
+  id: midnightlib
+
+# Project IDs for Modrinth & CurseForge
+publish:
+  modrinth: "codAaoxh"
+  curseforge: "488090"
+
+# Supported versions and their ranges
+"1.21.1":
+  mod.mc_releases:
+    - "1.21"
+    - "1.21.1"
+  mod.fabric_mc_range: ">=1.21 <=1.21.1"
+  mod.neoforge_mc_range: "[1.21, 1.21.1]"
+"1.21.5":
+  mod.mc_releases:
+    - "1.21.4"
+    - "1.21.5"
+  mod.fabric_mc_range: ">=1.21.4 <=1.21.5"
+  mod.neoforge_mc_range: "[1.21.4, 1.21.5]"
+"1.21.8":
+  mod.mc_releases:
+    - "1.21.6"
+    - "1.21.7"
+    - "1.21.8"
+  mod.fabric_mc_range: ">=1.21.6 <=1.21.8"
+  mod.neoforge_mc_range: "[1.21.6, 1.21.8]"
+"1.21.10":
+  mod.mc_releases:
+    - "1.21.9"
+    - "1.21.10"
+  mod.fabric_mc_range: ">=1.21.9 <=1.21.10"
+  mod.neoforge_mc_range: "[1.21.9,1.21.10]"
+"1.21.11":
+  mod.mc_releases:
+    - "1.21.11"
+  mod.fabric_mc_range: "1.21.11"
+  mod.neoforge_mc_range: "[1.21.11]"
+"26.1":
+  mod.mc_releases:
+    - "26.1"
+    - "26.1.1"
+    - "26.1.2"
+  mod.fabric_mc_range: ">=26.1 <26.2"
+  mod.neoforge_mc_range: "[26.1, 26.2)"
+"26.2":
+  mod.mc_releases:
+    - "26.2"
+  mod.fabric_mc_range: ">=26.2 <26.3"
+  mod.neoforge_mc_range: "[26.2, 26.3)"
+"26.3":
+  mod.mc_releases:
+    - "26.3"
+  mod.fabric_mc_range: ">=26.3"
+  mod.neoforge_mc_range: "[26.3)"
+
+loomx.loom_version: "1.17-SNAPSHOT"
+
+# Loader-specific dependencies
+fabric:deps: # https://fabricmc.net/develop/
+  fabric_loader: 0.19.5
+  "1.21.1":
+    fabric_api: 0.114.0+1.21.1
+    modmenu: 11.0.3
+  "1.21.5":
+    fabric_api: 0.121.0+1.21.5
+    modmenu: 14.0.0-rc.1
+  "1.21.8":
+    fabric_api: 0.136.0+1.21.8
+    modmenu: 15.0.0
+  "1.21.10":
+    fabric_api: 0.138.0+1.21.10
+    modmenu: 16.0.0-rc.1
+  "1.21.11":
+    fabric_api: 0.141.6+1.21.11
+    modmenu: 17.0.0-alpha.1
+  "26.1":
+    fabric_api: 0.145.1+26.1
+    modmenu: 18.0.0-alpha.6
+  "26.2":
+    fabric_api: 0.157.0+26.2
+    modmenu: 20.0.0-alpha.1
+  "26.3":
+    fabric_api: 0.160.4+26.3
+    modmenu: 21.0.0-beta.1
+
+neoforge:deps: # https://neoforged.net/
+  "1.21.1":
+    neoforge_loader: 21.1.66
+  "1.21.5":
+    neoforge_loader: 21.5.98
+  "1.21.8":
+    neoforge_loader: 21.8.50
+  "1.21.10":
+    neoforge_loader: 21.10.47-beta
+  "1.21.11":
+    neoforge_loader: 21.11.3-beta
+  "26.1":
+    neoforge_loader: 26.1.0.1-beta
+  "26.2":
+    neoforge_loader: 26.2.0.1-beta
+  "26.3":
+    neoforge_loader: 26.3.0.0-beta

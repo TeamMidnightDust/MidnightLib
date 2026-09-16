@@ -1,17 +1,27 @@
-import org.gradle.kotlin.dsl.replace
-
 plugins {
     id("dev.kikugie.stonecutter")
-    id("me.modmuss50.mod-publish-plugin") version "0.8.4" apply false
+    id("me.modmuss50.mod-publish-plugin") version "2.2.0" apply false
 }
-stonecutter active "26.2-fabric" /* [SC] DO NOT EDIT */
+stonecutter active "26.3-fabric" /* [SC] DO NOT EDIT */
 
 // See https://stonecutter.kikugie.dev/wiki/config/params
 stonecutter parameters {
-    swaps["mod_version"] = "\"" + property("mod.version") + "\";"
-    swaps["minecraft"] = "\"" + node.metadata.version + "\";"
-    constants["release"] = property("mod.id") != "template"
-    dependencies["fapi"] = node.project.property("deps.fabric_version") as String
+    val (version, loader) = current.project.split('-', limit = 2)
+
+    // Makes version- and loader-specific properties apply from `stoncutter.properties.toml`
+    properties {
+        tags(version, loader)
+    }
+
+    // Adds constants to Stonecutter comments (i.e. for `//? if fabric {...`)
+    constants {
+        match(loader, "fabric", "neoforge")
+    }
+
+    swaps["mod_version"] = "\"${properties.get<String>("mod.version")}\";"
+    swaps["minecraft"] = "\"${node.metadata.version}\";"
+    constants["release"] = properties.get<String>("mod.id") != "template"
+    dependencies["fapi"] = properties.getOrNull<String>("deps.fabric_api") ?: "0"
 
     replacements {
         string {
@@ -43,7 +53,7 @@ stonecutter parameters {
             replace("drawCenteredString", "centeredText")
         }
         string(current.parsed >= "26.2-pre.3") {
-            replace("Objects.requireNonNull(minecraft).setScreen(", "minecraft.gui.setScreen(")
+            replace("minecraft.setScreen(", "minecraft.gui.setScreen(")
         }
     }
 }

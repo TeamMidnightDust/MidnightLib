@@ -8,8 +8,11 @@
 	"midnightlib.modrinth":"Modrinth",
 	"midnightlib.curseforge":"CurseForge",
 	"midnightlib.wiki":"Wiki",
-	"midnightconfig.colorChooser.title": "Choose a color",
     "midnightconfig.action.list_index": "Editing list at index %s",
     "midnightconfig.action.color_chooser": "Open color chooser",
-    "midnightconfig.action.file_chooser": "Open file chooser"
+    "midnightconfig.action.file_chooser": "Open file chooser",
+    "midnightconfig.color_chooser.title": "Choose a color",
+    "midnightconfig.color_chooser.hue": "Hue: %s",
+    "midnightconfig.color_chooser.saturation": "Saturation: %s",
+    "midnightconfig.color_chooser.brightness": "Brightness: %s"
 }

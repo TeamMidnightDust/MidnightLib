@@ -15,6 +15,9 @@ import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+//? if >= 26.3-rc-2 {
+import java.net.URI;
+//?}
 //? if >= 1.21.9 {
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.world.item.ItemStack;
@@ -80,12 +83,12 @@ public class ButtonEntry extends ContainerObjectSelectionList.Entry<ButtonEntry>
     /*public boolean mouseClicked(double d, double e, int i) {
     *///?}
         if (this.info != null && this.info.comment != null && !this.info.comment.url().isBlank())
-            //? if >= 26.2-pre.3 {
-            ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().gui.screen(), this.info.comment.url(), true);
-            //?} else if >= 1.21 {
-             /*ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().screen, this.info.comment.url(), true);
+            //? if >= 26.3-rc-2 {
+            ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().gui.screen(), URI.create(this.info.comment.url()), true);
+            //?} else if >= 26.2 {
+            /*ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().gui.screen(), this.info.comment.url(), true);
             *///?} else {
-            /*ConfirmLinkScreen.confirmLinkNow(this.info.comment.url(), Minecraft.getInstance().screen, true);
+             /*ConfirmLinkScreen.confirmLinkNow(Minecraft.getInstance().screen, this.info.comment.url(), true);
             *///?}
         //? if >= 1.21.9 {
         return super.mouseClicked(click, doubled);

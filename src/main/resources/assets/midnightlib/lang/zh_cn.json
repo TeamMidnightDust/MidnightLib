@@ -6,5 +6,5 @@
 	"midnightlib.midnightconfig.enum.ConfigButton.FALSE":"§c否",
 	"midnightlib.midnightconfig.enum.ConfigButton.MODMENU":"§b模组菜单",
 	"modmenu.summaryTranslation.midnightlib": "一个便于模组配置的通用库模组",
-	"midnightconfig.colorChooser.title": "选择一种颜色"
+	"midnightconfig.color_chooser.title": "选择一种颜色"
 }
