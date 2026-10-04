@@ -1,0 +1,18 @@
+{
+	"midnightlib.overview.title":"MidnightConfig Genel Bakış",
+	"midnightlib.midnightconfig.title":"MidnightLib Ayarları",
+	"midnightlib.midnightconfig.config_screen_list":"Mod Ayarları Düğmesini Göster",
+	"midnightlib.midnightconfig.enum.ConfigButton.TRUE":"§aEvet",
+	"midnightlib.midnightconfig.enum.ConfigButton.FALSE":"§cHayır",
+	"midnightlib.midnightconfig.enum.ConfigButton.MODMENU":"§bModMenu",
+	"midnightlib.modrinth":"Modrinth",
+	"midnightlib.curseforge":"CurseForge",
+	"midnightlib.wiki":"Viki",
+    "midnightconfig.action.list_index": "Listedeki %s indeksli öğre düzenleniyor",
+    "midnightconfig.action.color_chooser": "Renk seçiciyi aç",
+    "midnightconfig.action.file_chooser": "Dosya seçiciyi aç",
+    "midnightconfig.color_chooser.title": "Renk Seç",
+    "midnightconfig.color_chooser.hue": "Ton: %s",
+    "midnightconfig.color_chooser.saturation": "Doygunluk: %s",
+    "midnightconfig.color_chooser.brightness": "Parlaklık: %s"
+}
