@@ -60,7 +60,7 @@ public abstract class MidnightConfig {
                 *///?}
             ).setPrettyPrinting().create();
 
-    protected static final LinkedHashMap<String, EntryInfo> entries = new LinkedHashMap<>();    // modid:fieldName -> EntryInfo
+    protected static final Map<String, EntryInfo> entries = Collections.synchronizedMap(new LinkedHashMap<>());;    // modid:fieldName -> EntryInfo
 
     public static final Map<String, MidnightConfig> configInstances = new HashMap<>();
 
