@@ -1,6 +1,6 @@
 mod:
   name: MidnightLib
-  version: 2.0.0-dev.1
+  version: 1.10.0
   group: eu.midnightdust
   id: midnightlib
 

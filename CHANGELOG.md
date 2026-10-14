@@ -1,3 +1,13 @@
+## MidnightLib v1.10.0
+
+- Improved dialogs (with macOS support, finally!)
+  - Switch to native operating system file/folder dialogs using SDL (in MC 26.3) or TinyFileDialogs (in older versions)
+  - Add built-in color picker in Minecraft style
+  - No longer initialize Swing UI (less log spam)
+- Add new `MidnightConfig.register(...)` method, replacing `.init(...)` and returning the created config instance
+- Fix `ConcurrentModificationException` upon startup in NeoForge environments
+- Add Turkish translations (by [@iFair1](https://github.com/iFair1))
+
 ### MidnightLib v1.9.3.1
 
 - Fix crash on Neoforge 26.3 due to invalid version range
