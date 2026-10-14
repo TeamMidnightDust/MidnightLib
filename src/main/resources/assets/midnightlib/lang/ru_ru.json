@@ -7,5 +7,5 @@
   "midnightlib.midnightconfig.enum.ConfigButton.MODMENU": "§bModMenu",
   "midnightlib.wiki": "Вики",
   "modmenu.summaryTranslation.midnightlib": "Общая библиотека для простой настройки.",
-  "midnightconfig.colorChooser.title": "Выберите цвет"
+  "midnightconfig.color_chooser.title": "Выберите цвет"
 }

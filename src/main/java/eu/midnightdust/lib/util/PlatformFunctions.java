@@ -16,12 +16,6 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
 *///?}
-//? if forge {
-/*import eu.midnightdust.core.MidnightLib;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.loading.FMLPaths;
-*///?}
 
 public class PlatformFunctions {
     //? if fabric {
@@ -53,22 +47,6 @@ public class PlatformFunctions {
         //?} else {
          /^return FMLEnvironment.dist.isClient();
         ^///?}
-    }
-    public static boolean isModLoaded(String modid) {
-        return ModList.get().isLoaded(modid);
-    }
-    public static void registerCommand(LiteralArgumentBuilder<CommandSourceStack> command) {
-        MidnightLib.commands.add(command);
-    }
-    *///?} else if forge {
-    /*public static String getPlatformName() {
-        return "forge";
-    }
-    public static Path getConfigDirectory() {
-        return FMLPaths.CONFIGDIR.get();
-    }
-    public static boolean isClientEnv() {
-        return FMLEnvironment.dist.isClient();
     }
     public static boolean isModLoaded(String modid) {
         return ModList.get().isLoaded(modid);

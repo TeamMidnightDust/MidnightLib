@@ -35,8 +35,6 @@ import java.util.regex.Pattern;
 import net.fabricmc.api.*;
 //? neoforge
 /^import net.neoforged.api.distmarker.*;^/
-//? forge
-/^import net.minecraftforge.api.distmarker.*;^/
 *///?}
 
 /** MidnightConfig is an incredibly lightweight, but still fully-featured config library for Minecraft mods.<br>
@@ -62,7 +60,7 @@ public abstract class MidnightConfig {
                 *///?}
             ).setPrettyPrinting().create();
 
-    protected static final LinkedHashMap<String, EntryInfo> entries = new LinkedHashMap<>();    // modid:fieldName -> EntryInfo
+    protected static final Map<String, EntryInfo> entries = Collections.synchronizedMap(new LinkedHashMap<>());;    // modid:fieldName -> EntryInfo
 
     public static final Map<String, MidnightConfig> configInstances = new HashMap<>();
 
@@ -74,10 +72,9 @@ public abstract class MidnightConfig {
      * This is basically an argumented constructor without the requirement of having one in each config class.<br>
      * Not meant to be used externally.
      * */
-    protected static <T extends MidnightConfig> T createInstance(String modid, Class<? extends MidnightConfig> configClass) {
+    protected static <T extends MidnightConfig> T createInstance(String modid, Class<T> configClass) {
         try {
-            //noinspection unchecked
-            T instance = (T) configClass.getDeclaredConstructor().newInstance();
+            T instance = configClass.getDeclaredConstructor().newInstance();
             instance.modid = modid;
             instance.configClass = configClass;
             configInstances.put(modid, instance);
@@ -90,9 +87,12 @@ public abstract class MidnightConfig {
      * Initializes the config by registering all fields annotated with {@link Entry} or {@link Comment}<br>
      * @param modid Your mod's id
      * @param config The class containing your mod's config
+     *
+     * @return a newly created instance of the passed {@code config} class
      * */
-    public static void init(String modid, Class<? extends MidnightConfig> config) {
-        MidnightConfig instance = createInstance(modid, config);
+    @SuppressWarnings("UnusedReturnValue")
+    public static <T extends MidnightConfig> T register(String modid, Class<T> config) {
+        T instance = createInstance(modid, config);
 
         for (Field field : config.getFields()) {
             if ((field.isAnnotationPresent(Entry.class) || field.isAnnotationPresent(Comment.class))
@@ -102,6 +102,18 @@ public abstract class MidnightConfig {
                 instance.addClientEntry(field, new EntryInfo(field, modid));
         }
         instance.loadValuesFromJson();
+
+        return instance;
+    }
+
+    /**
+     * Deprecated.
+     * <p>
+     * Use {@link #register(String, Class)} instead.
+     */
+    @Deprecated
+    public static void init(String modid, Class<? extends MidnightConfig> config) {
+        register(modid, config);
     }
 
     /**

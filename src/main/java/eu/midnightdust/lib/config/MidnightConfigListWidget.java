@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
 //? if >= 1.21.6 {
 import net.minecraft.client.renderer.RenderPipelines;
 //?} else {
@@ -14,11 +15,11 @@ import net.minecraft.client.renderer.RenderPipelines;
 *///?}
 
 
-public class MidnightConfigListWidget extends ContainerObjectSelectionList<ButtonEntry> {
+public class MidnightConfigListWidget extends ContainerObjectSelectionList<@NotNull ButtonEntry> {
     public boolean renderHeaderSeparator = true;
 
     public MidnightConfigListWidget(Minecraft client, int width, int height, int y, int itemHeight) {
-         super(client, width, height, y, /*? if < 1.21 {*/ /*height + y, *//*?}*/ itemHeight);
+         super(client, width, height, y, itemHeight);
     }
 
     @Override
@@ -26,7 +27,6 @@ public class MidnightConfigListWidget extends ContainerObjectSelectionList<Butto
         return this.width - 7;
     }
 
-    //? if >= 1.21 {
     @Override
     public void extractListSeparators(GuiGraphicsExtractor context) {
         if (renderHeaderSeparator)
@@ -40,7 +40,6 @@ public class MidnightConfigListWidget extends ContainerObjectSelectionList<Butto
             *///?}
             this.minecraft.level == null ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR, this.getX(), this.getBottom(), 0, 0, this.getWidth(), 2, 32, 2);
     }
-    //?}
 
     public void addButton(List<AbstractWidget> buttons, Component text, EntryInfo info) {
         this.addEntry(new ButtonEntry(buttons, text, info));

@@ -159,7 +159,7 @@ publishMods {
 
     curseforge {
         projectId = property("publish.curseforge").toString()
-        accessToken = curseforgeToken.toString()
+        accessToken = curseforgeToken
         compatibleVersions.forEach(minecraftVersions::add)
         requires("fabric-api")
 

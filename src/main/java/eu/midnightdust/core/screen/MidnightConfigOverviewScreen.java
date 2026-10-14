@@ -5,7 +5,6 @@ import eu.midnightdust.lib.config.MidnightConfig;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -38,14 +37,8 @@ public class MidnightConfigOverviewScreen extends Screen {
     }
     @Override
     public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
-        //? if >= 1.21 {
-         super.extractRenderState(context, mouseX, mouseY, delta);
-        //?} else {
-        /*super.renderBackground(context);
-        *///?}
+        super.extractRenderState(context, mouseX, mouseY, delta);
         this.list.extractRenderState(context, mouseX, mouseY, delta);
         context.centeredText(font, title, width / 2, 10, 0xFFFFFFFF);
-        //? if < 1.21
-        //super.extractRenderState(context, mouseX, mouseY, delta);
     }
 }
